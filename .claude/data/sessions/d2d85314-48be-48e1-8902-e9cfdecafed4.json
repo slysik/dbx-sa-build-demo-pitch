@@ -1,0 +1,11 @@
+{
+  "session_id": "d2d85314-48be-48e1-8902-e9cfdecafed4",
+  "prompts": [
+    "/prime ",
+    "create simple customer delta table, 100 rows in my workspace. ask questions for clarity and intent",
+    " justfile shortcut",
+    " databricks auth login --host https://adb-7405613453749188.8.azuredatabricks.net --profile slysik",
+    "/plan_w_team  \u276f\u00a0create simple customer2 delta table, 100 rows in my workspace. ask questions for clarity and intent"
+  ],
+  "agent_name": "Prism"
+}

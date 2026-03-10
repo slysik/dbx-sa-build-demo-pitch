@@ -1,0 +1,241 @@
+/**
+ * Coding Interview Gate — Captures prompt + manages phase context
+ *
+ * Updated for CODING interview (pair programming, think out loud, code stewardship).
+ * Shows prompt + phase + narration hints in a persistent widget.
+ * Injects phase-appropriate system prompt guidance.
+ *
+ * Usage: pi -e .pi/extensions/coding-interview-gate.ts
+ */
+
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+
+function bgBar(s: string): string {
+	return `\x1b[48;2;30;40;60m${s}\x1b[49m`;
+}
+function accent(s: string): string {
+	return `\x1b[38;2;100;200;255m${s}\x1b[39m`;
+}
+function bright(s: string): string {
+	return `\x1b[38;2;255;255;255m${s}\x1b[39m`;
+}
+function dim(s: string): string {
+	return `\x1b[38;2;140;140;160m${s}\x1b[39m`;
+}
+function orange(s: string): string {
+	return `\x1b[38;2;255;106;0m${s}\x1b[39m`;
+}
+function bold(s: string): string {
+	return `\x1b[1m${s}\x1b[22m`;
+}
+
+type Phase = "discovery" | "datagen" | "bronze" | "silver" | "gold" | "validate" | "discuss";
+
+const PHASE_META: Record<Phase, { emoji: string; label: string; hint: string }> = {
+	discovery: {
+		emoji: "🔍",
+		label: "DISCOVERY",
+		hint: "Ask: business key? volume? batch vs streaming? what does 'correct' mean?",
+	},
+	datagen: {
+		emoji: "🧪",
+		label: "DATA GEN",
+		hint: "spark.range() + hash + Faker. Narrate: distributed, deterministic, scalable.",
+	},
+	bronze: {
+		emoji: "🥉",
+		label: "BRONZE",
+		hint: "Raw landing. No transforms. Schema evolution. Explain append-only pattern.",
+	},
+	silver: {
+		emoji: "🥈",
+		label: "SILVER",
+		hint: "MERGE with ROW_NUMBER dedup. CHECK constraints. Liquid Clustering. OPTIMIZE.",
+	},
+	gold: {
+		emoji: "🥇",
+		label: "GOLD",
+		hint: "Idempotent window rebuild. GROUP BY + window functions. Explain shuffle.",
+	},
+	validate: {
+		emoji: "✅",
+		label: "VALIDATE",
+		hint: "Row counts, uniqueness, constraint test, pruning proof. Prove it works.",
+	},
+	discuss: {
+		emoji: "💬",
+		label: "DISCUSS",
+		hint: "Narrow vs wide. Join strategy. Scaling to 1B rows. Streaming pivot.",
+	},
+};
+
+export default function (pi: ExtensionAPI) {
+	let interviewPrompt: string | undefined;
+	let vertical: string = "generic";
+	let phase: Phase = "discovery";
+	let startTime: number | undefined;
+
+	async function askForPrompt(ctx: any) {
+		while (!interviewPrompt) {
+			const answer = await ctx.ui.input(
+				"🎯 Interviewer's prompt?",
+				'Paste the prompt they give you, e.g. "Build a pipeline for retail order analytics..."'
+			);
+			if (answer && answer.trim()) {
+				interviewPrompt = answer.trim();
+				startTime = Date.now();
+
+				// Auto-detect vertical
+				const lower = answer.toLowerCase();
+				if (lower.includes("retail") || lower.includes("order") || lower.includes("store") || lower.includes("product")) {
+					vertical = "retail";
+				} else if (lower.includes("media") || lower.includes("stream") || lower.includes("content") || lower.includes("watch")) {
+					vertical = "media";
+				} else {
+					vertical = "generic";
+				}
+			} else {
+				ctx.ui.notify("Enter the prompt to begin.", "warning");
+			}
+		}
+		updateWidget(ctx);
+	}
+
+	function updateWidget(ctx: any) {
+		ctx.ui.setWidget("coding-prompt", () => ({
+			render(width: number): string[] {
+				const elapsed = startTime ? Math.floor((Date.now() - startTime) / 60000) : 0;
+				const meta = PHASE_META[phase];
+
+				const pad = bgBar(" ".repeat(width));
+				const line1 = bgBar(
+					truncateToWidth(
+						accent(bold("  🎯 ")) + bright(interviewPrompt!) + " ".repeat(width),
+						width,
+						""
+					)
+				);
+				const line2 = bgBar(
+					truncateToWidth(
+						dim(`  ${meta.emoji} ${meta.label}`) +
+							dim(` │ ${vertical.toUpperCase()}`) +
+							dim(` │ ⏱ ${elapsed}m`) +
+							" ".repeat(width),
+						width,
+						""
+					)
+				);
+				const line3 = bgBar(
+					truncateToWidth(
+						orange(`  💬 ${meta.hint}`) + " ".repeat(width),
+						width,
+						""
+					)
+				);
+				return [pad, line1, line2, line3, pad];
+			},
+			invalidate() {},
+		}));
+	}
+
+	// /phase — switch interview phase
+	pi.registerCommand("phase", {
+		description: "Switch phase: discovery|datagen|bronze|silver|gold|validate|discuss",
+		handler: async (args, ctx) => {
+			const arg = args.trim().toLowerCase() as Phase;
+			if (arg in PHASE_META) {
+				phase = arg;
+				updateWidget(ctx);
+				ctx.ui.notify(
+					`${PHASE_META[phase].emoji} ${PHASE_META[phase].label}\n💬 ${PHASE_META[phase].hint}`,
+					"success"
+				);
+			} else {
+				const choices = Object.entries(PHASE_META).map(
+					([k, v]) => `${k} — ${v.emoji} ${v.hint}`
+				);
+				const choice = await ctx.ui.select("Select Phase", choices);
+				if (choice) {
+					phase = choice.split(" —")[0] as Phase;
+					updateWidget(ctx);
+					ctx.ui.notify(`Phase: ${PHASE_META[phase].label}`, "success");
+				}
+			}
+		},
+	});
+
+	// /vertical — switch vertical
+	pi.registerCommand("vertical", {
+		description: "Switch vertical: retail|media|generic",
+		handler: async (args, ctx) => {
+			const arg = args.trim().toLowerCase();
+			if (["retail", "media", "generic"].includes(arg)) {
+				vertical = arg;
+				updateWidget(ctx);
+				ctx.ui.notify(`Vertical: ${vertical.toUpperCase()}`, "success");
+			} else {
+				const choice = await ctx.ui.select("Select Vertical", [
+					"retail — Orders, stores, products, loyalty tiers",
+					"media — Streams, content, subscriptions, engagement",
+					"generic — Events, entities, categories",
+				]);
+				if (choice) {
+					vertical = choice.split(" —")[0];
+					updateWidget(ctx);
+				}
+			}
+		},
+	});
+
+	// Inject phase-appropriate system prompt
+	pi.on("before_agent_start", async (event) => {
+		if (!interviewPrompt) return;
+
+		const phaseInstructions: Record<Phase, string> = {
+			discovery: `Help the user ask clarifying questions. Suggest: business key, data volume, batch vs streaming, what "correct" means, SLAs. Keep it to 3-5 targeted questions.`,
+			datagen: `Generate synthetic data using PySpark. MUST use spark.range() + F.hash() for categoricals + Faker UDFs only for names. 100k rows. Include TALK/SCALING comments explaining distributed approach. Write as Delta to catalog.bronze.`,
+			bronze: `Create Bronze Delta tables. Raw data, no transforms. Include schema comments. Mention schema evolution capability.`,
+			silver: `Build Silver layer SQL. ROW_NUMBER dedup → MERGE INTO (deterministic, idempotent). CHECK constraints. DECIMAL for money. Liquid Clustering + OPTIMIZE + ANALYZE. Explain every step.`,
+			gold: `Build Gold layer SQL. Idempotent window rebuild (DELETE window + INSERT window). GROUP BY aggregations, window functions, CASE WHEN. DECIMAL(38,2) for aggregates. Explain shuffle and partial aggregation.`,
+			validate: `Build validation harness. Row counts across layers. Uniqueness check. Rule violation counts. Constraint enforcement test (INSERT bad data). Pruning proof (EXPLAIN). Idempotency proof (run Gold twice). Time travel (DESCRIBE HISTORY).`,
+			discuss: `Help explain Spark execution. For each code block: narrow vs wide transform, shuffle boundaries, join strategy, scaling to 1B rows. Coach user on what to SAY to the interviewer. Conversational, not textbook.`,
+		};
+
+		return {
+			systemPrompt:
+				event.systemPrompt +
+				`\n\n<interview-context>
+Interviewer's prompt: "${interviewPrompt}"
+Vertical: ${vertical.toUpperCase()}
+Current phase: ${PHASE_META[phase].label}
+Catalog: dbx_weg
+
+${phaseInstructions[phase]}
+
+CRITICAL INTERVIEW RULES:
+- This is a PAIR PROGRAMMING session — collaborative, not adversarial
+- THINK OUT LOUD — narrate tradeoffs and decisions
+- You are the PILOT — audit AI output, explain what the code does under the hood
+- PySpark for data gen, SQL for all transforms
+- DECIMAL for money, never FLOAT
+- Seed all random generators
+- Include detailed comments for narration
+- If stuck >2 min on syntax, mention "bail out" option
+- Evaluation: Computational Thinking + Code Stewardship + Resilience
+</interview-context>`,
+		};
+	});
+
+	pi.on("input", async (_event, ctx) => {
+		if (!interviewPrompt) {
+			ctx.ui.notify("Enter the interviewer's prompt first.", "warning");
+			return { action: "handled" as const };
+		}
+		return { action: "continue" as const };
+	});
+
+	pi.on("session_start", async (_event, ctx) => {
+		void askForPrompt(ctx);
+	});
+}

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NL2SQL Finance Agent — End-to-End Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0e1a; 
+    color: #e0e6f0;
+    padding: 40px;
+    min-height: 100vh;
+  }
+  h1 { 
+    text-align: center; 
+    font-size: 28px; 
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #7b8ab8;
+    margin-bottom: 48px;
+  }
+  
+  /* Layout */
+  .architecture {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  /* Layer styling */
+  .layer {
+    border-radius: 16px;
+    padding: 24px 28px;
+    position: relative;
+  }
+  .layer-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .layer-label .num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  
+  /* Component cards */
+  .components {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .card {
+    border-radius: 12px;
+    padding: 16px 18px;
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-tech {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+  .card-detail {
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+  .card-detail li {
+    margin-left: 14px;
+    margin-bottom: 3px;
+  }
+  
+  /* Layer 1 — Source (deep blue) */
+  .layer-source { background: linear-gradient(135deg, #0d1b3e 0%, #122448 100%); border: 1px solid #1a3a6e; }
+  .layer-source .layer-label { color: #4a90d9; }
+  .layer-source .num { background: #4a90d9; color: #0d1b3e; }
+  .layer-source .card { background: #0f2240; border: 1px solid #1a3a6e; }
+  .layer-source .card-title { color: #6aabef; }
+  .layer-source .card-tech { color: #4a90d9; }
+  
+  /* Layer 2 — Transform (teal) */
+  .layer-transform { background: linear-gradient(135deg, #0b2b2b 0%, #0e3535 100%); border: 1px solid #1a5c5c; }
+  .layer-transform .layer-label { color: #4ecdc4; }
+  .layer-transform .num { background: #4ecdc4; color: #0b2b2b; }
+  .layer-transform .card { background: #0d2f2f; border: 1px solid #1a5c5c; }
+  .layer-transform .card-title { color: #6ee7df; }
+  .layer-transform .card-tech { color: #4ecdc4; }
+  
+  /* Star schema visual */
+  .star-schema {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 20px 0;
+    flex: 2;
+    min-width: 400px;
+  }
+  .star-center {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+  }
+  .star-center .fact-name { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+  .dims-ring {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+  }
+  .dim-node {
+    position: absolute;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+  }
+  
+  /* Layer 3 — Semantic (purple) */
+  .layer-semantic { background: linear-gradient(135deg, #1a0e35 0%, #231348 100%); border: 1px solid #3a1a6e; }
+  .layer-semantic .layer-label { color: #a78bfa; }
+  .layer-semantic .num { background: #a78bfa; color: #1a0e35; }
+  .layer-semantic .card { background: #1e1045; border: 1px solid #3a1a6e; }
+  .layer-semantic .card-title { color: #c4a8ff; }
+  .layer-semantic .card-tech { color: #a78bfa; }
+  
+  /* Layer 4 — Agent (amber/orange) */
+  .layer-agent { background: linear-gradient(135deg, #2b1a0b 0%, #352010 100%); border: 1px solid #6e4a1a; }
+  .layer-agent .layer-label { color: #f5a623; }
+  .layer-agent .num { background: #f5a623; color: #2b1a0b; }
+  .layer-agent .card { background: #2f1e0d; border: 1px solid #6e4a1a; }
+  .layer-agent .card-title { color: #ffc060; }
+  .layer-agent .card-tech { color: #f5a623; }
+  
+  /* Layer 5 — Orchestration (pink) */
+  .layer-orch { background: linear-gradient(135deg, #2b0b1e 0%, #351028 100%); border: 1px solid #6e1a4a; }
+  .layer-orch .layer-label { color: #f472b6; }
+  .layer-orch .num { background: #f472b6; color: #2b0b1e; }
+  .layer-orch .card { background: #2f0d20; border: 1px solid #6e1a4a; }
+  .layer-orch .card-title { color: #ff8ed0; }
+  .layer-orch .card-tech { color: #f472b6; }
+  
+  /* Layer 6 — Actions (green) */
+  .layer-actions { background: linear-gradient(135deg, #0b2b14 0%, #0e351a 100%); border: 1px solid #1a6e30; }
+  .layer-actions .layer-label { color: #4ade80; }
+  .layer-actions .num { background: #4ade80; color: #0b2b14; }
+  .layer-actions .card { background: #0d2f16; border: 1px solid #1a6e30; }
+  .layer-actions .card-title { color: #6ef5a0; }
+  .layer-actions .card-tech { color: #4ade80; }
+  
+  /* Layer 7 — User surfaces (white/silver) */
+  .layer-user { background: linear-gradient(135deg, #1a1e2e 0%, #222840 100%); border: 1px solid #3a4060; }
+  .layer-user .layer-label { color: #94a3b8; }
+  .layer-user .num { background: #94a3b8; color: #1a1e2e; }
+  .layer-user .card { background: #1e2236; border: 1px solid #3a4060; }
+  .layer-user .card-title { color: #cbd5e1; }
+  .layer-user .card-tech { color: #94a3b8; }
+  
+  /* Flow arrows */
+  .flow-arrow {
+    text-align: center;
+    padding: 4px 0;
+    font-size: 18px;
+    color: #3a4a6e;
+    letter-spacing: 8px;
+  }
+  .flow-arrow .flow-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #5a6a8e;
+    display: block;
+  }
+  
+  /* Conversation flow panel */
+  .conversation {
+    max-width: 1200px;
+    margin: 48px auto 0;
+    border-radius: 16px;
+    background: #111827;
+    border: 1px solid #1f2937;
+    padding: 28px;
+  }
+  .conversation h2 {
+    font-size: 16px;
+    color: #9ca3af;
+    margin-bottom: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .conv-flow {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .conv-step {
+    min-width: 160px;
+    max-width: 180px;
+    border-radius: 12px;
+    padding: 14px;
+    flex-shrink: 0;
+  }
+  .conv-step.user { background: #1e3a5f; border: 1px solid #2563eb; }
+  .conv-step.agent { background: #2d1f0e; border: 1px solid #f59e0b; }
+  .conv-step.system { background: #1a2e1a; border: 1px solid #22c55e; }
+  .conv-step.copilot { background: #2b1028; border: 1px solid #ec4899; }
+  .conv-step-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .conv-step.user .conv-step-label { color: #60a5fa; }
+  .conv-step.agent .conv-step-label { color: #fbbf24; }
+  .conv-step.system .conv-step-label { color: #4ade80; }
+  .conv-step.copilot .conv-step-label { color: #f472b6; }
+  .conv-step-text {
+    font-size: 11px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+  .conv-arrow {
+    display: flex;
+    align-items: center;
+    color: #374151;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  
+  /* Security bar */
+  .security-bar {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    border-radius: 12px;
+    background: #181028;
+    border: 1px solid #4a1a6e;
+    padding: 16px 24px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .security-bar .sec-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #a78bfa;
+  }
+  .security-bar .sec-item {
+    font-size: 11px;
+    color: #c4b5fd;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .security-bar .sec-item::before {
+    content: "🔒";
+    font-size: 10px;
+  }
+
+  /* Hitachi badge */
+  .badge {
+    max-width: 1200px;
+    margin: 32px auto 0;
+    text-align: center;
+    font-size: 11px;
+    color: #4a5568;
+  }
+</style>
+</head>
+<body>
+
+<h1>NL2SQL Finance Agent — F&O Star Schema</h1>
+<p class="subtitle">Hitachi Solutions · Agentic Automation · End-to-End Architecture</p>
+
+<div class="architecture">
+
+  <!-- Layer 1: Data Source -->
+  <div class="layer layer-source">
+    <div class="layer-label">
+      <span class="num">1</span> Data Source — F&O to OneLake
+    </div>
+    <div class="components">
+      <div class="card">
+        <div class="card-title">⚙️ D365 F&O (AxDB)</div>
+        <div class="card-tech">Azure SQL Managed Instance</div>
+        <div class="card-detail">
+          <ul>
+            <li>5,000+ normalized tables</li>
+            <li>No direct SQL access (locked)</li>
+            <li>GL, AP, AR, Procurement</li>
+            <li>Financial Dimensions as RecIds</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔗 Fabric Link for F&O</div>
+        <div class="card-tech">Microsoft Fabric</div>
+        <div class="card-detail">
+          <ul>
+            <li>Syncs selected AxDB tables</li>
+            <li>Delta Parquet in OneLake</li>
+            <li>Near real-time (minutes)</li>
+            <li>Replaces BYOD / Synapse Link</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🗄️ OneLake — Raw Zone</div>
+        <div class="card-tech">Fabric Lakehouse</div>
+        <div class="card-detail">
+          <ul>
+            <li>VendTrans, VendTable, VendGroup</li>
+            <li>CustTrans, CustTable, CustGroup</li>
+            <li>GeneralJournalAccountEntry</li>
+            <li>DimensionAttributeValue* (6 tables)</li>
+            <li>MainAccount, FiscalCalendar</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">▼ ▼ ▼<span class="flow-label">Delta Parquet sync (no ETL code)</span></div>
+
+  <!-- Layer 2: Transformation -->
+  <div class="layer layer-transform">
+    <div class="layer-label">
+      <span class="num">2</span> Transformation — Normalized → Star Schema
+    </div>
+    <div class="components">
+      <div class="card">
+        <div class="card-title">🔄 Transformation Pipeline</div>
+        <div class="card-tech">Fabric Notebooks (PySpark)</div>
+        <div class="card-detail">
+          <ul>
+            <li>Financial dimension resolution<br><span style="opacity:0.6;font-size:10px">5-6 table join chain → friendly names</span></li>
+            <li>Enum → label mapping</li>
+            <li>Currency conversion</li>
+            <li>AP aging bucket calculation</li>
+            <li>Fiscal period assignment</li>
+            <li>Cross-module joins</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="flex:2; min-width: 360px;">
+        <div class="card-title">⭐ Finance Star Schema</div>
+        <div class="card-tech">OneLake — Curated Zone</div>
+        <div class="card-detail" style="display:flex; gap: 24px; flex-wrap: wrap;">
+          <div>
+            <div style="font-weight:700; font-size:11px; margin-bottom:6px; color:#4ecdc4;">FACT TABLES</div>
+            <ul>
+              <li><b>fact_ap_transactions</b><br><span style="opacity:0.6;font-size:10px">invoices, payments, credits, aging</span></li>
+              <li><b>fact_ar_transactions</b><br><span style="opacity:0.6;font-size:10px">customer invoices, receipts</span></li>
+              <li><b>fact_gl_entries</b><br><span style="opacity:0.6;font-size:10px">journal lines, debits/credits</span></li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-weight:700; font-size:11px; margin-bottom:6px; color:#4ecdc4;">DIMENSION TABLES</div>
+            <ul>
+              <li><b>dim_date</b> <span style="opacity:0.6">— fiscal calendar</span></li>
+              <li><b>dim_vendor</b> <span style="opacity:0.6">— vendor + category</span></li>
+              <li><b>dim_customer</b> <span style="opacity:0.6">— customer + segment</span></li>
+              <li><b>dim_main_account</b> <span style="opacity:0.6">— chart of accounts</span></li>
+              <li><b>dim_financial_dims</b> <span style="opacity:0.6">— RESOLVED ✓</span></li>
+              <li><b>dim_company</b> <span style="opacity:0.6">— legal entity</span></li>
+              <li><b>dim_currency</b> <span style="opacity:0.6">— FX rates</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">▼ ▼ ▼<span class="flow-label">Incremental refresh · Fabric Data Pipeline orchestration</span></div>
+
+  <!-- Layer 3: Semantic -->
+  <div class="layer layer-semantic">
+    <div class="layer-label">
+      <span class="num">3</span> Semantic Layer — Schema Documentation
+    </div>
+    <div class="components">
+      <div class="card">
+        <div class="card-title">📋 SQL Endpoint Views</div>
+        <div class="card-tech">Fabric SQL Endpoint</div>
+        <div class="card-detail">
+          <ul>
+            <li>Business-friendly column names</li>
+            <li>Pre-joined common patterns</li>
+            <li>Read-only access enforced</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 Table & Column Descriptions</div>
+        <div class="card-tech">Agent Context / Metadata</div>
+        <div class="card-detail">
+          <ul>
+            <li>Plain English description per column</li>
+            <li>Valid values & business rules</li>
+            <li>Critical for NL2SQL accuracy</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Gold-Standard Queries</div>
+        <div class="card-tech">Few-Shot Examples (10-15)</div>
+        <div class="card-detail">
+          <ul>
+            <li>"AP aging by vendor" → SQL</li>
+            <li>"Revenue by department" → SQL</li>
+            <li>"Cash position by entity" → SQL</li>
+            <li>Agent uses as reference patterns</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">▼ ▼ ▼<span class="flow-label">Schema DDL + descriptions + examples loaded as agent context</span></div>
+
+  <!-- Layer 4: Agent -->
+  <div class="layer layer-agent">
+    <div class="layer-label">
+      <span class="num">4</span> NL2SQL Agent — Intelligence Engine
+    </div>
+    <div class="components">
+      <div class="card" style="flex:2;">
+        <div class="card-title">🤖 Foundry Data Agent</div>
+        <div class="card-tech">Azure AI Foundry · GPT-4o</div>
+        <div class="card-detail">
+          <ul>
+            <li><b>Input:</b> Natural language question</li>
+            <li><b>Process:</b> NL → understand intent → check schema → generate SQL → execute → interpret results → format response</li>
+            <li><b>Output:</b> Plain English insight + data table</li>
+            <li><b>Guardrails:</b> SELECT-only, row limits, PII filtering, SQL injection prevention</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔧 Agent Tools (MCP / Function Calling)</div>
+        <div class="card-tech">Registered Tool Endpoints</div>
+        <div class="card-detail">
+          <ul>
+            <li><b>sql_query</b> — execute read-only SQL against Fabric SQL endpoint</li>
+            <li><b>get_schema</b> — retrieve table/column metadata</li>
+            <li><b>create_visual</b> — generate Power BI chart spec</li>
+            <li><b>send_report</b> — trigger email/export flow</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">▼ ▼ ▼<span class="flow-label">Agent registered as plugin / delegated agent</span></div>
+
+  <!-- Layer 5: Orchestration -->
+  <div class="layer layer-orch">
+    <div class="layer-label">
+      <span class="num">5</span> Copilot Studio — Orchestration & Conversation
+    </div>
+    <div class="components">
+      <div class="card">
+        <div class="card-title">💬 Finance Query Topic</div>
+        <div class="card-tech">Copilot Studio Topic</div>
+        <div class="card-detail">
+          <ul>
+            <li>Detects finance intent</li>
+            <li>Routes to Foundry Agent</li>
+            <li>Returns formatted response</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">❓ Clarification Topic</div>
+        <div class="card-tech">Copilot Studio Topic</div>
+        <div class="card-detail">
+          <ul>
+            <li>Handles ambiguous questions</li>
+            <li>"Which company / time period?"</li>
+            <li>Guides user to specific query</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ Action Topic</div>
+        <div class="card-tech">Copilot Studio → Power Automate</div>
+        <div class="card-detail">
+          <ul>
+            <li>"Chart this" → create_visual</li>
+            <li>"Email this" → send_report</li>
+            <li>"Export to Excel" → export flow</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">▼ ▼ ▼<span class="flow-label">Action triggers dispatched to Power Automate</span></div>
+
+  <!-- Layer 6: Actions -->
+  <div class="layer layer-actions">
+    <div class="layer-label">
+      <span class="num">6</span> Power Automate — Action Execution
+    </div>
+    <div class="components">
+      <div class="card">
+        <div class="card-title">📊 Create Visual</div>
+        <div class="card-tech">Power BI REST API</div>
+        <div class="card-detail">Chart spec → Power BI report page → share link</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📧 Email Report</div>
+        <div class="card-tech">Outlook Connector</div>
+        <div class="card-detail">HTML formatted table → send to AP team</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📁 Export Excel</div>
+        <div class="card-tech">OneDrive Connector</div>
+        <div class="card-detail">Results → .xlsx → shared link</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Audit Log</div>
+        <div class="card-tech">Dataverse Connector</div>
+        <div class="card-detail">Every query logged: user, question, SQL, timestamp</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-arrow">▼ ▼ ▼<span class="flow-label">Responses delivered to user surfaces</span></div>
+
+  <!-- Layer 7: User Surfaces -->
+  <div class="layer layer-user">
+    <div class="layer-label">
+      <span class="num">7</span> User Surfaces — Where Finance Users Interact
+    </div>
+    <div class="components">
+      <div class="card">
+        <div class="card-title">💼 Microsoft Teams</div>
+        <div class="card-tech">Primary Channel</div>
+        <div class="card-detail">Chat with "Finance Copilot" directly in Teams. Most natural for daily use.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏢 D365 F&O Embedded</div>
+        <div class="card-tech">Copilot Pane</div>
+        <div class="card-detail">Ask questions while working in F&O. Context-aware — knows what module you're in.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🌐 Web Portal</div>
+        <div class="card-tech">Power Pages / Custom</div>
+        <div class="card-detail">Standalone web app for finance leadership. Dashboard + conversational interface.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📱 Mobile</div>
+        <div class="card-tech">Teams Mobile</div>
+        <div class="card-detail">CFO checks AP aging from phone. Same agent, responsive format.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Conversation Flow -->
+<div class="conversation">
+  <h2>💬 Demo Conversation Flow</h2>
+  <div class="conv-flow">
+    <div class="conv-step user">
+      <div class="conv-step-label">👤 User</div>
+      <div class="conv-step-text">"What's our AP aging by vendor category for Q4 2025?"</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step copilot">
+      <div class="conv-step-label">💬 Copilot Studio</div>
+      <div class="conv-step-text">Detects finance intent. Routes question to Foundry Data Agent.</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step agent">
+      <div class="conv-step-label">🤖 Foundry Agent</div>
+      <div class="conv-step-text">Calls get_schema → reads star schema metadata. Generates SQL query.</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step system">
+      <div class="conv-step-label">⚡ SQL Execution</div>
+      <div class="conv-step-text">sql_query tool runs SELECT against Fabric SQL endpoint. Returns 24 rows.</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step agent">
+      <div class="conv-step-label">🤖 Foundry Agent</div>
+      <div class="conv-step-text">Interprets results: "Total AP is $12.4M. Professional Services has $2.1M in 90+ days."</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step copilot">
+      <div class="conv-step-label">💬 Copilot Studio</div>
+      <div class="conv-step-text">Presents insight + table. Offers: 📊 Chart it · 📧 Email it · 🔍 Drill in</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step user">
+      <div class="conv-step-label">👤 User</div>
+      <div class="conv-step-text">"Generate a stacked bar chart"</div>
+    </div>
+    <div class="conv-arrow">→</div>
+    <div class="conv-step system">
+      <div class="conv-step-label">⚡ Power Automate</div>
+      <div class="conv-step-text">create_visual flow → Power BI REST API → chart created → link shared</div>
+    </div>
+  </div>
+</div>
+
+<!-- Security Bar -->
+<div class="security-bar">
+  <div class="sec-title">Security & Governance</div>
+  <div class="sec-item">Entra ID authentication required</div>
+  <div class="sec-item">Row-Level Security on star schema</div>
+  <div class="sec-item">SELECT-only · no write access</div>
+  <div class="sec-item">Every query audit-logged to Dataverse</div>
+  <div class="sec-item">PII filtering on agent output</div>
+</div>
+
+<div class="badge">
+  Hitachi Solutions · Agentic Automation Practice · NL2SQL Finance Agent Architecture · 2026
+</div>
+
+</body>
+</html>

@@ -1,0 +1,3381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Databricks SA Whiteboard Builder</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #232736;
+      --border: #2e3348;
+      --text: #e1e4ed;
+      --muted: #8b90a0;
+      --accent: #ff6e40;
+      --accent2: #4ecdc4;
+      --bronze: #cd7f32;
+      --silver: #c0c0c0;
+      --gold: #ffd700;
+      --blue: #5b8def;
+      --purple: #a78bfa;
+      --green: #4ade80;
+      --red: #ef4444;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-btn {
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .header-btn:hover {
+      background: var(--border);
+    }
+
+    .header-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Discovery Tab - Left-to-right 3-panel layout */
+    .discovery-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .coach-panel {
+      width: 300px;
+      flex-shrink: 0;
+      overflow-y: auto;
+      padding: 16px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .coach-section {
+      margin-bottom: 24px;
+    }
+
+    .coach-section-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-goal {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      padding: 8px;
+      background: var(--surface2);
+      border-left: 2px solid var(--accent2);
+      border-radius: 2px;
+      line-height: 1.4;
+    }
+
+    .coach-question {
+      font-size: 13px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background: var(--surface2);
+      border-left: 2px solid var(--muted);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+
+    .coach-question:hover {
+      background: var(--border);
+      border-left-color: var(--accent);
+    }
+
+    .coach-question.answered {
+      opacity: 0.45;
+      border-left-color: var(--green);
+      text-decoration: line-through;
+    }
+
+    .coach-question.asked {
+      background: var(--accent2);
+      color: #000;
+      border-left-color: var(--accent2);
+    }
+
+    /* Wizard form */
+    .wizard-form {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 28px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-dot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .step-dot.completed {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 -8px;
+    }
+
+    .step-connector.active {
+      background: var(--accent);
+    }
+
+    .wizard-step {
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    .wizard-step.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .wizard-step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wizard-step-icon {
+      font-size: 28px;
+    }
+
+    .wizard-step-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 110, 64, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 6px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      background: var(--border);
+    }
+
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .field-highlight {
+      animation: fieldPulse 2s ease-out;
+    }
+
+    @keyframes fieldPulse {
+      0% { box-shadow: 0 0 0 3px rgba(255, 110, 64, 0.5); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 110, 64, 0); }
+    }
+
+    .wizard-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      padding: 10px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: var(--border);
+    }
+
+    .nav-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Preview panel */
+    .discovery-preview {
+      width: 300px;
+      flex-shrink: 0;
+      overflow-y: auto;
+      padding: 12px;
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .preview-toggle {
+      display: none;
+      padding: 6px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .preview-title {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .preview-completeness {
+      font-size: 10px;
+      color: var(--muted);
+      padding: 3px 8px;
+      background: var(--surface2);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .preview-completeness-filled {
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    .preview-layer {
+      margin-bottom: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .preview-layer-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--surface2);
+      border-left: 3px solid var(--border);
+    }
+
+    .preview-layer[data-layer="sources"] .preview-layer-header { border-left-color: var(--bronze); }
+    .preview-layer[data-layer="ingestion"] .preview-layer-header { border-left-color: var(--accent); }
+    .preview-layer[data-layer="processing"] .preview-layer-header { border-left-color: var(--blue); }
+    .preview-layer[data-layer="governance"] .preview-layer-header { border-left-color: var(--purple); }
+    .preview-layer[data-layer="consumption"] .preview-layer-header { border-left-color: var(--green); }
+
+    .preview-layer-icon {
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .preview-layer-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-layer-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .preview-layer-badge.has-items {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .preview-layer-chevron {
+      font-size: 9px;
+      color: var(--muted);
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+
+    .preview-layer.collapsed .preview-layer-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .preview-layer-body {
+      padding: 6px 8px;
+      font-size: 10px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .preview-layer.collapsed .preview-layer-body {
+      display: none;
+    }
+
+    .preview-tbd {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 10px;
+    }
+
+    .preview-pill {
+      display: inline-block;
+      padding: 1px 6px;
+      margin: 1px 2px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 500;
+      line-height: 1.6;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .preview-layer[data-layer="sources"] .preview-pill { border-color: var(--bronze); color: var(--bronze); }
+    .preview-layer[data-layer="ingestion"] .preview-pill { border-color: var(--accent); color: var(--accent); }
+    .preview-layer[data-layer="processing"] .preview-pill { border-color: var(--blue); color: var(--blue); }
+    .preview-layer[data-layer="governance"] .preview-pill { border-color: var(--purple); color: var(--purple); }
+    .preview-layer[data-layer="consumption"] .preview-pill { border-color: var(--green); color: var(--green); }
+
+    .preview-rec {
+      font-size: 10px;
+      color: var(--text);
+      padding: 2px 0;
+      line-height: 1.4;
+    }
+
+    .preview-rec-label {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .preview-rec-value {
+      color: var(--text);
+    }
+
+    .preview-text-item {
+      font-size: 10px;
+      color: var(--muted);
+      padding: 1px 0;
+    }
+
+    /* Build Tab */
+    .build-layout {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .palette-panel {
+      width: 280px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .palette-header {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .palette-search {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .palette-filter {
+      width: 100%;
+      padding: 6px 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .palette-count {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .palette-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .component-card {
+      padding: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: move;
+      font-size: 11px;
+      line-height: 1.3;
+      transition: all 0.2s;
+    }
+
+    .component-card:hover {
+      border-color: var(--accent);
+      background: var(--border);
+    }
+
+    .component-card.active {
+      border-color: var(--accent);
+      background: rgba(255, 110, 64, 0.1);
+    }
+
+    .canvas-area {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: auto;
+      position: relative;
+    }
+
+    .canvas {
+      position: relative;
+      width: 1400px;
+      height: 800px;
+      background: var(--surface);
+      margin: 12px;
+    }
+
+    .swim-lane {
+      position: absolute;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px;
+      background: var(--surface2);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .canvas-element {
+      position: absolute;
+      padding: 8px;
+      background: var(--blue);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: move;
+      font-size: 11px;
+      min-width: 60px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .canvas-element:hover {
+      box-shadow: 0 0 8px rgba(255, 110, 64, 0.3);
+    }
+
+    .canvas-element.selected {
+      border: 2px solid var(--accent);
+      background: var(--accent);
+    }
+
+    /* Present Tab */
+    .present-content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .present-content.active {
+      display: flex;
+    }
+
+    .present-slide {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      font-size: 24px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 16px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 4px;
+      font-size: 13px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+
+    /* Collapsible sections in coach panel */
+    .collapsible-header {
+      padding: 10px 12px;
+      background: var(--surface2);
+      border-left: 2px solid var(--accent2);
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+
+    .collapsible-header::after {
+      content: '▼';
+      font-size: 10px;
+      transition: transform 0.3s;
+    }
+
+    .collapsible-header.collapsed::after {
+      transform: rotate(-90deg);
+    }
+
+    .collapsible-content {
+      display: block;
+      max-height: 500px;
+      overflow: hidden;
+      transition: max-height 0.3s;
+    }
+
+    .collapsible-content.collapsed {
+      max-height: 0;
+    }
+
+    /* Timer */
+    .timer-display {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: bold;
+      margin: 0 12px;
+    }
+
+    .timer-phase {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .rubric-item {
+      padding: 8px;
+      margin-bottom: 6px;
+      background: var(--surface2);
+      border-left: 2px solid var(--border);
+      border-radius: 2px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+
+    .rubric-item:hover {
+      border-left-color: var(--accent);
+    }
+
+    .rubric-item.checked {
+      border-left-color: var(--green);
+      background: rgba(74, 222, 128, 0.1);
+    }
+
+    .rubric-item::before {
+      content: '☐ ';
+      margin-right: 4px;
+      color: var(--muted);
+    }
+
+    .rubric-item.checked::before {
+      content: '☑ ';
+      color: var(--green);
+    }
+
+    /* Context Menu */
+    .context-menu {
+      display: none;
+      position: fixed;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      z-index: 3000;
+      min-width: 150px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .context-menu.active {
+      display: block;
+    }
+
+    .context-menu-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+
+    .context-menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .context-menu-item:hover {
+      background: var(--border);
+    }
+
+    /* Dynamic followups */
+    .followup-item {
+      font-size: 12px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background: var(--surface2);
+      border-left: 2px solid var(--purple);
+      border-radius: 2px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .followup-label {
+      color: var(--purple);
+      font-weight: bold;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <div class="logo">Databricks SA Whiteboard Builder</div>
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('discovery')">Discovery</button>
+          <button class="tab-btn" onclick="switchTab('build')">Build</button>
+          <button class="tab-btn" onclick="switchTab('deepdive')">DW Deep Dive</button>
+          <button class="tab-btn" onclick="switchTab('present')">Present</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <label style="font-size: 12px; display: flex; align-items: center; gap: 6px;">
+          <input type="checkbox" id="scenarioToggle" onchange="handleScenarioToggle()">
+          <span>Scenario Data</span>
+        </label>
+        <button class="header-btn" onclick="startTimer()">Start Timer</button>
+        <button class="header-btn" onclick="showRubric()">Rubric</button>
+        <button class="header-btn" onclick="exportJSON()">Save JSON</button>
+        <button class="header-btn" onclick="loadJSONFile()">Load JSON</button>
+        <button class="header-btn primary" onclick="exportPresentation()">Export</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content">
+      <!-- Discovery Tab -->
+      <div id="discoveryTab" class="tab-content active">
+        <div class="discovery-layout">
+          <!-- Coach Panel (LEFT) -->
+          <div class="coach-panel">
+            <div class="coach-section">
+              <div class="coach-section-title">Coach</div>
+              <div id="coachGoal" class="section-goal"></div>
+              <div id="coachQuestions"></div>
+            </div>
+            <div class="coach-section">
+              <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                Dynamic Follow-ups
+              </div>
+              <div id="dynamicFollowups" class="collapsible-content"></div>
+            </div>
+            <div class="coach-section">
+              <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                Transition Phrases & Trade-offs
+              </div>
+              <div id="transitionPhrases" class="collapsible-content">
+                <div class="followup-item">Design medallion architecture when sources support it.</div>
+                <div class="followup-item">Consider data mesh if org culture supports domain ownership.</div>
+                <div class="followup-item">Unity Catalog simplifies multi-workspace governance.</div>
+                <div class="followup-item">Start with central platform team, scale to federated later.</div>
+                <div class="followup-item">Real-time costs more; prioritize what truly needs it.</div>
+              </div>
+            </div>
+            <div class="coach-section">
+              <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                Quick Rubric
+              </div>
+              <div id="quickRubric" class="collapsible-content"></div>
+            </div>
+          </div>
+
+          <!-- Wizard Form (CENTER) -->
+          <div class="wizard-form">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="display: flex; gap: 8px;">
+                <button id="wizardModeBtn" class="nav-btn primary" onclick="setDiscoveryMode('wizard')" style="font-size: 11px; padding: 6px 12px;">Wizard</button>
+                <button id="quickModeBtn" class="nav-btn" onclick="setDiscoveryMode('quick')" style="font-size: 11px; padding: 6px 12px;">Quick Capture</button>
+              </div>
+              <div style="font-size: 11px; color: var(--muted);" id="modeHint">Step-by-step guided discovery</div>
+            </div>
+            <div class="step-indicator" id="stepIndicator"></div>
+
+            <!-- Section 1: Business Outcomes & Scope -->
+            <div class="wizard-step" data-step="1">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">🎯</div>
+                <div>
+                  <div class="wizard-step-title">Business Outcomes & Scope</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Customer Name</label>
+                <input type="text" id="customer_name" class="form-input" placeholder="e.g., ACME Corp" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Primary Business Problem</label>
+                <textarea id="biz_problem" class="form-textarea" placeholder="Describe the main business challenge..." onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Use Cases</label>
+                <div id="use_cases" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Key Consumers</label>
+                <div id="consumers" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Success KPIs / Timeline</label>
+                <input type="text" id="biz_kpis" class="form-input" placeholder="e.g., Reduce query latency to 5s by Q4" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()" disabled>← Back</button>
+                <button class="nav-btn primary" onclick="nextStep()">Next →</button>
+              </div>
+            </div>
+
+            <!-- Section 2: Data Sources & Ingestion -->
+            <div class="wizard-step" data-step="2">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">🔌</div>
+                <div>
+                  <div class="wizard-step-title">Data Sources & Ingestion</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Source Systems</label>
+                <textarea id="sources" class="form-textarea" placeholder="List main data sources, systems, and their locations..." onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Cloud Platform(s)</label>
+                <div id="cloud" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Current BI Tools</label>
+                <input type="text" id="bi_tools" class="form-input" placeholder="e.g., Tableau, Power BI, Looker" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Current ETL/ELT Tools</label>
+                <input type="text" id="etl_tools" class="form-input" placeholder="e.g., Informatica, dbt, custom Python" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data Freshness Requirements</label>
+                <div id="latency" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data Formats</label>
+                <div id="formats" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data Volume (approximate)</label>
+                <input type="text" id="volume" class="form-input" placeholder="e.g., 10 TB, 500 GB/day" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Number of Source Systems</label>
+                <input type="number" id="num_sources" class="form-input" placeholder="e.g., 25" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()">← Back</button>
+                <button class="nav-btn primary" onclick="nextStep()">Next →</button>
+              </div>
+            </div>
+
+            <!-- Section 3: Data Warehouse & Modeling -->
+            <div class="wizard-step" data-step="3">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">🏗️</div>
+                <div>
+                  <div class="wizard-step-title">Data Warehouse & Modeling</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">DW Approach</label>
+                <div id="dw_approach" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Key Data Domains / Subject Areas</label>
+                <input type="text" id="domains" class="form-input" placeholder="e.g., Customer, Product, Sales, Finance" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Key Grains & Level of Detail</label>
+                <textarea id="subject_areas" class="form-textarea" placeholder="Describe the finest grain for each domain..." onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Modeling Preference</label>
+                <div id="modeling_pref" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Migration Approach (if applicable)</label>
+                <div id="migration_approach" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Query Patterns & SLAs</label>
+                <input type="text" id="query_slas" class="form-input" placeholder="e.g., 100 concurrent users, <5s response time" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()">← Back</button>
+                <button class="nav-btn primary" onclick="nextStep()">Next →</button>
+              </div>
+            </div>
+
+            <!-- Section 4: Non-Functional Requirements -->
+            <div class="wizard-step" data-step="4">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">⚙️</div>
+                <div>
+                  <div class="wizard-step-title">Non-Functional Requirements</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">DR Objectives (RPO/RTO)</label>
+                <input type="text" id="dr" class="form-input" placeholder="e.g., RPO 4h, RTO 1h" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Peak Periods</label>
+                <input type="text" id="peak_periods" class="form-input" placeholder="e.g., Month-end, nightly ETL 10-11pm" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Concurrent Users & Latency Expectations</label>
+                <input type="text" id="users" class="form-input" placeholder="e.g., 150 concurrent, <3s ad-hoc queries" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Cost Sensitivity</label>
+                <div id="cost_sensitivity" class="chips-container"></div>
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()">← Back</button>
+                <button class="nav-btn primary" onclick="nextStep()">Next →</button>
+              </div>
+            </div>
+
+            <!-- Section 5: Governance, Security & Compliance -->
+            <div class="wizard-step" data-step="5">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">🔐</div>
+                <div>
+                  <div class="wizard-step-title">Governance, Security & Compliance</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Compliance Frameworks</label>
+                <div id="compliance" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Access Control Model</label>
+                <div id="access_model" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Data Catalog Strategy</label>
+                <div id="catalog_strategy" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Audit & Data Residency Requirements</label>
+                <textarea id="audit_reqs" class="form-textarea" placeholder="Describe audit requirements, data residency, retention policies..." onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()">← Back</button>
+                <button class="nav-btn primary" onclick="nextStep()">Next →</button>
+              </div>
+            </div>
+
+            <!-- Section 6: Operational Model & SDLC -->
+            <div class="wizard-step" data-step="6">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">🚀</div>
+                <div>
+                  <div class="wizard-step-title">Operational Model & SDLC</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Deployment Approach</label>
+                <div id="deploy_approach" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Environment Strategy</label>
+                <div id="environments" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Operational Model</label>
+                <div id="ops_model" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Monitoring & Alerting Tools</label>
+                <input type="text" id="monitoring" class="form-input" placeholder="e.g., Datadog, Splunk, CloudWatch" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()">← Back</button>
+                <button class="nav-btn primary" onclick="nextStep()">Next →</button>
+              </div>
+            </div>
+
+            <!-- Section 7: Success Metrics & Timeline -->
+            <div class="wizard-step" data-step="7">
+              <div class="wizard-step-header">
+                <div class="wizard-step-icon">🎯</div>
+                <div>
+                  <div class="wizard-step-title">Success Metrics & Timeline</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Success in 3-6 Months</label>
+                <textarea id="success_short" class="form-textarea" placeholder="What's the minimal viable product?" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Vision for 18-24 Months</label>
+                <textarea id="success_long" class="form-textarea" placeholder="What's the target-state architecture?" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Must-hit External Deadlines</label>
+                <input type="text" id="deadlines" class="form-input" placeholder="e.g., Regulatory report due Q1" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">MVP Use Cases (1-2 to ship first)</label>
+                <textarea id="mvp_uses" class="form-textarea" placeholder="What 1-2 use cases go live in the MVP?" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Tech Mandates / Existing Contracts</label>
+                <input type="text" id="mandates" class="form-input" placeholder="e.g., Must use Azure, existing Informatica contract" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Required Skills</label>
+                <div id="skills" class="chips-container"></div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Previous Pain Points & What Failed</label>
+                <textarea id="pain_points" class="form-textarea" placeholder="What's failed before, and why?" onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Additional Notes</label>
+                <textarea id="notes" class="form-textarea" placeholder="Any other context..." onchange="updateCoachAnsweredState(); generateDynamicFollowups(); updatePreview();"></textarea>
+              </div>
+
+              <div class="wizard-nav">
+                <button class="nav-btn" onclick="prevStep()">← Back</button>
+                <button class="nav-btn" onclick="completeWizard()">Complete ✓</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview Panel (RIGHT) -->
+          <div class="discovery-preview">
+            <div class="preview-header">
+              <div class="preview-title">Architecture Preview</div>
+              <button class="preview-toggle" style="display: block;" onclick="togglePreview()">Hide</button>
+            </div>
+            <div id="architecturePreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Build Tab -->
+      <div id="buildTab" class="tab-content">
+        <div class="build-layout">
+          <!-- Palette -->
+          <div class="palette-panel">
+            <div class="palette-header">
+              <input type="text" id="paletteSearch" class="palette-search" placeholder="Search components..." onkeyup="filterPalette()">
+              <select id="paletteFilter" class="palette-filter" onchange="filterPalette()">
+                <option value="">All Layers</option>
+                <option value="sources">Sources</option>
+                <option value="ingestion">Ingestion</option>
+                <option value="bronze">Bronze</option>
+                <option value="silver">Silver</option>
+                <option value="gold">Gold</option>
+                <option value="governance">Governance</option>
+                <option value="consumption">Consumption</option>
+              </select>
+              <div class="palette-count"><span id="componentCount">0</span> components</div>
+            </div>
+            <div id="paletteContent" class="palette-content"></div>
+          </div>
+
+          <!-- Canvas -->
+          <div class="canvas-area">
+            <div id="canvas" class="canvas"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DW Deep Dive Tab -->
+      <div id="deepdiveTab" class="tab-content">
+        <div style="display: flex; flex: 1; overflow: hidden;">
+          <!-- Left: Topic Cards -->
+          <div style="flex: 1; overflow-y: auto; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: start;">
+
+            <!-- Card 1: Dimensional Modeling -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 3px solid var(--gold);">
+              <div style="font-size: 14px; font-weight: bold; color: var(--gold); margin-bottom: 8px;">Dimensional Modeling on Lakehouse</div>
+              <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+                <b>Star Schema (Kimball)</b> — Gold layer; Photon delivers 18x perf for star joins; known query patterns, BI-heavy<br><br>
+                <b>Data Vault 2.0</b> — Silver layer (Hubs/Links/Satellites); many source systems, full auditability; Gold for consumption<br><br>
+                <b>One Big Table (OBT)</b> — Gold layer; >20x speedup with Liquid Clustering; single-purpose analytics<br><br>
+                <b>Hybrid approach:</b> <span style="color: var(--accent);">"Data Vault or 3NF in Silver for integration, star schemas in Gold for consumption. The medallion architecture gives you natural separation."</span><br><br>
+                <b>SCD Type 2:</b> AUTO CDC with <code style="background: var(--surface2); padding: 2px 4px; border-radius: 2px;">STORED AS SCD TYPE 2</code> + <code style="background: var(--surface2); padding: 2px 4px; border-radius: 2px;">TRACK HISTORY ON</code> — handles out-of-order records via SEQUENCE BY
+              </div>
+            </div>
+
+            <!-- Card 2: Query Performance -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 3px solid var(--accent);">
+              <div style="font-size: 14px; font-weight: bold; color: var(--accent); margin-bottom: 8px;">Query Performance & Optimization</div>
+              <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+                <b>1. Data Layout</b> — Liquid Clustering (replaces Z-ORDER + partitioning, GA)<br>
+                <span style="color: var(--muted);">Up to 4 keys; CLUSTER BY AUTO lets platform choose; incremental, no rewrite on key change</span><br><br>
+                <b>2. Table Maintenance</b> — Predictive Optimization (GA, auto-enabled)<br>
+                <span style="color: var(--muted);">Auto OPTIMIZE, VACUUM, ANALYZE on UC managed tables; zero manual maintenance</span><br><br>
+                <b>3. Compute</b> — Serverless SQL Warehouse + Photon<br>
+                <span style="color: var(--muted);">IWM auto-scales; PQE replans mid-query for skew; 40% improvement in 2025</span><br><br>
+                <b>4. Semantic</b> — Materialized Views for frequent aggregations<br>
+                <span style="color: var(--muted);">Incremental refresh via serverless DLT; requires row tracking on source tables</span><br><br>
+                <b>Key stat:</b> <span style="color: var(--accent);">Serverless delivered up to 40% perf improvement with zero tuning</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Migration Strategy -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 3px solid var(--accent2);">
+              <div style="font-size: 14px; font-weight: bold; color: var(--accent2); margin-bottom: 8px;">Legacy DW Migration</div>
+              <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+                <b>1. Assess</b> — Lakebridge Analyzer: scans legacy env, classifies by complexity<br>
+                <b>2. Strategy</b> — Choose approach:<br>
+                &nbsp;&nbsp;• <b>Federation-First</b> (lowest risk): query legacy DW in place<br>
+                &nbsp;&nbsp;• <b>Parallel Run</b>: both systems live, Lakebridge reconciler validates<br>
+                &nbsp;&nbsp;• <b>Medallion Refactor</b>: re-architect into Bronze/Silver/Gold<br>
+                <b>3. Convert</b> — Lakebridge transpilers: auto-convert ~80% of SQL<br>
+                <b>4. Optimize</b> — Liquid Clustering + Predictive Optimization + Photon<br>
+                <span style="color: var(--muted);">Reported 2.7x faster, 12x cost efficiency post-migration</span><br>
+                <b>5. Govern</b> — Unity Catalog replaces legacy security model<br><br>
+                <span style="color: var(--accent2);">"At IBM, I spent 8 years helping customers manage Netezza. I've seen the pain of proprietary platforms firsthand."</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Governance -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 3px solid var(--purple);">
+              <div style="font-size: 14px; font-weight: bold; color: var(--purple); margin-bottom: 8px;">Governance & Security</div>
+              <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+                <b>Row Filters</b> (GA) — SQL UDFs filtering rows at query time by user/role<br>
+                <b>Column Masks</b> (GA) — Replace sensitive values based on identity<br>
+                <b>ABAC</b> (Public Preview) — Tag-based policies, inherit down catalog → schema → table<br>
+                <b>Lineage</b> (GA) — Automatic, runtime, column-level, all languages<br>
+                <b>Data Classification</b> (GA) — Auto-detect PII<br>
+                <b>Budget Policies</b> (GA) — Tag-based cost attribution for serverless<br><br>
+                <b>Multi-region:</b> One metastore per region; Delta Sharing for cross-region; row filters by country tags for data residency
+              </div>
+            </div>
+
+            <!-- Card 5: Databricks vs Snowflake -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 3px solid var(--blue);">
+              <div style="font-size: 14px; font-weight: bold; color: var(--blue); margin-bottom: 8px;">Databricks vs Snowflake</div>
+              <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+                <b>Price/Performance:</b> 2.8x faster, 3.6x less cost (TPC-DS-like)<br>
+                <b>Streaming:</b> Native Structured Streaming, DLT, Auto Loader vs Snowpipe<br>
+                <b>AI/ML:</b> Native MLflow, Feature Store, Model Serving (more mature)<br>
+                <b>Open Formats:</b> Delta Lake, zero vendor lock-in vs Iceberg recently added<br>
+                <b>Governance:</b> Unity Catalog (multi-cloud, multi-language) vs SQL-level<br>
+                <b>Ease of use:</b> Steeper curve but more powerful<br><br>
+                <span style="color: var(--blue);"><b>Diplomatic framing:</b> "Both have strengths. Databricks differentiates on the unified platform — DE, DW, and ML on one platform with open formats. For customers doing more than just BI, the TCO advantage is significant because you eliminate the integration tax."</span>
+              </div>
+            </div>
+
+            <!-- Card 6: Key Phrases -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; border-left: 3px solid var(--green);">
+              <div style="font-size: 14px; font-weight: bold; color: var(--green); margin-bottom: 8px;">Key Phrases to Use</div>
+              <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+                <span style="color: var(--green);">&#10003;</span> "Let me start with some discovery questions before I whiteboard."<br>
+                <span style="color: var(--green);">&#10003;</span> "The trade-off here is [X] vs [Y] — I'm choosing [X] because..."<br>
+                <span style="color: var(--green);">&#10003;</span> "If the requirements change to [Z], I'd reconsider and use [Y] instead."<br>
+                <span style="color: var(--green);">&#10003;</span> "In my experience at IBM/Microsoft with similar customers..."<br>
+                <span style="color: var(--green);">&#10003;</span> "Liquid Clustering replaces both partitioning and Z-ORDER — it's the new default."<br>
+                <span style="color: var(--green);">&#10003;</span> "Predictive Optimization eliminates manual OPTIMIZE/VACUUM entirely."<br>
+                <span style="color: var(--green);">&#10003;</span> "Lakehouse Federation lets us query legacy DW in place while we migrate."<br>
+                <span style="color: var(--green);">&#10003;</span> "One platform for DE + DW + ML eliminates the integration tax."<br><br>
+                <b style="color: var(--red);">Never say:</b> "Just do lift-and-shift" · "Snowflake is bad" · "Let me start drawing" · "That's how we always do it" · "I'm not sure about that"
+              </div>
+            </div>
+
+          </div>
+          <!-- Right: Notes Panel -->
+          <div style="width: 320px; flex-shrink: 0; border-left: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; background: var(--surface);">
+            <div style="font-size: 12px; font-weight: bold; color: var(--accent2); text-transform: uppercase; margin-bottom: 12px;">Interviewer Questions & Notes</div>
+            <textarea id="interviewerNotes" style="flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 4px; padding: 12px; font-size: 13px; font-family: inherit; resize: none;" placeholder="Capture interviewer questions here as they ask them...&#10;&#10;e.g.:&#10;- How would you handle SCD Type 2?&#10;- What about query performance at scale?&#10;- Tell me about Liquid Clustering vs partitioning"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Present Tab -->
+      <div id="presentTab" class="tab-content">
+        <div id="presentContent" class="present-content">
+          <div class="present-slide" id="presentSlide">
+            Presentation Mode Ready
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="rubricModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Architecture Rubric Self-Check (15 items)</span>
+        <button class="modal-close" onclick="closeRubric()">✕</button>
+      </div>
+      <div id="rubricList" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="contextMenu" class="context-menu"></div>
+
+  <script>
+    // ============================================================================
+    // CONFIGURATION & DATA
+    // ============================================================================
+
+    const SECTIONS = [
+      {
+        step: 1,
+        title: 'Business Outcomes & Scope',
+        icon: '🎯',
+        goal: 'Anchor everything to value, not tools.',
+        coachQuestions: [
+          { q: 'What are the primary business outcomes you want?', field: 'biz_problem' },
+          { q: 'Who are the key user groups and must-have use cases?', chips: 'consumers' },
+          { q: 'Are we focused on one domain or enterprise-wide?', chips: 'use_cases' },
+          { q: 'Which decisions will this support, and how often?', field: 'biz_kpis' },
+          { q: 'What happens if this project fails or is delayed?', field: 'biz_problem' },
+          { q: 'Are there organizational changes (mergers, reorgs) on the horizon?', field: 'notes' },
+        ]
+      },
+      {
+        step: 2,
+        title: 'Data Sources & Ingestion',
+        icon: '🔌',
+        goal: 'Drive medallion design and ingestion/latency decisions.',
+        coachQuestions: [
+          { q: 'What are your main source systems and where do they live?', field: 'sources' },
+          { q: 'For each source, what is the change pattern?', field: 'sources' },
+          { q: 'How fresh does data need to be for critical use cases?', chips: 'latency' },
+          { q: 'Roughly how much data are we talking about?', field: 'volume' },
+          { q: 'For each source, what is the change capture pattern? (CDC, full refresh, event-driven)', field: 'sources' },
+          { q: 'How do you handle schema changes from upstream sources today?', field: 'sources' },
+          { q: 'What downstream systems consume data from the current DW?', field: 'bi_tools' },
+        ]
+      },
+      {
+        step: 3,
+        title: 'Data Warehouse & Modeling',
+        icon: '🏗️',
+        goal: 'Steer into DW mental model and trade-offs.',
+        coachQuestions: [
+          { q: 'How do you think about your "warehouse" today?', chips: 'dw_approach' },
+          { q: 'Most important subject areas and grains?', field: 'subject_areas' },
+          { q: 'Normalized model or dimensional/star schemas?', chips: 'modeling_pref' },
+          { q: 'Which reporting tools are in scope, query SLAs?', field: 'query_slas' },
+          { q: 'How many stored procs, views, and UDFs exist? How many are actively used?', field: 'subject_areas' },
+          { q: 'What proprietary SQL extensions are you using? (BTEQ, QUALIFY, temporal tables)', field: 'notes' },
+          { q: 'Do you need point-in-time queries for audit or regulatory purposes?', field: 'query_slas' },
+        ]
+      },
+      {
+        step: 4,
+        title: 'Non-Functional Requirements',
+        icon: '⚙️',
+        goal: 'Make the design production-ready, not a PoC.',
+        coachQuestions: [
+          { q: 'What are your RPO/RTO objectives?', field: 'dr' },
+          { q: 'Are there peak periods we need to design for?', field: 'peak_periods' },
+          { q: 'How many concurrent users and acceptable latency?', field: 'users' },
+          { q: 'Is cost optimization primary or secondary to performance?', chips: 'cost_sensitivity' },
+          { q: 'What is your current annual DW spend? (licensing, hardware, people)', field: 'peak_periods' },
+          { q: 'How do you want to model costs — by department, workload, or LOB?', chips: 'cost_sensitivity' },
+        ]
+      },
+      {
+        step: 5,
+        title: 'Governance, Security & Compliance',
+        icon: '🔐',
+        goal: 'Justify Unity Catalog, security model, and multi-env design.',
+        coachQuestions: [
+          { q: 'What regulations or compliance regimes apply?', chips: 'compliance' },
+          { q: 'How do you want to control access?', chips: 'access_model' },
+          { q: 'Do you have a data catalog or lineage strategy?', chips: 'catalog_strategy' },
+          { q: 'Strict requirements around audit logging?', field: 'audit_reqs' },
+          { q: 'Do you have data sovereignty requirements — where data can be stored/processed?', field: 'audit_reqs' },
+          { q: 'How do you track data lineage today — manual or automated?', chips: 'catalog_strategy' },
+        ]
+      },
+      {
+        step: 6,
+        title: 'Operational Model & SDLC',
+        icon: '🚀',
+        goal: 'Expose thinking on operational excellence and resilience.',
+        coachQuestions: [
+          { q: 'How do you currently deploy and manage pipelines?', chips: 'deploy_approach' },
+          { q: 'Do you maintain separate dev/test/prod environments?', chips: 'environments' },
+          { q: 'Who will operate this platform day-to-day?', chips: 'ops_model' },
+          { q: 'What monitoring/alerting tools do you rely on?', field: 'monitoring' },
+        ]
+      },
+      {
+        step: 7,
+        title: 'Success Metrics & Timeline',
+        icon: '🎯',
+        goal: 'Frame trade-offs and MVP vs. target-state.',
+        coachQuestions: [
+          { q: 'What does success look like in 3-6 months?', field: 'success_short' },
+          { q: 'What does success look like in 18-24 months?', field: 'success_long' },
+          { q: 'Any must-hit external deadlines?', field: 'deadlines' },
+          { q: 'Which 1-2 use cases must go live first?', field: 'mvp_uses' },
+          { q: 'Have any previous migration attempts failed? What happened?', field: 'pain_points' },
+          { q: 'Who owns the data today, and who wants to own it after migration?', chips: 'ops_model' },
+          { q: 'What is the training plan for the team? SQL-only vs Python/Spark adoption?', chips: 'skills' },
+        ]
+      }
+    ];
+
+    const CHIP_OPTIONS = {
+      use_cases: ['Regulatory Reporting', 'Real-time KPIs', 'Self-service Analytics', 'ML/AI Platform', 'Data Democratization', 'Cost Optimization', 'Legacy Migration', 'Customer 360', 'IoT Analytics', 'Demand Forecasting', 'Fraud Detection', 'Supply Chain Optimization'],
+      consumers: ['Analysts', 'ML Models', 'Regulators', 'Executives', 'Data Scientists', 'Apps/APIs'],
+      cloud: ['Azure', 'AWS', 'GCP', 'Multi-cloud', 'Hybrid'],
+      latency: ['Real-time', 'Near-real-time', 'Hourly', 'Daily batch'],
+      formats: ['Structured/SQL', 'Semi-structured/JSON', 'Unstructured/Docs', 'Images/Video', 'Streaming/IoT'],
+      dw_approach: ['Centralized EDW', 'Data Marts', 'Point Solutions', 'No DW yet'],
+      modeling_pref: ['Normalized/3NF', 'Star/Dimensional', 'Data Vault', 'One Big Table'],
+      cost_sensitivity: ['Cost-first', 'Performance-first', 'Balanced'],
+      compliance: ['GDPR', 'CCPA', 'PCI-DSS', 'SOX', 'HIPAA', 'Basel III/IV', 'FedRAMP'],
+      access_model: ['RBAC', 'ABAC/Tags', 'Domain-based', 'Geography-based'],
+      catalog_strategy: ['Existing catalog', 'Need new', 'Unity Catalog'],
+      deploy_approach: ['Manual', 'Scripts', 'CI/CD', 'IaC/Terraform'],
+      environments: ['Single env', 'Dev/Prod', 'Dev/Test/Prod'],
+      ops_model: ['Central platform team', 'Federated / LOB', 'Data mesh', 'Managed service'],
+      skills: ['SQL-heavy', 'Python', 'Spark', 'Low-code', 'dbt'],
+      migration_approach: ['Lift-and-shift', 'Parallel Run', 'Federation-First', 'Re-architect'],
+    };
+
+    const RUBRIC_ITEMS = [
+      'Business outcomes clearly anchored (not tool-centric)',
+      'Data sources & change patterns identified',
+      'Latency requirements vs. medallion architecture match',
+      'DW approach justified (centralized, marts, etc.)',
+      'Modeling strategy fits the use cases & grains',
+      'SLAs & concurrency realistic for platform sizing',
+      'DR/RTO/RPO strategy documented',
+      'Peak period handling (month-end, campaigns, etc.) addressed',
+      'Governance & compliance mapped to UC & security model',
+      'Access control strategy justified (RBAC, ABAC, etc.)',
+      'Operational model (central, federated, mesh) aligned with org',
+      'SDLC & deployment approach (CI/CD, IaC, etc.) defined',
+      'Cost sensitivity & performance trade-offs transparent',
+      'MVP use cases & 6-month success criteria clear',
+      '18-24 month vision & target state architecture sketched'
+    ];
+
+    const COMPONENTS = [
+      // Sources (30 items)
+      { name: 'SAP ERP', layer: 'sources', icon: '📦' },
+      { name: 'Oracle DB', layer: 'sources', icon: '📦' },
+      { name: 'Salesforce', layer: 'sources', icon: '📦' },
+      { name: 'Snowflake', layer: 'sources', icon: '📦' },
+      { name: 'SQL Server', layer: 'sources', icon: '📦' },
+      { name: 'PostgreSQL', layer: 'sources', icon: '📦' },
+      { name: 'MySQL', layer: 'sources', icon: '📦' },
+      { name: 'MongoDB', layer: 'sources', icon: '📦' },
+      { name: 'Kafka', layer: 'sources', icon: '📦' },
+      { name: 'RabbitMQ', layer: 'sources', icon: '📦' },
+      { name: 'S3 / Data Lake', layer: 'sources', icon: '📦' },
+      { name: 'Azure Blob', layer: 'sources', icon: '📦' },
+      { name: 'GCS', layer: 'sources', icon: '📦' },
+      { name: 'REST APIs', layer: 'sources', icon: '📦' },
+      { name: 'SFTP/File Drop', layer: 'sources', icon: '📦' },
+      { name: 'Mainframe', layer: 'sources', icon: '📦' },
+      { name: 'NetSuite', layer: 'sources', icon: '📦' },
+      { name: 'Workday', layer: 'sources', icon: '📦' },
+      { name: 'SAP Analytics', layer: 'sources', icon: '📦' },
+      { name: 'Google Analytics', layer: 'sources', icon: '📦' },
+      { name: 'Advertising APIs', layer: 'sources', icon: '📦' },
+      { name: 'IoT Sensors', layer: 'sources', icon: '📦' },
+      { name: 'Web Events', layer: 'sources', icon: '📦' },
+      { name: 'CRM (Custom)', layer: 'sources', icon: '📦' },
+      { name: 'Legacy System A', layer: 'sources', icon: '📦' },
+      { name: 'Third-party Data', layer: 'sources', icon: '📦' },
+      { name: 'EDI / X12', layer: 'sources', icon: '📦' },
+      { name: 'Excel/CSV Uploads', layer: 'sources', icon: '📦' },
+      { name: 'Email Attachments', layer: 'sources', icon: '📦' },
+      { name: 'Document Stores', layer: 'sources', icon: '📦' },
+
+      // Ingestion (25 items)
+      { name: 'AWS DMS', layer: 'ingestion', icon: '⚡' },
+      { name: 'Fivetran', layer: 'ingestion', icon: '⚡' },
+      { name: 'Stitch Data', layer: 'ingestion', icon: '⚡' },
+      { name: 'Talend', layer: 'ingestion', icon: '⚡' },
+      { name: 'Informatica', layer: 'ingestion', icon: '⚡' },
+      { name: 'Apache NiFi', layer: 'ingestion', icon: '⚡' },
+      { name: 'Logstash', layer: 'ingestion', icon: '⚡' },
+      { name: 'Debezium', layer: 'ingestion', icon: '⚡' },
+      { name: 'AWS Glue', layer: 'ingestion', icon: '⚡' },
+      { name: 'Data Factory', layer: 'ingestion', icon: '⚡' },
+      { name: 'Dataflow (GCP)', layer: 'ingestion', icon: '⚡' },
+      { name: 'Custom Spark Jobs', layer: 'ingestion', icon: '⚡' },
+      { name: 'Kafka Connectors', layer: 'ingestion', icon: '⚡' },
+      { name: 'Cloud Functions', layer: 'ingestion', icon: '⚡' },
+      { name: 'Lambda Functions', layer: 'ingestion', icon: '⚡' },
+      { name: 'dbt (ELT)', layer: 'ingestion', icon: '⚡' },
+      { name: 'Airflow', layer: 'ingestion', icon: '⚡' },
+      { name: 'Dagster', layer: 'ingestion', icon: '⚡' },
+      { name: 'Prefect', layer: 'ingestion', icon: '⚡' },
+      { name: 'Luigi', layer: 'ingestion', icon: '⚡' },
+      { name: 'MuleSoft', layer: 'ingestion', icon: '⚡' },
+      { name: 'SSIS', layer: 'ingestion', icon: '⚡' },
+      { name: 'Boomi', layer: 'ingestion', icon: '⚡' },
+      { name: 'Custom Python', layer: 'ingestion', icon: '⚡' },
+      { name: 'REST Sync', layer: 'ingestion', icon: '⚡' },
+
+      // Bronze (20 items)
+      { name: 'Raw Data Lake', layer: 'bronze', icon: '🥉' },
+      { name: 'Kafka Topics', layer: 'bronze', icon: '🥉' },
+      { name: 'S3 Raw Zone', layer: 'bronze', icon: '🥉' },
+      { name: 'ADLS Raw', layer: 'bronze', icon: '🥉' },
+      { name: 'GCS Raw', layer: 'bronze', icon: '🥉' },
+      { name: 'Delta Lake (raw)', layer: 'bronze', icon: '🥉' },
+      { name: 'Iceberg Tables', layer: 'bronze', icon: '🥉' },
+      { name: 'Staging Tables', layer: 'bronze', icon: '🥉' },
+      { name: 'Change Data Capture', layer: 'bronze', icon: '🥉' },
+      { name: 'Time-series Storage', layer: 'bronze', icon: '🥉' },
+      { name: 'Document Storage', layer: 'bronze', icon: '🥉' },
+      { name: 'Archive Zone', layer: 'bronze', icon: '🥉' },
+      { name: 'Cold Storage', layer: 'bronze', icon: '🥉' },
+      { name: 'Parquet (raw)', layer: 'bronze', icon: '🥉' },
+      { name: 'ORC (raw)', layer: 'bronze', icon: '🥉' },
+      { name: 'Avro (raw)', layer: 'bronze', icon: '🥉' },
+      { name: 'Message Queue Archive', layer: 'bronze', icon: '🥉' },
+      { name: 'Event Stream Buffer', layer: 'bronze', icon: '🥉' },
+      { name: 'Data Validation Layer', layer: 'bronze', icon: '🥉' },
+      { name: 'Metadata Registry', layer: 'bronze', icon: '🥉' },
+
+      // Silver (25 items)
+      { name: 'Cleansed Tables', layer: 'silver', icon: '🥈' },
+      { name: 'Deduplicated Data', layer: 'silver', icon: '🥈' },
+      { name: 'Conformed Dimensions', layer: 'silver', icon: '🥈' },
+      { name: 'Bridge Tables', layer: 'silver', icon: '🥈' },
+      { name: 'Slowly Changing Dims', layer: 'silver', icon: '🥈' },
+      { name: 'Enriched Facts', layer: 'silver', icon: '🥈' },
+      { name: 'Time Dimensions', layer: 'silver', icon: '🥈' },
+      { name: 'Geography Dimensions', layer: 'silver', icon: '🥈' },
+      { name: 'Product Master', layer: 'silver', icon: '🥈' },
+      { name: 'Customer Master', layer: 'silver', icon: '🥈' },
+      { name: 'Supplier Master', layer: 'silver', icon: '🥈' },
+      { name: 'Account Ledger', layer: 'silver', icon: '🥈' },
+      { name: 'Transaction Facts', layer: 'silver', icon: '🥈' },
+      { name: 'Order Facts', layer: 'silver', icon: '🥈' },
+      { name: 'Sales Facts', layer: 'silver', icon: '🥈' },
+      { name: 'Inventory Facts', layer: 'silver', icon: '🥈' },
+      { name: 'HR Master Data', layer: 'silver', icon: '🥈' },
+      { name: 'Operational Tables', layer: 'silver', icon: '🥈' },
+      { name: 'Data Quality Flags', layer: 'silver', icon: '🥈' },
+      { name: 'Aggregated Tables', layer: 'silver', icon: '🥈' },
+      { name: 'Slowly Changing Facts', layer: 'silver', icon: '🥈' },
+      { name: 'Normalized Relations', layer: 'silver', icon: '🥈' },
+      { name: 'Audit Tables', layer: 'silver', icon: '🥈' },
+      { name: 'Error Logs', layer: 'silver', icon: '🥈' },
+      { name: 'Data Dictionary', layer: 'silver', icon: '🥈' },
+
+      // Gold (25 items)
+      { name: 'Mart: Finance', layer: 'gold', icon: '🥇' },
+      { name: 'Mart: Sales', layer: 'gold', icon: '🥇' },
+      { name: 'Mart: HR', layer: 'gold', icon: '🥇' },
+      { name: 'Mart: Operations', layer: 'gold', icon: '🥇' },
+      { name: 'Mart: Marketing', layer: 'gold', icon: '🥇' },
+      { name: 'Mart: Customer', layer: 'gold', icon: '🥇' },
+      { name: 'Analytics View: Exec KPIs', layer: 'gold', icon: '🥇' },
+      { name: 'Analytics View: Trends', layer: 'gold', icon: '🥇' },
+      { name: 'ML Feature Store', layer: 'gold', icon: '🥇' },
+      { name: 'Real-time Aggregates', layer: 'gold', icon: '🥇' },
+      { name: 'Cached Tables', layer: 'gold', icon: '🥇' },
+      { name: 'Materialized Views', layer: 'gold', icon: '🥇' },
+      { name: 'Star Schema (core)', layer: 'gold', icon: '🥇' },
+      { name: 'Fact Table (sales)', layer: 'gold', icon: '🥇' },
+      { name: 'Dimension (product)', layer: 'gold', icon: '🥇' },
+      { name: 'Dimension (customer)', layer: 'gold', icon: '🥇' },
+      { name: 'Dimension (date)', layer: 'gold', icon: '🥇' },
+      { name: 'Dimension (org)', layer: 'gold', icon: '🥇' },
+      { name: 'Role-Playing Dims', layer: 'gold', icon: '🥇' },
+      { name: 'Conformed Facts', layer: 'gold', icon: '🥇' },
+      { name: 'Federated Analytics', layer: 'gold', icon: '🥇' },
+      { name: 'Domain Marts', layer: 'gold', icon: '🥇' },
+      { name: 'OBT (One Big Table)', layer: 'gold', icon: '🥇' },
+      { name: 'API Response Cache', layer: 'gold', icon: '🥇' },
+      { name: 'Dashboard Extracts', layer: 'gold', icon: '🥇' },
+
+      // Governance (15 items)
+      { name: 'Data Catalog', layer: 'governance', icon: '📋' },
+      { name: 'Unity Catalog', layer: 'governance', icon: '📋' },
+      { name: 'Data Lineage', layer: 'governance', icon: '📋' },
+      { name: 'Data Quality Rules', layer: 'governance', icon: '📋' },
+      { name: 'DQ Monitoring', layer: 'governance', icon: '📋' },
+      { name: 'Audit Logs', layer: 'governance', icon: '📋' },
+      { name: 'Access Control (RBAC)', layer: 'governance', icon: '📋' },
+      { name: 'Tag-based Security', layer: 'governance', icon: '📋' },
+      { name: 'PII Detection', layer: 'governance', icon: '📋' },
+      { name: 'Data Masking', layer: 'governance', icon: '📋' },
+      { name: 'Encryption (at-rest)', layer: 'governance', icon: '📋' },
+      { name: 'Encryption (in-transit)', layer: 'governance', icon: '📋' },
+      { name: 'Compliance Reporting', layer: 'governance', icon: '📋' },
+      { name: 'Data Retention Policy', layer: 'governance', icon: '📋' },
+      { name: 'Metadata Store', layer: 'governance', icon: '📋' },
+
+      // Consumption (20 items)
+      { name: 'Tableau', layer: 'consumption', icon: '📊' },
+      { name: 'Power BI', layer: 'consumption', icon: '📊' },
+      { name: 'Looker', layer: 'consumption', icon: '📊' },
+      { name: 'Qlik', layer: 'consumption', icon: '📊' },
+      { name: 'Sisense', layer: 'consumption', icon: '📊' },
+      { name: 'MicroStrategy', layer: 'consumption', icon: '📊' },
+      { name: 'Cognos', layer: 'consumption', icon: '📊' },
+      { name: 'Superset', layer: 'consumption', icon: '📊' },
+      { name: 'Metabase', layer: 'consumption', icon: '📊' },
+      { name: 'Grafana', layer: 'consumption', icon: '📊' },
+      { name: 'Custom BI App', layer: 'consumption', icon: '📊' },
+      { name: 'Jupyter Notebooks', layer: 'consumption', icon: '📊' },
+      { name: 'RStudio', layer: 'consumption', icon: '📊' },
+      { name: 'Python/Pandas', layer: 'consumption', icon: '📊' },
+      { name: 'SQL Clients', layer: 'consumption', icon: '📊' },
+      { name: 'REST APIs', layer: 'consumption', icon: '📊' },
+      { name: 'Webhooks', layer: 'consumption', icon: '📊' },
+      { name: 'ML Model Pipeline', layer: 'consumption', icon: '📊' },
+      { name: 'Real-time Dashboards', layer: 'consumption', icon: '📊' },
+      { name: 'Operational Alerts', layer: 'consumption', icon: '📊' },
+    ];
+
+    const FOLLOWUP_RULES = [
+      {
+        condition: (data) => data.num_sources && parseInt(data.num_sources) > 20,
+        followup: 'With 20+ sources, you need a robust ingestion orchestration (Airflow, Dagster) and comprehensive error handling.',
+        section: 2
+      },
+      {
+        condition: (data) => getActiveChips('latency').includes('Real-time'),
+        followup: 'Real-time requirements suggest Kafka, stream processing, and lower RPO. Have you designed for late-arriving data?',
+        section: 2
+      },
+      {
+        condition: (data) => getActiveChips('latency').includes('Real-time') && getActiveChips('cloud').includes('Azure'),
+        followup: 'Azure Event Hubs + Databricks Streaming is a strong pairing for real-time latency.',
+        section: 2
+      },
+      {
+        condition: (data) => getActiveChips('dw_approach').includes('Centralized EDW'),
+        followup: 'Centralized EDW typically needs strong data governance, a shared data model, and cross-functional buy-in.',
+        section: 3
+      },
+      {
+        condition: (data) => getActiveChips('modeling_pref').includes('Star/Dimensional') && getActiveChips('dw_approach').includes('Centralized EDW'),
+        followup: 'Star schema in a centralized EDW is classic—focus on conformed dimensions, slowly changing dimension handling, and grain consistency.',
+        section: 3
+      },
+      {
+        condition: (data) => getActiveChips('modeling_pref').includes('One Big Table'),
+        followup: 'OBT is trendy for analytics-only use cases. Make sure your queries, joins, and grain are truly optimized for it.',
+        section: 3
+      },
+      {
+        condition: (data) => parseInt(data.users) > 100,
+        followup: 'With 100+ concurrent users, plan for materialized views, query result caching, and potential semantic layer.',
+        section: 4
+      },
+      {
+        condition: (data) => getActiveChips('cost_sensitivity').includes('Cost-first'),
+        followup: 'If cost is primary, emphasize Spot instances, partition pruning, reserved capacity, and thoughtful aggregation.',
+        section: 4
+      },
+      {
+        condition: (data) => getActiveChips('compliance').length > 2,
+        followup: 'Multiple compliance frameworks require a unified governance approach—Unity Catalog or equivalent is essential.',
+        section: 5
+      },
+      {
+        condition: (data) => getActiveChips('compliance').includes('GDPR'),
+        followup: 'GDPR requires data residency, right-to-be-forgotten, and strict audit trails. Plan for pseudonymization / masking.',
+        section: 5
+      },
+      {
+        condition: (data) => getActiveChips('access_model').includes('ABAC/Tags'),
+        followup: 'Attribute-Based Access Control scales better than RBAC but needs a tagging strategy and enforcement layer.',
+        section: 5
+      },
+      {
+        condition: (data) => getActiveChips('catalog_strategy').includes('Unity Catalog'),
+        followup: 'UC simplifies cross-workspace governance and multi-cloud scenarios. Plan for external location setup and migration.',
+        section: 5
+      },
+      {
+        condition: (data) => getActiveChips('deploy_approach').includes('Manual'),
+        followup: 'Manual deployment works for small teams, but invest in scripts/CI-CD soon to reduce errors and improve velocity.',
+        section: 6
+      },
+      {
+        condition: (data) => getActiveChips('deploy_approach').includes('IaC/Terraform'),
+        followup: 'IaC with Terraform is best practice—plan for workspace modules, state management, and drift detection.',
+        section: 6
+      },
+      {
+        condition: (data) => getActiveChips('ops_model').includes('Data mesh'),
+        followup: 'Data mesh requires strong product mindset, federated ownership, and clear domain boundaries. High organizational lift.',
+        section: 6
+      },
+      {
+        condition: (data) => getActiveChips('ops_model').includes('Central platform team'),
+        followup: 'Central platform team is simpler to start but can become a bottleneck. Plan for APIs and self-service.',
+        section: 6
+      },
+      {
+        condition: (data) => getActiveChips('skills').includes('SQL-heavy'),
+        followup: 'SQL-heavy teams are ideal for Databricks SQL, dbt, and dimensional modeling. Minimize Python/Scala complexity.',
+        section: 7
+      },
+      {
+        condition: (data) => getActiveChips('skills').includes('Python') && getActiveChips('skills').includes('Spark'),
+        followup: 'Strong Python + Spark team? Focus on PySpark transformations, custom models, and feature engineering.',
+        section: 7
+      },
+      {
+        condition: (data) => data.pain_points && data.pain_points.includes('slow'),
+        followup: 'If query/ingestion slowness was a pain point, prioritize indexing, partitioning, and right-sizing compute.',
+        section: 7
+      },
+      {
+        condition: (data) => data.pain_points && data.pain_points.includes('quality'),
+        followup: 'If data quality was a pain, build quality checks early in the Bronze→Silver layer.',
+        section: 7
+      },
+      {
+        condition: (data) => getActiveChips('formats').includes('Streaming/IoT'),
+        followup: 'Streaming IoT data needs low-latency ingest, time-series storage, and efficient compression.',
+        section: 2
+      },
+      {
+        condition: (data) => getActiveChips('formats').includes('Unstructured/Docs'),
+        followup: 'Unstructured data (PDFs, text) requires extraction/OCR tools. Consider embedding or full-text search.',
+        section: 2
+      },
+      {
+        condition: (data) => getActiveChips('use_cases').includes('ML/AI Platform'),
+        followup: 'ML/AI platform requires feature store, model registry, and CI/CD for model deployment.',
+        section: 1
+      },
+      {
+        condition: (data) => getActiveChips('use_cases').includes('Real-time KPIs'),
+        followup: 'Real-time KPIs need streaming aggregations, low-latency dashboards, and alerting.',
+        section: 1
+      },
+      {
+        condition: (data) => getActiveChips('cloud').includes('Multi-cloud'),
+        followup: 'Multi-cloud architecture needs Unity Catalog, consistent tooling, and careful cost/latency trade-offs.',
+        section: 2
+      },
+      {
+        condition: (data) => parseInt(data.num_sources) > 50,
+        followup: 'With 50+ sources, implement a hub-and-spoke ingest pattern and domain-based organization.',
+        section: 2
+      },
+      {
+        condition: (data) => data.peak_periods && data.peak_periods.includes('month-end'),
+        followup: 'Month-end peaks often involve batch jobs. Stagger ingestion, use incremental loads, and pre-compute aggregates.',
+        section: 4
+      },
+      {
+        condition: (data) => getActiveChips('environments').includes('Single env'),
+        followup: 'Single environment limits testing and rollback options. Plan a migration path to Dev/Test/Prod.',
+        section: 6
+      },
+      {
+        condition: (data) => getActiveChips('environments').includes('Dev/Test/Prod'),
+        followup: 'Three-tier environments require a consistent CI/CD pipeline and promotion strategy.',
+        section: 6
+      },
+      {
+        condition: (data) => getActiveChips('consumers').includes('ML Models'),
+        followup: 'ML models need low-latency, high-dimensional feature access. Feature store architecture is critical.',
+        section: 1
+      },
+      {
+        condition: (data) => getActiveChips('use_cases').includes('Data Democratization'),
+        followup: 'Data democratization requires excellent documentation, lineage, and self-service analytics tools.',
+        section: 1
+      },
+      {
+        condition: (data) => data.volume && data.volume.includes('TB'),
+        followup: 'Large volumes (TBs+) need careful partitioning, compression, and lifecycle policies.',
+        section: 2
+      },
+      {
+        condition: (data) => getActiveChips('compliance').includes('HIPAA') || getActiveChips('compliance').includes('PCI-DSS'),
+        followup: 'HIPAA/PCI require encryption, audit trails, and strict access control. Security is non-negotiable.',
+        section: 5
+      },
+      {
+        condition: (data) => !data.notes || data.notes.trim() === '',
+        followup: 'No additional context yet? Consider adding org constraints, legacy tech, or political considerations.',
+        section: 7
+      },
+      {
+        condition: (data) => data.mvp_uses && data.mvp_uses.length > 0,
+        followup: 'Smart to pick 1-2 MVP use cases. This focuses your architecture and delivers value quickly.',
+        section: 7
+      },
+      {
+        condition: (data) => getActiveChips('use_cases').includes('Legacy Migration'),
+        followup: 'Legacy migration? Start with Lakehouse Federation to query in place while migrating incrementally. Use Lakebridge Analyzer to assess conversion complexity.',
+        section: 1
+      },
+      {
+        condition: (data) => data.sources && (data.sources.toLowerCase().includes('teradata') || data.sources.toLowerCase().includes('netezza')),
+        followup: 'Teradata/Netezza source detected. Lakebridge transpiler can auto-convert ~80% of proprietary SQL. Assess stored procedure usage — often 60-80% are inactive.',
+        section: 2
+      },
+      {
+        condition: (data) => data.sources && data.sources.toLowerCase().includes('snowflake'),
+        followup: 'Existing Snowflake instances? Lakehouse Federation can query them in place. Consider Delta Sharing for data exchange during transition.',
+        section: 2
+      },
+      {
+        condition: (data) => data.pain_points && data.pain_points.toLowerCase().includes('cost'),
+        followup: 'Cost is a pain point. Compare current DW TCO (licensing + hardware + people) against Databricks serverless. Budget policies in Unity Catalog enable chargeback by LOB.',
+        section: 7
+      },
+      {
+        condition: (data) => getActiveChips('compliance').includes('GDPR') && getActiveChips('access_model').includes('Geography-based'),
+        followup: 'GDPR + geography-based access? Each EU region needs its own Unity Catalog metastore. Use Delta Sharing for cross-region data distribution. Row filters by country tags.',
+        section: 5
+      },
+      {
+        condition: (data) => getActiveChips('modeling_pref').includes('Data Vault'),
+        followup: 'Data Vault maps naturally to medallion: Raw Vault in Silver (Hubs/Links/Satellites), Business Vault at Silver/Gold boundary, star schemas in Gold for consumption.',
+        section: 3
+      },
+      {
+        condition: (data) => data.num_sources && parseInt(data.num_sources) > 30,
+        followup: 'With 30+ sources, LakeFlow Connect managed connectors + Auto Loader for file-based sources. Organize ingestion by domain to avoid bottlenecks.',
+        section: 2
+      }
+    ];
+
+    const SCENARIOS = {
+      finserv: {
+        customer_name: 'FinServ Bank Corp',
+        biz_problem: 'Regulatory reporting delays, stale real-time KPIs, siloed risk and compliance data',
+        biz_kpis: 'Reduce report delivery from 5 days to 1 day; enable real-time risk dashboards in 90 days',
+        use_cases: ['Regulatory Reporting', 'Real-time KPIs', 'Data Democratization', 'ML/AI Platform'],
+        consumers: ['Regulators', 'Executives', 'Analysts', 'Data Scientists'],
+        sources: 'Core banking (Temenos), loan origination (Fiserv), market data (Bloomberg), risk systems (custom), HR (Workday)',
+        cloud: ['Azure'],
+        bi_tools: 'Power BI, custom VB6 reports',
+        etl_tools: 'SSIS, custom scheduled jobs',
+        latency: ['Near-real-time', 'Hourly'],
+        formats: ['Structured/SQL', 'Semi-structured/JSON'],
+        volume: '2-3 TB daily, growing 20%/year',
+        num_sources: '28',
+        dw_approach: ['Centralized EDW'],
+        domains: 'Customers, Accounts, Products, Transactions, Risk, Compliance, HR',
+        subject_areas: 'Customer grain, Account-daily, Transaction-atomic, Risk-daily, Compliance-audit-trail',
+        modeling_pref: ['Star/Dimensional'],
+        query_slas: '50 concurrent report users, <2s exec dashboard, <30s ad-hoc',
+        dr: 'RPO 4h, RTO 2h (regulatory requirement)',
+        peak_periods: 'Month-end close (72h window), regulatory deadline sprints',
+        users: '250 knowledge workers + 5 automated systems',
+        cost_sensitivity: ['Balanced'],
+        compliance: ['GDPR', 'PCI-DSS', 'SOX', 'Basel IV'],
+        access_model: ['RBAC'],
+        catalog_strategy: ['Unity Catalog'],
+        audit_reqs: 'Complete audit trail for all data access, quarterly compliance certification',
+        deploy_approach: ['CI/CD', 'IaC/Terraform'],
+        environments: ['Dev/Test/Prod'],
+        ops_model: ['Central platform team'],
+        monitoring: 'Datadog, Azure Monitor',
+        success_short: 'Regulatory reporting on real-time data by month-end (90 days)',
+        success_long: 'Cross-bank ML-powered risk prediction, self-service analytics, real-time compliance monitoring',
+        deadlines: 'GDPR audit (Q3), regulatory reporting deadline (Q4)',
+        mvp_uses: 'Regulatory report acceleration, real-time KPI dashboard',
+        mandates: 'Must use Azure (enterprise standard), cannot move data out of region',
+        skills: ['SQL-heavy', 'Python'],
+        pain_points: 'Legacy SSIS jobs fail silently; data quality issues not caught until report time; cross-system reconciliation is manual',
+        notes: 'Risk aversion high; prefer Databricks over open-source Spark. Data governance is top priority.'
+      },
+      wegmans: {
+        customer_name: 'Wegmans Food Markets',
+        biz_problem: 'Store operations data siloed; can\'t predict demand; no real-time inventory visibility',
+        biz_kpis: 'Reduce markdown/shrink by 5%; improve forecast accuracy to 90%; cut data ops headcount by 30%',
+        use_cases: ['Demand Forecasting', 'Real-time KPIs', 'Self-service Analytics', 'Cost Optimization'],
+        consumers: ['Store Managers', 'Analysts', 'ML Models', 'Executives'],
+        sources: 'POS (SAP), inventory (Maximo), supply chain (JDA), vendor data (EDI), web/app events',
+        cloud: ['AWS'],
+        bi_tools: 'Tableau (current, limited adoption)',
+        etl_tools: 'Custom Python scripts, some Talend connectors',
+        latency: ['Real-time', 'Hourly'],
+        formats: ['Structured/SQL', 'Semi-structured/JSON', 'Streaming/IoT'],
+        volume: '100-150 GB/day across ~480 stores',
+        num_sources: '12',
+        dw_approach: ['Centralized EDW', 'Data Marts'],
+        domains: 'Store Operations, Inventory, POS Transactions, Supplier, Marketing, Employee',
+        subject_areas: 'Transaction-atomic, Inventory-by-item-store-daily, Customer-transaction-grain',
+        modeling_pref: ['Star/Dimensional', 'One Big Table'],
+        query_slas: '80 concurrent store-ops users, <1s dashboards, <10s ad-hoc',
+        dr: 'RPO 2h, RTO 1h (store operations critical)',
+        peak_periods: 'Weekend sales surge, end-of-month inventory, holiday campaigns',
+        users: '500 store managers, 50 analysts, 10 data scientists',
+        cost_sensitivity: ['Cost-first'],
+        compliance: ['CCPA'],
+        access_model: ['RBAC', 'Domain-based'],
+        catalog_strategy: ['Need new'],
+        audit_reqs: 'Customer privacy (PII masking), transaction audit trail',
+        deploy_approach: ['CI/CD'],
+        environments: ['Dev/Test/Prod'],
+        ops_model: ['Federated / LOB'],
+        monitoring: 'CloudWatch, custom Slack alerts',
+        success_short: 'Real-time store KPI dashboard + demand forecast model in production (6 months)',
+        success_long: 'Autonomous replenishment, predictive pricing, personalized promotions by store',
+        deadlines: 'Q3 forecast model live; Q4 holiday season readiness',
+        mvp_uses: 'Real-time POS-to-dashboard pipeline, weekly demand forecast',
+        mandates: 'AWS-only (existing Redshift contract); prefer open-source (dbt, Airflow, Spark)',
+        skills: ['Python', 'Spark', 'SQL-heavy'],
+        pain_points: 'Data integrity issues between systems; forecast models break every few weeks; 15-person data ops team is bottleneck',
+        notes: 'Very collaborative culture; quick decision-making. Data literacy improving. Open to modern DevOps practices.'
+      },
+      dw_migration: {
+        customer_name: 'Global Manufacturing Corp',
+        biz_problem: 'Migrate aging 500TB Teradata EDW to Databricks Lakehouse. Consolidate departmental Snowflake instances. Enable real-time analytics and self-service across 50 countries.',
+        biz_kpis: 'Decommission Teradata in 18 months; reduce DW TCO by 40%; enable self-service analytics for 500+ users in 90 days',
+        use_cases: ['Legacy Migration', 'Self-service Analytics', 'Regulatory Reporting', 'Real-time KPIs', 'Cost Optimization', 'Data Democratization'],
+        consumers: ['Analysts', 'Executives', 'Regulators', 'Data Scientists', 'Apps/APIs'],
+        sources: 'Teradata EDW (500TB, 15yr), Oracle ERP (OLTP), departmental Snowflake (3 instances), SAP S/4HANA, Salesforce CRM, Kafka (IoT telemetry), market data feeds (Bloomberg)',
+        cloud: ['Azure'],
+        bi_tools: 'Power BI (primary), Tableau (some departments), custom Crystal Reports',
+        etl_tools: 'Informatica PowerCenter, SSIS (legacy), some dbt (new team), manual stored procedures',
+        latency: ['Near-real-time', 'Hourly', 'Daily batch'],
+        formats: ['Structured/SQL', 'Semi-structured/JSON', 'Streaming/IoT'],
+        volume: '500 TB existing + 2-3 TB daily growth, ~50 TB/year net new',
+        num_sources: '45',
+        dw_approach: ['Centralized EDW'],
+        domains: 'Manufacturing, Supply Chain, Finance, Sales, Customer, HR, IoT/Telemetry, Regulatory',
+        subject_areas: 'Transaction-atomic, Inventory-by-plant-daily, Customer-account-grain, Financial-ledger-monthly, IoT-sensor-5min-intervals',
+        modeling_pref: ['Star/Dimensional', 'Data Vault'],
+        query_slas: '200 concurrent analysts, <3s dashboards, <30s ad-hoc, batch reports within 2hr SLA',
+        dr: 'RPO 4h, RTO 2h (regulatory), RPO 1h for IoT/operational data',
+        peak_periods: 'Month-end close (5-day window), quarterly regulatory submissions, annual audit season',
+        users: '500+ analysts across 50 countries, 20 data engineers, 15 data scientists, 50+ automated reporting jobs',
+        cost_sensitivity: ['Balanced'],
+        compliance: ['GDPR', 'SOX', 'Basel III/IV'],
+        access_model: ['RBAC', 'ABAC/Tags', 'Geography-based'],
+        catalog_strategy: ['Unity Catalog'],
+        audit_reqs: 'Full audit trail for regulatory reporting, data residency per EU/APAC/Americas, 7-year retention for financial data',
+        deploy_approach: ['CI/CD', 'IaC/Terraform'],
+        environments: ['Dev/Test/Prod'],
+        ops_model: ['Central platform team', 'Federated / LOB'],
+        monitoring: 'Datadog, PagerDuty, ServiceNow integration',
+        success_short: 'Federate Teradata queries via Lakehouse Federation; migrate top 10 reporting workloads to DBSQL; stand up self-service sandbox for analysts',
+        success_long: 'Full Teradata decommission; real-time IoT analytics; ML-powered demand forecasting; global unified data platform',
+        deadlines: 'Teradata contract renewal in 18 months; SOX audit Q3; GDPR compliance review Q4',
+        mvp_uses: 'Migrate top 10 executive dashboards to DBSQL; Federation for remaining Teradata queries during transition',
+        mandates: 'Must use Azure (enterprise agreement); cannot move EU data outside EU; existing Informatica contract (2 years remaining)',
+        skills: ['SQL-heavy', 'Python', 'Spark'],
+        pain_points: 'Teradata license cost unsustainable ($8M/yr); 3000+ stored procedures (only ~200 actively used); Snowflake sprawl with no governance; cross-region data sharing is manual CSV exports; 48hr SLA for new report requests',
+        notes: 'Strong executive sponsorship from CFO. Central platform team of 20 exists but domains want self-service. Previous attempt to migrate to Hadoop failed 3 years ago — team is cautious. Informatica team resistant to change.',
+        migration_approach: ['Federation-First']
+      }
+    };
+
+    let currentStep = 1;
+    const TOTAL_STEPS = 7;
+    let discoveryMode = 'wizard';
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let currentScenario = null;
+    let canvasElements = [];
+
+    // ============================================================================
+    // INITIALIZATION
+    // ============================================================================
+
+    function initializeDiscoveryTab() {
+      // Initialize chip groups
+      Object.keys(CHIP_OPTIONS).forEach(groupId => {
+        const container = document.getElementById(groupId);
+        if (container) {
+          container.innerHTML = '';
+          CHIP_OPTIONS[groupId].forEach(option => {
+            const chip = document.createElement('button');
+            chip.className = 'chip';
+            chip.textContent = option;
+            chip.onclick = function(e) {
+              e.preventDefault();
+              this.classList.toggle('active');
+              updateCoachAnsweredState();
+              generateDynamicFollowups();
+              updatePreview();
+            };
+            container.appendChild(chip);
+          });
+        }
+      });
+
+      // Initialize wizard with first step
+      renderStepIndicator();
+      goToStep(1);
+    }
+
+    function initializeBuildTab() {
+      renderPalette();
+      initializeCanvas();
+    }
+
+    function renderPalette() {
+      const content = document.getElementById('paletteContent');
+      content.innerHTML = '';
+      COMPONENTS.forEach(comp => {
+        const card = document.createElement('div');
+        card.className = 'component-card';
+        card.draggable = true;
+        card.textContent = `${comp.icon} ${comp.name}`;
+        card.dataset.layer = comp.layer;
+        card.dataset.name = comp.name;
+        card.ondragstart = (e) => {
+          e.dataTransfer.effectAllowed = 'copy';
+          e.dataTransfer.setData('componentName', comp.name);
+          e.dataTransfer.setData('componentLayer', comp.layer);
+        };
+        content.appendChild(card);
+      });
+      updateComponentCount();
+    }
+
+    function initializeCanvas() {
+      const canvas = document.getElementById('canvas');
+      canvas.innerHTML = '';
+      canvas.ondrop = handleCanvasDrop;
+      canvas.ondragover = (e) => e.preventDefault();
+
+      // Create swim lanes for medallion architecture
+      const lanes = [
+        { name: 'Sources', y: 20, color: '#5b8def' },
+        { name: 'Bronze', y: 180, color: '#cd7f32' },
+        { name: 'Silver', y: 340, color: '#c0c0c0' },
+        { name: 'Gold', y: 500, color: '#ffd700' },
+        { name: 'Consumption', y: 660, color: '#4ecdc4' }
+      ];
+
+      lanes.forEach(lane => {
+        const swimLane = document.createElement('div');
+        swimLane.className = 'swim-lane';
+        swimLane.style.top = lane.y + 'px';
+        swimLane.style.left = '10px';
+        swimLane.style.width = 'calc(100% - 20px)';
+        swimLane.style.height = '140px';
+        swimLane.textContent = lane.name;
+        swimLane.style.borderColor = lane.color;
+        swimLane.style.color = lane.color;
+        canvas.appendChild(swimLane);
+      });
+    }
+
+    function handleCanvasDrop(e) {
+      e.preventDefault();
+      const name = e.dataTransfer.getData('componentName');
+      if (!name) return;
+
+      const canvas = document.getElementById('canvas');
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      addCanvasElement(name, x, y);
+    }
+
+    function addCanvasElement(name, x, y) {
+      const canvas = document.getElementById('canvas');
+      const el = document.createElement('div');
+      el.className = 'canvas-element';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.textContent = name;
+      el.draggable = true;
+
+      el.ondragstart = (e) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.currentTarget.dataset.draggedElement = 'true';
+      };
+
+      el.ondragover = (e) => e.preventDefault();
+
+      el.ondrop = (e) => {
+        e.preventDefault();
+      };
+
+      el.oncontextmenu = (e) => {
+        e.preventDefault();
+        showContextMenu(e, el);
+      };
+
+      el.ondrag = (e) => {
+        if (e.clientX > 0 && e.clientY > 0) {
+          el.style.left = (e.clientX - canvas.getBoundingClientRect().left) + 'px';
+          el.style.top = (e.clientY - canvas.getBoundingClientRect().top) + 'px';
+        }
+      };
+
+      canvas.appendChild(el);
+      canvasElements.push(el);
+    }
+
+    // ============================================================================
+    // WIZARD NAVIGATION & STEPS
+    // ============================================================================
+
+    function setDiscoveryMode(mode) {
+      discoveryMode = mode;
+      const wizardBtn = document.getElementById('wizardModeBtn');
+      const quickBtn = document.getElementById('quickModeBtn');
+      const modeHint = document.getElementById('modeHint');
+      const stepIndicator = document.getElementById('stepIndicator');
+
+      if (mode === 'quick') {
+        wizardBtn.classList.remove('primary');
+        quickBtn.classList.add('primary');
+        modeHint.textContent = 'All sections visible \u2014 scroll and capture fast';
+        stepIndicator.style.display = 'none';
+
+        // Show ALL wizard steps at once
+        document.querySelectorAll('.wizard-step').forEach(step => {
+          step.style.display = 'block';
+          step.classList.add('active');
+        });
+        // Hide all wizard-nav (Next/Back buttons) in quick mode
+        document.querySelectorAll('.wizard-nav').forEach(nav => {
+          nav.style.display = 'none';
+        });
+      } else {
+        quickBtn.classList.remove('primary');
+        wizardBtn.classList.add('primary');
+        modeHint.textContent = 'Step-by-step guided discovery';
+        stepIndicator.style.display = 'flex';
+
+        // Restore wizard behavior
+        document.querySelectorAll('.wizard-nav').forEach(nav => {
+          nav.style.display = 'flex';
+        });
+        goToStep(currentStep);
+      }
+    }
+
+    function renderStepIndicator() {
+      const indicator = document.getElementById('stepIndicator');
+      indicator.innerHTML = '';
+
+      for (let i = 1; i <= TOTAL_STEPS; i++) {
+        const hasContent = hasStepContent(i);
+
+        const dot = document.createElement('div');
+        dot.className = 'step-dot';
+        if (i === currentStep) dot.classList.add('active');
+        if (hasContent) dot.classList.add('completed');
+        dot.textContent = i;
+        dot.onclick = () => goToStep(i);
+
+        indicator.appendChild(dot);
+
+        if (i < TOTAL_STEPS) {
+          const connector = document.createElement('div');
+          connector.className = 'step-connector';
+          if (i < currentStep) connector.classList.add('active');
+          indicator.appendChild(connector);
+        }
+      }
+    }
+
+    function hasStepContent(stepNum) {
+      const section = SECTIONS[stepNum - 1];
+      if (section) {
+        const checkField = (fieldId) => {
+          const field = document.getElementById(fieldId);
+          if (!field) return false;
+          if (field.tagName === 'INPUT' || field.tagName === 'TEXTAREA') {
+            return field.value.trim().length > 0;
+          }
+          return false;
+        };
+
+        const checkChips = (groupId) => {
+          return document.querySelectorAll(`#${groupId} .chip.active`).length > 0;
+        };
+
+        if (section.step === 1) {
+          return checkField('customer_name') || checkField('biz_problem') || checkChips('use_cases') || checkChips('consumers') || checkField('biz_kpis');
+        }
+        if (section.step === 2) {
+          return checkField('sources') || checkChips('cloud') || checkChips('latency') || checkChips('formats') || checkField('volume') || checkField('num_sources');
+        }
+        if (section.step === 3) {
+          return checkChips('dw_approach') || checkField('domains') || checkField('subject_areas') || checkChips('modeling_pref') || checkField('query_slas');
+        }
+        if (section.step === 4) {
+          return checkField('dr') || checkField('peak_periods') || checkField('users') || checkChips('cost_sensitivity');
+        }
+        if (section.step === 5) {
+          return checkChips('compliance') || checkChips('access_model') || checkChips('catalog_strategy') || checkField('audit_reqs');
+        }
+        if (section.step === 6) {
+          return checkChips('deploy_approach') || checkChips('environments') || checkChips('ops_model') || checkField('monitoring');
+        }
+        if (section.step === 7) {
+          return checkField('success_short') || checkField('success_long') || checkField('deadlines') || checkField('mvp_uses') || checkChips('skills');
+        }
+        return false;
+      }
+      return false;
+    }
+
+    function goToStep(n) {
+      if (n < 1 || n > TOTAL_STEPS) return;
+      currentStep = n;
+
+      document.querySelectorAll('.wizard-step').forEach(step => {
+        const stepNum = parseInt(step.dataset.step);
+        if (stepNum === currentStep) {
+          step.style.display = 'block';
+          step.classList.add('active');
+        } else {
+          step.style.display = 'none';
+          step.classList.remove('active');
+        }
+      });
+
+      renderStepIndicator();
+      renderCoachForStep(currentStep);
+      generateDynamicFollowups();
+      updatePreview();
+
+      const wizardForm = document.querySelector('.wizard-form');
+      if (wizardForm) wizardForm.scrollTop = 0;
+    }
+
+    function nextStep() {
+      if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
+    }
+
+    function prevStep() {
+      if (currentStep > 1) goToStep(currentStep - 1);
+    }
+
+    function completeWizard() {
+      showToast('Whiteboard complete! Use Build tab to create architecture.');
+      autoPopulateBuild();
+    }
+
+    // ============================================================================
+    // COACH PANEL
+    // ============================================================================
+
+    function renderCoachForStep(stepNum) {
+      const section = SECTIONS[stepNum - 1];
+      if (!section) return;
+
+      const goalEl = document.getElementById('coachGoal');
+      goalEl.textContent = section.goal;
+
+      const questionsEl = document.getElementById('coachQuestions');
+      questionsEl.innerHTML = '';
+
+      section.coachQuestions.forEach(item => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'coach-question';
+        questionDiv.textContent = item.q;
+
+        if (item.field) {
+          questionDiv.dataset.field = item.field;
+        } else if (item.chips) {
+          questionDiv.dataset.chips = item.chips;
+        }
+
+        questionDiv.onclick = () => focusLinkedField(questionDiv);
+        questionsEl.appendChild(questionDiv);
+      });
+
+      updateCoachAnsweredState();
+    }
+
+    function focusLinkedField(el) {
+      const fieldId = el.dataset.field;
+      const chipsId = el.dataset.chips;
+
+      if (fieldId) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          const step = field.closest('.wizard-step');
+          if (step) {
+            const stepNum = parseInt(step.dataset.step);
+            if (stepNum !== currentStep) goToStep(stepNum);
+          }
+          field.focus();
+          field.classList.add('field-highlight');
+          setTimeout(() => field.classList.remove('field-highlight'), 2000);
+        }
+      } else if (chipsId) {
+        const chipsContainer = document.getElementById(chipsId);
+        if (chipsContainer) {
+          const step = chipsContainer.closest('.wizard-step');
+          if (step) {
+            const stepNum = parseInt(step.dataset.step);
+            if (stepNum !== currentStep) goToStep(stepNum);
+          }
+          chipsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+
+      el.classList.toggle('asked');
+    }
+
+    function updateCoachAnsweredState() {
+      document.querySelectorAll('.coach-question[data-field]').forEach(q => {
+        const fieldId = q.dataset.field;
+        const field = document.getElementById(fieldId);
+        if (field && (field.tagName === 'INPUT' || field.tagName === 'TEXTAREA')) {
+          q.classList.toggle('answered', field.value.trim().length > 0);
+        }
+      });
+
+      document.querySelectorAll('.coach-question[data-chips]').forEach(q => {
+        const chipsId = q.dataset.chips;
+        const active = document.querySelectorAll(`#${chipsId} .chip.active`).length;
+        q.classList.toggle('answered', active > 0);
+      });
+    }
+
+    function getActiveChips(groupId) {
+      const chips = document.querySelectorAll(`#${groupId} .chip.active`);
+      return Array.from(chips).map(c => c.textContent.trim());
+    }
+
+    function getVal(fieldId) {
+      const field = document.getElementById(fieldId);
+      if (!field) return '';
+      return field.value || '';
+    }
+
+    // ============================================================================
+    // DYNAMIC FOLLOW-UPS
+    // ============================================================================
+
+    function generateDynamicFollowups() {
+      const container = document.getElementById('dynamicFollowups');
+
+      const data = gatherFormData();
+
+      const relevantFollowups = FOLLOWUP_RULES.filter(rule => {
+        return (!rule.section || rule.section === currentStep) && rule.condition(data);
+      });
+
+      if (relevantFollowups.length === 0) {
+        container.innerHTML = '<div style="font-size: 12px; color: var(--muted);">No follow-ups for this section yet.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      relevantFollowups.slice(0, 3).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'followup-item';
+        div.innerHTML = `<div class="followup-label">💡 Follow-up</div><div>${item.followup}</div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function gatherFormData() {
+      return {
+        customer_name: getVal('customer_name'),
+        biz_problem: getVal('biz_problem'),
+        biz_kpis: getVal('biz_kpis'),
+        sources: getVal('sources'),
+        bi_tools: getVal('bi_tools'),
+        etl_tools: getVal('etl_tools'),
+        volume: getVal('volume'),
+        num_sources: getVal('num_sources'),
+        domains: getVal('domains'),
+        subject_areas: getVal('subject_areas'),
+        query_slas: getVal('query_slas'),
+        dr: getVal('dr'),
+        peak_periods: getVal('peak_periods'),
+        users: getVal('users'),
+        monitoring: getVal('monitoring'),
+        audit_reqs: getVal('audit_reqs'),
+        success_short: getVal('success_short'),
+        success_long: getVal('success_long'),
+        deadlines: getVal('deadlines'),
+        mvp_uses: getVal('mvp_uses'),
+        mandates: getVal('mandates'),
+        pain_points: getVal('pain_points'),
+        notes: getVal('notes'),
+      };
+    }
+
+    // ============================================================================
+    // PREVIEW PANEL
+    // ============================================================================
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function deriveFullArchitecture() {
+      // Gather all chip and field values
+      const formats = getActiveChips('formats');
+      const volume = getVal('volume');
+      const numSources = getVal('num_sources');
+      const sources = getVal('sources');
+      const latencies = getActiveChips('latency');
+      const etlTools = getVal('etl_tools');
+      const migrationApproach = getActiveChips('migration_approach');
+      const dwApproach = getActiveChips('dw_approach');
+      const modelingPref = getActiveChips('modeling_pref');
+      const costSensitivity = getActiveChips('cost_sensitivity');
+      const compliance = getActiveChips('compliance');
+      const accessModel = getActiveChips('access_model');
+      const catalogStrategy = getActiveChips('catalog_strategy');
+      const consumers = getActiveChips('consumers');
+      const useCases = getActiveChips('use_cases');
+      const opsModel = getActiveChips('ops_model');
+      const deployApproach = getActiveChips('deploy_approach');
+      const biTools = getVal('bi_tools');
+      const skills = getActiveChips('skills');
+
+      // Layer 1: Sources & Data
+      const sourcesLayer = { items: [], pills: [] };
+      if (formats.length) sourcesLayer.pills.push(...formats);
+      if (volume) sourcesLayer.items.push({ label: 'Volume', value: volume });
+      if (numSources) sourcesLayer.items.push({ label: 'Sources', value: numSources + ' systems' });
+      if (sources) sourcesLayer.items.push({ label: 'Systems', value: sources });
+
+      // Layer 2: Ingestion & Movement
+      const ingestionLayer = { items: [], pills: [] };
+      const ingestionMap = {
+        'Real-time': 'Structured Streaming + Auto Loader + DLT',
+        'Near-real-time': 'Auto Loader + Triggered DLT Pipelines',
+        'Hourly': 'Scheduled DLT + Auto Loader',
+        'Daily batch': 'Scheduled Jobs + COPY INTO'
+      };
+      latencies.forEach(function(l) {
+        if (ingestionMap[l]) ingestionLayer.items.push({ label: l, value: ingestionMap[l] });
+      });
+      if (etlTools) ingestionLayer.items.push({ label: 'Current ETL', value: etlTools });
+      if (migrationApproach.length) {
+        ingestionLayer.items.push({ label: 'Migration', value: migrationApproach.join(', ') });
+      }
+
+      // Layer 3: Processing & Medallion
+      const processingLayer = { items: [], pills: [] };
+      if (dwApproach.length) {
+        processingLayer.pills.push(...dwApproach);
+      }
+      const modelingMap = {
+        'Star/Dimensional': 'Star Schema in Gold + Liquid Clustering on join keys',
+        'Data Vault': 'Data Vault 2.0 in Silver \u2192 Star Schema marts in Gold',
+        'Normalized/3NF': 'Normalized Silver \u2192 Denormalized Gold aggregates',
+        'One Big Table': 'Wide fact tables in Gold + Materialized Views'
+      };
+      modelingPref.forEach(function(m) {
+        if (modelingMap[m]) processingLayer.items.push({ label: m, value: modelingMap[m] });
+      });
+      processingLayer.items.push({ label: 'Medallion', value: 'Bronze \u2192 Silver \u2192 Gold (Delta Lake)' });
+      if (costSensitivity.includes('Performance-first')) {
+        processingLayer.pills.push('Photon enabled');
+      }
+
+      // Layer 4: Governance & Security
+      const governanceLayer = { items: [], pills: [] };
+      if (compliance.length) governanceLayer.pills.push(...compliance);
+      const accessMap = {
+        'RBAC': 'Unity Catalog RBAC with workspace-level groups',
+        'ABAC/Tags': 'Unity Catalog attribute-based access + column tags',
+        'Domain-based': 'Domain-level catalogs with cross-domain sharing',
+        'Geography-based': 'Region-specific workspaces + row-level filters'
+      };
+      accessModel.forEach(function(a) {
+        if (accessMap[a]) governanceLayer.items.push({ label: a, value: accessMap[a] });
+      });
+      if (catalogStrategy.length) {
+        governanceLayer.items.push({ label: 'Catalog', value: catalogStrategy.join(', ') });
+      }
+      governanceLayer.items.push({ label: 'Core', value: 'Unity Catalog for lineage + data classification' });
+
+      // Layer 5: Consumption & Operations
+      const consumptionLayer = { items: [], pills: [] };
+      if (consumers.length) consumptionLayer.pills.push(...consumers);
+      if (useCases.length) {
+        const shown = useCases.slice(0, 3).join(', ');
+        const extra = useCases.length > 3 ? ' +' + (useCases.length - 3) + ' more' : '';
+        consumptionLayer.items.push({ label: 'Use Cases', value: shown + extra });
+      }
+      const opsMap = {
+        'Central platform team': 'Centralized governance, shared compute',
+        'Federated / LOB': 'Federated catalogs per domain, shared standards',
+        'Data mesh': 'Domain-owned products, Unity Catalog mesh federation'
+      };
+      opsModel.forEach(function(o) {
+        if (opsMap[o]) consumptionLayer.items.push({ label: 'Ops', value: opsMap[o] });
+      });
+      if (deployApproach.length) {
+        consumptionLayer.items.push({ label: 'CI/CD', value: deployApproach.join(', ') });
+      }
+      if (biTools) consumptionLayer.items.push({ label: 'BI Tools', value: biTools });
+      if (skills.length) {
+        consumptionLayer.items.push({ label: 'Dev Interface', value: skills.join(', ') });
+      }
+
+      return [
+        { key: 'sources', icon: '\uD83D\uDCCA', name: 'Sources & Data', data: sourcesLayer },
+        { key: 'ingestion', icon: '\u26A1', name: 'Ingestion & Movement', data: ingestionLayer },
+        { key: 'processing', icon: '\uD83C\uDFD7\uFE0F', name: 'Processing & Medallion', data: processingLayer },
+        { key: 'governance', icon: '\uD83D\uDD12', name: 'Governance & Security', data: governanceLayer },
+        { key: 'consumption', icon: '\uD83D\uDCC8', name: 'Consumption & Ops', data: consumptionLayer }
+      ];
+    }
+
+    function renderPreviewLayer(layer) {
+      const d = layer.data;
+      const itemCount = d.pills.length + d.items.length;
+      const hasCustomData = d.pills.length > 0 || d.items.some(function(i) { return i.label !== 'Medallion' && i.label !== 'Core'; });
+      const badgeClass = hasCustomData ? 'preview-layer-badge has-items' : 'preview-layer-badge';
+
+      const container = document.createElement('div');
+      container.className = 'preview-layer';
+      container.dataset.layer = layer.key;
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'preview-layer-header';
+      header.addEventListener('click', function() { container.classList.toggle('collapsed'); });
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'preview-layer-icon';
+      iconSpan.textContent = layer.icon;
+      header.appendChild(iconSpan);
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'preview-layer-name';
+      nameSpan.textContent = layer.name;
+      header.appendChild(nameSpan);
+
+      const badge = document.createElement('span');
+      badge.className = badgeClass;
+      badge.textContent = itemCount;
+      header.appendChild(badge);
+
+      const chevron = document.createElement('span');
+      chevron.className = 'preview-layer-chevron';
+      chevron.textContent = '\u25BC';
+      header.appendChild(chevron);
+
+      container.appendChild(header);
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'preview-layer-body';
+
+      if (!hasCustomData) {
+        const tbd = document.createElement('div');
+        tbd.className = 'preview-tbd';
+        tbd.textContent = 'No selections yet';
+        body.appendChild(tbd);
+        d.items.forEach(function(item) {
+          const rec = document.createElement('div');
+          rec.className = 'preview-rec';
+          const lbl = document.createElement('span');
+          lbl.className = 'preview-rec-label';
+          lbl.textContent = item.label + ': ';
+          const val = document.createElement('span');
+          val.className = 'preview-rec-value';
+          val.textContent = item.value;
+          rec.appendChild(lbl);
+          rec.appendChild(val);
+          body.appendChild(rec);
+        });
+      } else {
+        if (d.pills.length) {
+          const pillWrap = document.createElement('div');
+          pillWrap.style.marginBottom = '4px';
+          d.pills.forEach(function(p) {
+            const pill = document.createElement('span');
+            pill.className = 'preview-pill';
+            pill.textContent = p;
+            pillWrap.appendChild(pill);
+          });
+          body.appendChild(pillWrap);
+        }
+        d.items.forEach(function(item) {
+          const rec = document.createElement('div');
+          rec.className = 'preview-rec';
+          const lbl = document.createElement('span');
+          lbl.className = 'preview-rec-label';
+          lbl.textContent = item.label + ': ';
+          const val = document.createElement('span');
+          val.className = 'preview-rec-value';
+          val.textContent = item.value;
+          rec.appendChild(lbl);
+          rec.appendChild(val);
+          body.appendChild(rec);
+        });
+      }
+
+      container.appendChild(body);
+      return container;
+    }
+
+    function updatePreview() {
+      const preview = document.getElementById('architecturePreview');
+      const layers = deriveFullArchitecture();
+
+      // Count layers with user-provided data (beyond static defaults)
+      const filledCount = layers.filter(function(l) {
+        const d = l.data;
+        const hasCustomItems = d.items.some(function(i) { return i.label !== 'Medallion' && i.label !== 'Core'; });
+        return d.pills.length > 0 || hasCustomItems;
+      }).length;
+
+      // Clear and rebuild with DOM methods
+      preview.textContent = '';
+
+      // Completeness indicator
+      const completeness = document.createElement('div');
+      completeness.className = 'preview-completeness';
+      const countSpan = document.createElement('span');
+      countSpan.textContent = filledCount + '/5';
+      if (filledCount === 5) countSpan.className = 'preview-completeness-filled';
+      completeness.appendChild(countSpan);
+      completeness.appendChild(document.createTextNode(' layers defined'));
+      preview.appendChild(completeness);
+
+      // Render each layer
+      layers.forEach(function(layer) {
+        preview.appendChild(renderPreviewLayer(layer));
+      });
+    }
+
+    function togglePreview() {
+      const preview = document.querySelector('.discovery-preview');
+      preview.style.display = preview.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // ============================================================================
+    // BUILD TAB FUNCTIONS
+    // ============================================================================
+
+    function filterPalette() {
+      const search = document.getElementById('paletteSearch').value.toLowerCase();
+      const filter = document.getElementById('paletteFilter').value;
+      const cards = document.querySelectorAll('.component-card');
+
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const layer = card.dataset.layer;
+
+        const matchesSearch = name.includes(search);
+        const matchesFilter = !filter || layer === filter;
+
+        if (matchesSearch && matchesFilter) {
+          card.style.display = 'block';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      updateComponentCount();
+    }
+
+    function updateComponentCount() {
+      const visibleCards = document.querySelectorAll('.component-card[style="display: block"]').length;
+      document.getElementById('componentCount').textContent = visibleCards;
+    }
+
+    function autoPopulateBuild() {
+      const canvas = document.getElementById('canvas');
+      canvas.innerHTML = '';
+      initializeCanvas();
+
+      const latencies = getActiveChips('latency');
+      const dw = getActiveChips('dw_approach');
+      const modeling = getActiveChips('modeling_pref');
+
+      let components = [];
+
+      components.push({ name: 'Data Sources', x: 100, y: 40 });
+
+      if (latencies.includes('Real-time')) {
+        components.push({ name: 'Kafka', x: 100, y: 200 });
+      } else {
+        components.push({ name: 'Airflow', x: 100, y: 200 });
+      }
+
+      components.push({ name: 'Delta Lake (raw)', x: 100, y: 360 });
+      components.push({ name: 'Cleansed Tables', x: 100, y: 520 });
+      components.push({ name: 'Conformed Dims', x: 220, y: 520 });
+
+      if (modeling.includes('Star/Dimensional')) {
+        components.push({ name: 'Fact Table', x: 100, y: 680 });
+        components.push({ name: 'Dimensions', x: 220, y: 680 });
+      } else {
+        components.push({ name: 'Analytics Marts', x: 100, y: 680 });
+      }
+
+      components.forEach((comp, idx) => {
+        addCanvasElement(comp.name, comp.x + idx * 30, comp.y + idx * 10);
+      });
+    }
+
+    function showContextMenu(e, el) {
+      const menu = document.getElementById('contextMenu');
+      menu.innerHTML = '';
+      menu.style.left = e.clientX + 'px';
+      menu.style.top = e.clientY + 'px';
+
+      const deleteBtn = document.createElement('div');
+      deleteBtn.className = 'context-menu-item';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.onclick = () => {
+        el.remove();
+        canvasElements = canvasElements.filter(item => item !== el);
+        menu.classList.remove('active');
+      };
+
+      menu.appendChild(deleteBtn);
+      menu.classList.add('active');
+
+      document.addEventListener('click', () => menu.classList.remove('active'), { once: true });
+    }
+
+    // ============================================================================
+    // TIMER & RUBRIC
+    // ============================================================================
+
+    function startTimer() {
+      if (timerInterval) return;
+
+      timerSeconds = 0;
+      const phases = [
+        { name: 'Discovery', duration: 25 * 60 },
+        { name: 'Architecture Design', duration: 20 * 60 },
+        { name: 'Build & Review', duration: 15 * 60 }
+      ];
+
+      let currentPhaseIdx = 0;
+      let phaseSeconds = 0;
+
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        phaseSeconds++;
+
+        const phase = phases[currentPhaseIdx];
+        const remaining = phase.duration - phaseSeconds;
+
+        if (remaining <= 0) {
+          currentPhaseIdx = (currentPhaseIdx + 1) % phases.length;
+          phaseSeconds = 0;
+        }
+
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        const timerDisplay = document.querySelector('.timer-display');
+        if (timerDisplay) {
+          timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')} (${phases[currentPhaseIdx].name})`;
+        }
+
+        if (remaining <= 60 && remaining > 0 && remaining % 10 === 0) {
+          showToast(`${mins}:${secs.toString().padStart(2, '0')} remaining`);
+        }
+      }, 1000);
+
+      showToast('Timer started (60 minutes)');
+    }
+
+    function showRubric() {
+      const modal = document.getElementById('rubricModal');
+      const rubricList = document.getElementById('rubricList');
+
+      rubricList.innerHTML = '';
+      RUBRIC_ITEMS.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'rubric-item';
+        div.textContent = item;
+        div.onclick = function() {
+          this.classList.toggle('checked');
+        };
+        rubricList.appendChild(div);
+      });
+
+      modal.classList.add('active');
+    }
+
+    function closeRubric() {
+      document.getElementById('rubricModal').classList.remove('active');
+    }
+
+    function renderQuickRubric() {
+      const container = document.getElementById('quickRubric');
+      container.innerHTML = '';
+
+      RUBRIC_ITEMS.slice(0, 5).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'rubric-item';
+        div.textContent = item;
+        div.onclick = function() {
+          this.classList.toggle('checked');
+        };
+        container.appendChild(div);
+      });
+    }
+
+    // ============================================================================
+    // SCENARIOS
+    // ============================================================================
+
+    function handleScenarioToggle() {
+      const toggle = document.getElementById('scenarioToggle');
+      if (toggle.checked) {
+        showScenarioSelector();
+      } else {
+        currentScenario = null;
+      }
+    }
+
+    function showScenarioSelector() {
+      const selection = prompt('Select scenario:\n1. finserv\n2. wegmans\n3. dw_migration', 'dw_migration');
+
+      if (selection === 'finserv' || selection === '1') {
+        loadScenario('finserv');
+      } else if (selection === 'wegmans' || selection === '2') {
+        loadScenario('wegmans');
+      } else if (selection === 'dw_migration' || selection === '3') {
+        loadScenario('dw_migration');
+      } else {
+        document.getElementById('scenarioToggle').checked = false;
+      }
+    }
+
+    function loadScenario(key) {
+      const scenario = SCENARIOS[key];
+      if (!scenario) return;
+
+      currentScenario = key;
+
+      Object.keys(scenario).forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && (field.tagName === 'INPUT' || field.tagName === 'TEXTAREA')) {
+          const value = scenario[fieldId];
+          if (Array.isArray(value)) {
+            const groupId = fieldId;
+            const container = document.getElementById(groupId);
+            if (container) {
+              const chips = container.querySelectorAll('.chip');
+              chips.forEach(chip => {
+                if (value.includes(chip.textContent.trim())) {
+                  chip.classList.add('active');
+                }
+              });
+            }
+          } else if (typeof value === 'string') {
+            field.value = value;
+          }
+        }
+      });
+
+      const chipGroups = ['use_cases', 'consumers', 'cloud', 'latency', 'formats', 'dw_approach', 'modeling_pref', 'compliance', 'access_model', 'catalog_strategy', 'deploy_approach', 'environments', 'ops_model', 'cost_sensitivity', 'skills', 'migration_approach'];
+      chipGroups.forEach(groupId => {
+        const value = scenario[groupId];
+        if (Array.isArray(value)) {
+          const container = document.getElementById(groupId);
+          if (container) {
+            const chips = container.querySelectorAll('.chip');
+            chips.forEach(chip => {
+              if (value.includes(chip.textContent.trim())) {
+                chip.classList.add('active');
+              } else {
+                chip.classList.remove('active');
+              }
+            });
+          }
+        }
+      });
+
+      updateCoachAnsweredState();
+      generateDynamicFollowups();
+      updatePreview();
+      goToStep(1);
+      showToast(`Loaded scenario: ${key}`);
+    }
+
+    // ============================================================================
+    // EXPORT FUNCTIONS
+    // ============================================================================
+
+    function exportJSON() {
+      const data = {
+        customer_name: getVal('customer_name'),
+        biz_problem: getVal('biz_problem'),
+        biz_kpis: getVal('biz_kpis'),
+        sources: getVal('sources'),
+        bi_tools: getVal('bi_tools'),
+        etl_tools: getVal('etl_tools'),
+        volume: getVal('volume'),
+        num_sources: getVal('num_sources'),
+        domains: getVal('domains'),
+        subject_areas: getVal('subject_areas'),
+        query_slas: getVal('query_slas'),
+        dr: getVal('dr'),
+        peak_periods: getVal('peak_periods'),
+        users: getVal('users'),
+        monitoring: getVal('monitoring'),
+        audit_reqs: getVal('audit_reqs'),
+        success_short: getVal('success_short'),
+        success_long: getVal('success_long'),
+        deadlines: getVal('deadlines'),
+        mvp_uses: getVal('mvp_uses'),
+        mandates: getVal('mandates'),
+        pain_points: getVal('pain_points'),
+        notes: getVal('notes'),
+        use_cases: getActiveChips('use_cases'),
+        consumers: getActiveChips('consumers'),
+        cloud: getActiveChips('cloud'),
+        latency: getActiveChips('latency'),
+        formats: getActiveChips('formats'),
+        dw_approach: getActiveChips('dw_approach'),
+        modeling_pref: getActiveChips('modeling_pref'),
+        compliance: getActiveChips('compliance'),
+        access_model: getActiveChips('access_model'),
+        catalog_strategy: getActiveChips('catalog_strategy'),
+        deploy_approach: getActiveChips('deploy_approach'),
+        environments: getActiveChips('environments'),
+        ops_model: getActiveChips('ops_model'),
+        cost_sensitivity: getActiveChips('cost_sensitivity'),
+        skills: getActiveChips('skills'),
+        migration_approach: getActiveChips('migration_approach'),
+        canvas_elements: canvasElements.map(el => ({
+          name: el.textContent,
+          x: el.style.left,
+          y: el.style.top
+        }))
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `whiteboard-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showToast('Whiteboard exported as JSON');
+    }
+
+    function loadJSONFile() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+
+            Object.keys(data).forEach(key => {
+              const field = document.getElementById(key);
+              if (field && (field.tagName === 'INPUT' || field.tagName === 'TEXTAREA')) {
+                if (typeof data[key] === 'string') {
+                  field.value = data[key];
+                }
+              }
+            });
+
+            const chipGroups = ['use_cases', 'consumers', 'cloud', 'latency', 'formats', 'dw_approach', 'modeling_pref', 'compliance', 'access_model', 'catalog_strategy', 'deploy_approach', 'environments', 'ops_model', 'cost_sensitivity', 'skills', 'migration_approach'];
+            chipGroups.forEach(groupId => {
+              if (data[groupId] && Array.isArray(data[groupId])) {
+                const container = document.getElementById(groupId);
+                if (container) {
+                  const chips = container.querySelectorAll('.chip');
+                  chips.forEach(chip => {
+                    if (data[groupId].includes(chip.textContent.trim())) {
+                      chip.classList.add('active');
+                    } else {
+                      chip.classList.remove('active');
+                    }
+                  });
+                }
+              }
+            });
+
+            if (data.canvas_elements && Array.isArray(data.canvas_elements)) {
+              const canvas = document.getElementById('canvas');
+              canvas.innerHTML = '';
+              initializeCanvas();
+              data.canvas_elements.forEach(el => {
+                addCanvasElement(el.name, parseInt(el.x) || 100, parseInt(el.y) || 100);
+              });
+            }
+
+            updateCoachAnsweredState();
+            generateDynamicFollowups();
+            updatePreview();
+            goToStep(1);
+            showToast('Whiteboard loaded from JSON');
+          } catch (err) {
+            showToast('Error loading JSON: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function exportPresentation() {
+      const modal = document.createElement('div');
+      modal.className = 'modal active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <span>Export Options</span>
+            <button class="modal-close" onclick="this.closest('.modal').remove()">✕</button>
+          </div>
+          <div class="modal-body">
+            <p>Export your whiteboard:</p>
+            <button class="header-btn primary" style="width: 100%; margin-bottom: 8px;" onclick="exportAsExcalidraw()">Export as Excalidraw</button>
+            <button class="header-btn primary" style="width: 100%;" onclick="exportAsPNG()">Export as PNG</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function exportAsExcalidraw() {
+      const elements = [];
+      canvasElements.forEach((el, idx) => {
+        elements.push({
+          type: 'rectangle',
+          x: parseFloat(el.style.left) || 0,
+          y: parseFloat(el.style.top) || 0,
+          width: 120,
+          height: 60,
+          strokeColor: '#ff6e40',
+          backgroundColor: '#5b8def',
+          strokeWidth: 1,
+          text: {
+            content: el.textContent,
+            fontSize: 11
+          }
+        });
+      });
+
+      const excalidraw = {
+        type: 'excalidraw',
+        version: 2,
+        source: 'Databricks SA Whiteboard Builder',
+        elements: elements
+      };
+
+      const blob = new Blob([JSON.stringify(excalidraw, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `whiteboard-${Date.now()}.excalidraw`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported to Excalidraw format');
+    }
+
+    function exportAsPNG() {
+      const canvas = document.getElementById('canvas');
+      html2canvas(canvas, { backgroundColor: '#0f1117' }).then(canvElement => {
+        const link = document.createElement('a');
+        link.href = canvElement.toDataURL('image/png');
+        link.download = `whiteboard-${Date.now()}.png`;
+        link.click();
+        showToast('Exported as PNG');
+      }).catch(err => {
+        showToast('PNG export failed: ' + err.message);
+      });
+    }
+
+    // ============================================================================
+    // TAB SWITCHING
+    // ============================================================================
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      const tabId = tabName + 'Tab';
+      const tab = document.getElementById(tabId);
+      if (tab) {
+        tab.classList.add('active');
+      }
+
+      event.target.classList.add('active');
+
+      if (tabName === 'build') {
+        initializeBuildTab();
+      }
+    }
+
+    // ============================================================================
+    // UTILITY FUNCTIONS
+    // ============================================================================
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    function toggleCollapsible(header) {
+      const content = header.nextElementSibling;
+      if (content) {
+        content.classList.toggle('collapsed');
+        header.classList.toggle('collapsed');
+      }
+    }
+
+    // ============================================================================
+    // PAGE LOAD
+    // ============================================================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeDiscoveryTab();
+      initializeBuildTab();
+      renderQuickRubric();
+
+      const headerRight = document.querySelector('.header-right');
+      const timerDisplay = document.createElement('div');
+      timerDisplay.className = 'timer-display';
+      timerDisplay.textContent = '60:00';
+      headerRight.insertBefore(timerDisplay, headerRight.firstChild);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeRubric();
+          const menu = document.getElementById('contextMenu');
+          if (menu) menu.classList.remove('active');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          exportJSON();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

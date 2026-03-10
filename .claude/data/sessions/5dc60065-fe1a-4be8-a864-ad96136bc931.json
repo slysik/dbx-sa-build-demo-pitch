@@ -1,0 +1,13 @@
+{
+  "session_id": "5dc60065-fe1a-4be8-a864-ad96136bc931",
+  "prompts": [
+    "why do I need the claude.ai Databricks mcp ",
+    "ultrathink on how dbx-best-practices.md can be best leveraged (template,skill,command, code best practices checker)  when I do my Databricks coding interview (Coding Interview_Candidate_Prep.pdf) to build most everything to my Databricks workspace. ask any questions for complete clarity an highlest alignment with my yes intention   ",
+    "also, like to add creation of metric view, materialzed view and use those to create an amazing dashboard for each prompt.",
+    "double check plan looks good and ask questions as needed.  ",
+    "my databricks workspace on Azure should support  Metric Views and we can check and verify runtime. plan is to use that for primary workspace and have a backup 30 day databricks workspace. i will confirm its okaty to use azure databricks workspace tomorrow during prep call with recruiter. compile ank questions I can ask to best prep. ",
+    "when you say build now for prep what does that mean?",
+    "yes"
+  ],
+  "agent_name": "Meridian"
+}

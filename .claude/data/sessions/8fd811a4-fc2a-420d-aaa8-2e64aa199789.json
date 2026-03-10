@@ -1,0 +1,8 @@
+{
+  "session_id": "8fd811a4-fc2a-420d-aaa8-2e64aa199789",
+  "prompts": [
+    "/dbx-interview-playbook Before generating code, run Step 0: Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3) Time budget? Then generate the full pipeline for: Build a real-time payment authorization pipeline for a retail bank.\nTransactions arrive with possible duplicates (same txn_id, different timestamps).\nDeduplicate in Silver, aggregate daily volumes by merchant in Gold.\nInclude fraud velocity features (txn count per account in last 1 hour).\n\nCONSTRAINTS:\n- Generate ~1000 synthetic records (functional test, not volume)\n- Keep serverless compute costs minimal. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol \u2014 verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary].",
+    "reuse finserv_demo . q2 , yes , azure 3) 60 min. use zerobus "
+  ],
+  "agent_name": "Kairos"
+}

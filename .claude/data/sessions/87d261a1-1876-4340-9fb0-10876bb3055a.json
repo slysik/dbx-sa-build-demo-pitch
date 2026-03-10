@@ -1,0 +1,16 @@
+{
+  "session_id": "87d261a1-1876-4340-9fb0-10876bb3055a",
+  "prompts": [
+    "search for the best excalidraw skill or plugin to help me learn how to build Databricks solution arch ",
+    "I have an amazing idea!!  here is my intent . /first Love to create  these ref arch, perhaps first one for now. https://learn.microsoft.com/en-us/azure/databricks/lakehouse-architecture/reference as a template. First create the full diagram, perhaps in a nice Exicalidraw. Simpicity is important and not to over arch . Nice to have main components so its easy to understand the flow.    Expand white board app so I answer discovery questions for each solution componet (like the  predefined questions here whiteboard-builder.html for example : \"What are your main source systems and where do they live?\"  and as I type answers into the correct section (Sources :netezza..) \"Data Engineering and Processing\" section  : if answer is pipelines then Pipelines is automatically is rendered in the \"Data Engineering and Processing\" section of the predefined arch. so as I get answers  to what customer needs to build the diagram is auto generated :  solution: discovery_answers map to  ==> mermaid ==> excalidraw canvas  ",
+    "1. main goal is to have a easy way to do exceptioanlly well at /Users/slysik/databricks/Design\\ \\&\\ Architecture\\ Interview_Candidate\\ Prep.pdf . prepare discovery questions interact back and forth with interviwers and all along auto build solutio arch diagram that is highest aligment with what what they want to build in Databricks.",
+    "3",
+    "1",
+    "2. I don't want to show them anything  built until after phase 1. I would then show them  what was built only after all questions answered and ask for feedback and be able to easily make changes to the diagram phase 3.",
+    "3. also, I will offer to show them the Discovery html yet might be only me typing/ clicking / dragging initially to capture their answers. alot of back and forth . ",
+    "I like exicalidraw. approach A yet not need for mermaid. make sure diagram created is simpple left to right with only the components or flow specific tho the use case, answers to easy to read and not to busy  ",
+    "Diagram design : make sure excalidraw use warm tonal colors like Anthropic web site, databricks for diagrams. No Azure.  Microsoft colors.  ",
+    "/plan_w_team review design plan so far"
+  ],
+  "agent_name": "Meridian"
+}

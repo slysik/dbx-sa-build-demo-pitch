@@ -1,0 +1,7 @@
+{
+  "session_id": "9a456943-9f10-419c-a8ac-b9c74b1608da",
+  "prompts": [
+    "/dbx-interview-playbook Step 0 answers: (1) Catalog: dbx_weg (2) Real Azure workspace with serverless, no Free Edition constraints (3) Time budget: 60 min. Skip questions \u2014 go straight to building. Generate the full pipeline for: Build a real-time payment authorization pipeline for a retail bank.\nTransactions arrive with possible duplicates (same txn_id, different timestamps).\nDeduplicate in Silver, aggregate daily volumes by merchant in Gold.\nInclude fraud velocity features (txn count per account in last 1 hour).\n\nCONSTRAINTS:\n- Generate ~1000 synthetic records (functional test, not volume)\n- Keep serverless compute costs minimal. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol \u2014 verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary]."
+  ],
+  "agent_name": "Prism"
+}

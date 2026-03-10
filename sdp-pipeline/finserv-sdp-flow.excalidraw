@@ -1,0 +1,384 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+
+
+    {
+      "id": "zone_source", "type": "rectangle",
+      "x": 40, "y": 80, "width": 200, "height": 440,
+      "angle": 0, "strokeColor": "#4a9eed", "backgroundColor": "#e8f4fd",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+      "roughness": 0, "opacity": 60, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "zone_bronze", "type": "rectangle",
+      "x": 290, "y": 80, "width": 260, "height": 440,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "#fff7ed",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+      "roughness": 0, "opacity": 60, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "zone_silver", "type": "rectangle",
+      "x": 610, "y": 80, "width": 260, "height": 440,
+      "angle": 0, "strokeColor": "#757575", "backgroundColor": "#f5f5f5",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+      "roughness": 0, "opacity": 60, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "zone_gold", "type": "rectangle",
+      "x": 930, "y": 80, "width": 280, "height": 440,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "#fffbeb",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "dashed",
+      "roughness": 0, "opacity": 60, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "lbl_zone_source", "type": "text",
+      "x": 55, "y": 90, "width": 170, "height": 24,
+      "angle": 0, "strokeColor": "#1e3a5f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "📥  DATA SOURCE", "fontSize": 13, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_zone_bronze", "type": "text",
+      "x": 305, "y": 90, "width": 230, "height": 24,
+      "angle": 0, "strokeColor": "#7c2d12", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "🥉  BRONZE  —  Streaming Table", "fontSize": 13, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_zone_silver", "type": "text",
+      "x": 620, "y": 90, "width": 240, "height": 24,
+      "angle": 0, "strokeColor": "#374151", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "🥈  SILVER  —  Materialized View", "fontSize": 13, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_zone_gold", "type": "text",
+      "x": 940, "y": 90, "width": 260, "height": 24,
+      "angle": 0, "strokeColor": "#78350f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "🥇  GOLD  —  Materialized Views", "fontSize": 13, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_source", "type": "rectangle",
+      "x": 60, "y": 160, "width": 160, "height": 280,
+      "angle": 0, "strokeColor": "#4a9eed", "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [{"id": "arrow_src_bronze", "type": "arrow"}], "isDeleted": false
+    },
+    {
+      "id": "lbl_source", "type": "text",
+      "x": 68, "y": 175, "width": 144, "height": 250,
+      "angle": 0, "strokeColor": "#1e3a5f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "📁 CSV Files\n\n/Volumes/dbx_weg\n/dwprep\n/dwprep_files\n/sdp_source/\n\nbatch1.csv  15r\nbatch2.csv  13r\nbatch3.csv  12r\nbatch4.csv  12r\n\n52 rows total",
+      "fontSize": 12, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_bronze", "type": "rectangle",
+      "x": 308, "y": 130, "width": 224, "height": 340,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "#ffd8a8",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null,
+      "boundElements": [
+        {"id": "arrow_src_bronze", "type": "arrow"},
+        {"id": "arrow_bronze_silver", "type": "arrow"}
+      ],
+      "isDeleted": false
+    },
+    {
+      "id": "lbl_bronze", "type": "text",
+      "x": 316, "y": 142, "width": 208, "height": 316,
+      "angle": 0, "strokeColor": "#7c2d12", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "bronze_sdp_transactions\n\nread_files()  ←  Auto Loader\nContinuous file discovery\nExact-once delivery\nCheckpoint managed\n\n─── Data Quality ───\n✅ DROP ROW\nvalid_account_id IS NOT NULL\n→ 1 row dropped\n\n⚠️ WARN (default)\nvalid_txn_type IN\n('DEBIT','CREDIT')\n→ 1 row flagged\n\n─── Properties ───\nappendOnly = true\nCDF enabled\n52 rows ingested",
+      "fontSize": 11, "fontFamily": 1,
+      "textAlign": "left", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_silver", "type": "rectangle",
+      "x": 628, "y": 155, "width": 224, "height": 290,
+      "angle": 0, "strokeColor": "#757575", "backgroundColor": "#e8e8e8",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null,
+      "boundElements": [
+        {"id": "arrow_bronze_silver", "type": "arrow"},
+        {"id": "arrow_silver_fraud", "type": "arrow"},
+        {"id": "arrow_silver_monthly", "type": "arrow"}
+      ],
+      "isDeleted": false
+    },
+    {
+      "id": "lbl_silver", "type": "text",
+      "x": 636, "y": 167, "width": 208, "height": 266,
+      "angle": 0, "strokeColor": "#374151", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "silver_sdp_transactions\nREADS: LIVE.bronze_sdp_transactions\n\n─── Transforms ───\nROW_NUMBER() dedup\n→ TXN-B2-003 dup removed\n\nFilter WARN rows\n→ INVALID type excluded\n\nMCC enrichment\n5411 → Grocery Stores\n6012 → Financial Inst.\n...10 categories\n\nPre-computed columns:\nis_debit = txn_type='DEBIT'\nabs_amount = ABS(amount)\ntxn_month = DATE_FORMAT()\n\n50 rows output",
+      "fontSize": 11, "fontFamily": 1,
+      "textAlign": "left", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_gold_fraud", "type": "rectangle",
+      "x": 950, "y": 115, "width": 240, "height": 210,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "#fff3bf",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null,
+      "boundElements": [{"id": "arrow_silver_fraud", "type": "arrow"}],
+      "isDeleted": false
+    },
+    {
+      "id": "lbl_gold_fraud", "type": "text",
+      "x": 958, "y": 125, "width": 224, "height": 190,
+      "angle": 0, "strokeColor": "#78350f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "gold_sdp_fraud_signals\nREADS: LIVE.silver_sdp_transactions\n\n─── Window Functions ───\nAVG(abs_amount) OVER\n(PARTITION BY customer_id,\n mcc_code)\n\nspend_ratio = amount / avg\n\nvelocity_flag:\n🚨 HIGH   > 3x avg\n⚠️  MEDIUM > 2x avg\n✅ NORMAL  ≤ 2x avg\n\nResult: 38 debit rows",
+      "fontSize": 11, "fontFamily": 1,
+      "textAlign": "left", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_gold_monthly", "type": "rectangle",
+      "x": 950, "y": 370, "width": 240, "height": 200,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "#fff3bf",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null,
+      "boundElements": [{"id": "arrow_silver_monthly", "type": "arrow"}],
+      "isDeleted": false
+    },
+    {
+      "id": "lbl_gold_monthly", "type": "text",
+      "x": 958, "y": 380, "width": 224, "height": 180,
+      "angle": 0, "strokeColor": "#78350f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "gold_sdp_monthly_summary\nREADS: LIVE.silver_sdp_transactions\n\n─── Aggregations ───\nGROUP BY\n  customer_id,\n  account_id,\n  txn_month\n\ntotal_debits  /  total_credits\nnet_flow  /  avg_txn_amount\nlargest_txn  /  unique_cats\n\nResult: 30 rows",
+      "fontSize": 11, "fontFamily": 1,
+      "textAlign": "left", "verticalAlign": "top",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "arrow_src_bronze", "type": "arrow",
+      "x": 222, "y": 300, "width": 84, "height": 0,
+      "angle": 0, "strokeColor": "#f59e0b", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "points": [[0, 0], [84, 0]],
+      "startBinding": {"elementId": "box_source", "focus": 0, "gap": 2},
+      "endBinding": {"elementId": "box_bronze", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_arrow_src", "type": "text",
+      "x": 228, "y": 278, "width": 72, "height": 18,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "read_files()", "fontSize": 11, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "arrow_bronze_silver", "type": "arrow",
+      "x": 534, "y": 300, "width": 92, "height": 0,
+      "angle": 0, "strokeColor": "#757575", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "points": [[0, 0], [92, 0]],
+      "startBinding": {"elementId": "box_bronze", "focus": 0, "gap": 2},
+      "endBinding": {"elementId": "box_silver", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_arrow_bronze", "type": "text",
+      "x": 540, "y": 278, "width": 80, "height": 18,
+      "angle": 0, "strokeColor": "#374151", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "LIVE.bronze", "fontSize": 11, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "arrow_silver_fraud", "type": "arrow",
+      "x": 854, "y": 260, "width": 96, "height": -40,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "points": [[0, 0], [96, -40]],
+      "startBinding": {"elementId": "box_silver", "focus": -0.4, "gap": 2},
+      "endBinding": {"elementId": "box_gold_fraud", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_arrow_fraud", "type": "text",
+      "x": 862, "y": 218, "width": 80, "height": 18,
+      "angle": 0, "strokeColor": "#78350f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "LIVE.silver", "fontSize": 11, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "arrow_silver_monthly", "type": "arrow",
+      "x": 854, "y": 340, "width": 96, "height": 40,
+      "angle": 0, "strokeColor": "#b45309", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 3, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "points": [[0, 0], [96, 40]],
+      "startBinding": {"elementId": "box_silver", "focus": 0.4, "gap": 2},
+      "endBinding": {"elementId": "box_gold_monthly", "focus": 0, "gap": 2},
+      "startArrowhead": null, "endArrowhead": "arrow",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_arrow_monthly", "type": "text",
+      "x": 862, "y": 354, "width": 80, "height": 18,
+      "angle": 0, "strokeColor": "#78350f", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "LIVE.silver", "fontSize": 11, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_uc", "type": "rectangle",
+      "x": 40, "y": 580, "width": 1160, "height": 60,
+      "angle": 0, "strokeColor": "#8b5cf6", "backgroundColor": "#1e1e2e",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_uc", "type": "text",
+      "x": 48, "y": 594, "width": 1144, "height": 34,
+      "angle": 0, "strokeColor": "#c4b5fd", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "🛡️  UNITY CATALOG  —  dbx_weg.dwprep    |    Column Lineage: Auto-captured    |    Column Masks: email, annual_income    |    Row Filters: LOB / Region    |    ABAC Tags: PII, PCI, GDPR",
+      "fontSize": 12, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_metrics", "type": "rectangle",
+      "x": 40, "y": 30, "width": 1160, "height": 42,
+      "angle": 0, "strokeColor": "#06b6d4", "backgroundColor": "#e0f7fa",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_metrics", "type": "text",
+      "x": 48, "y": 40, "width": 1144, "height": 24,
+      "angle": 0, "strokeColor": "#0e4f5c", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "✅  FinServ SDP Demo  |  Run: Feb 27, 2026  |  Status: Completed  |  Total: 21s  |  Serverless Compute  |  Bronze 7s · Silver 3s · Gold Fraud 2s · Gold Monthly 2s",
+      "fontSize": 12, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_dq_badge", "type": "rectangle",
+      "x": 308, "y": 488, "width": 224, "height": 50,
+      "angle": 0, "strokeColor": "#ef4444", "backgroundColor": "#fef2f2",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_dq_badge", "type": "text",
+      "x": 314, "y": 496, "width": 212, "height": 34,
+      "angle": 0, "strokeColor": "#991b1b", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "Expectations: 2 met | 2 unmet\n🚫 1 row dropped  ·  ⚠️ 1 row warned",
+      "fontSize": 11, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+
+
+    {
+      "id": "box_flag_callout", "type": "rectangle",
+      "x": 950, "y": 338, "width": 240, "height": 24,
+      "angle": 0, "strokeColor": "#ef4444", "backgroundColor": "#fef2f2",
+      "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100, "roundness": {"type": 3},
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    },
+    {
+      "id": "lbl_flag_callout", "type": "text",
+      "x": 952, "y": 342, "width": 236, "height": 16,
+      "angle": 0, "strokeColor": "#991b1b", "backgroundColor": "transparent",
+      "fillStyle": "solid", "strokeWidth": 1, "strokeStyle": "solid",
+      "roughness": 0, "opacity": 100,
+      "text": "🚨 TXN-B4-006: $8,500 wire = 118x avg → HIGH",
+      "fontSize": 11, "fontFamily": 1,
+      "textAlign": "center", "verticalAlign": "middle",
+      "groupIds": [], "frameId": null, "boundElements": [], "isDeleted": false
+    }
+
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff",
+    "currentItemFontFamily": 1
+  },
+  "files": {}
+}

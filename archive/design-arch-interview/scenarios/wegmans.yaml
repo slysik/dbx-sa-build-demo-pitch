@@ -1,0 +1,88 @@
+# Wegmans Food Markets — Databricks Lakehouse Discovery Answers
+# Scenario: Store operations, demand forecasting, real-time inventory
+
+name: "Wegmans Food Markets"
+description: "Store operations data siloed; can't predict demand; no real-time inventory visibility"
+
+answers:
+  # Section 1: Business Outcomes & Scope
+  customer_name: "Wegmans Food Markets"
+  biz_problem: "Store operations data siloed; can't predict demand; no real-time inventory visibility"
+  biz_kpis: "Reduce markdown/shrink by 5%; improve forecast accuracy to 90%; cut data ops headcount by 30%"
+  use_cases:
+    - Demand Forecasting
+    - Real-time KPIs
+    - Self-service Analytics
+    - Cost Optimization
+  consumers:
+    - Store Managers
+    - Analysts
+    - ML Models
+    - Executives
+
+  # Section 2: Data Sources & Ingestion
+  sources: "POS (SAP), inventory (Maximo), supply chain (JDA), vendor data (EDI), web/app events"
+  cloud:
+    - AWS
+  bi_tools: "Tableau (current, limited adoption)"
+  etl_tools: "Custom Python scripts, some Talend connectors"
+  latency:
+    - Real-time
+    - Hourly
+  formats:
+    - Structured/SQL
+    - Semi-structured/JSON
+    - Streaming/IoT
+  volume: "100-150 GB/day across ~480 stores"
+  num_sources: "12"
+
+  # Section 3: Data Warehouse & Modeling
+  dw_approach:
+    - Centralized EDW
+    - Data Marts
+  domains: "Store Operations, Inventory, POS Transactions, Supplier, Marketing, Employee"
+  subject_areas: "Transaction-atomic, Inventory-by-item-store-daily, Customer-transaction-grain"
+  modeling_pref:
+    - Star/Dimensional
+    - One Big Table
+  query_slas: "80 concurrent store-ops users, <1s dashboards, <10s ad-hoc"
+
+  # Section 4: Non-Functional Requirements
+  dr: "RPO 2h, RTO 1h (store operations critical)"
+  peak_periods: "Weekend sales surge, end-of-month inventory, holiday campaigns"
+  users: "500 store managers, 50 analysts, 10 data scientists"
+  cost_sensitivity:
+    - Cost-first
+
+  # Section 5: Governance, Security & Compliance
+  compliance:
+    - CCPA
+  access_model:
+    - RBAC
+    - Domain-based
+  catalog_strategy:
+    - Need new
+  audit_reqs: "Customer privacy (PII masking), transaction audit trail"
+
+  # Section 6: Operational Model & SDLC
+  deploy_approach:
+    - CI/CD
+  environments:
+    - Dev/Test/Prod
+  ops_model:
+    - Federated / LOB
+  monitoring: "CloudWatch, custom Slack alerts"
+
+  # Section 7: Success Metrics & Timeline
+  success_short: "Real-time store KPI dashboard + demand forecast model in production (6 months)"
+  success_long: "Autonomous replenishment, predictive pricing, personalized promotions by store"
+  deadlines: "Q3 forecast model live; Q4 holiday season readiness"
+  mvp_uses: "Real-time POS-to-dashboard pipeline, weekly demand forecast"
+  mandates: "AWS-only (existing Redshift contract); prefer open-source (dbt, Airflow, Spark)"
+  skills:
+    - Python
+    - Spark
+    - SQL-heavy
+  pain_points: "Data integrity issues between systems; forecast models break every few weeks; 15-person data ops team is bottleneck"
+  notes: "Very collaborative culture; quick decision-making. Data literacy improving. Open to modern DevOps practices."
+  migration_approach: []

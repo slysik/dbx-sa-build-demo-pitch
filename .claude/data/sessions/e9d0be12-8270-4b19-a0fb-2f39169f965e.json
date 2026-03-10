@@ -1,0 +1,14 @@
+{
+  "session_id": "e9d0be12-8270-4b19-a0fb-2f39169f965e",
+  "prompts": [
+    "update databricks skill and remove wegmans information. my focus will be on the Databricks SA interview in FINSERV",
+    "what is the identity.md? ",
+    "yes want to see the full file",
+    "check out this pdf: TERADATA-TO-DATABRICKS-(WITHOUT-REGRETTING-IT-LATER) in this dir since  my databricks interview \"spike\" will focus on my DW backgruund. ",
+    "yes",
+    "create a HTML diagram comparing 7 pitfalls with Databricks fixes",
+    "does this help for collation?   -- COLLATE: One line, solves the whole problem\n   STRING COLLATE UTF8_LCASE\n\n   -- CAST: Wrap every financial aggregation\n   CAST(SUM(CAST(amount AS DECIMAL(38,10))) AS DECIMAL(38,10))\n\n   -- AUTO CDC: 4 lines replace 50 lines of manual MERGE\n   AUTO CDC INTO gold.dim_customer\n   FROM STREAM silver.customers_clean\n   KEYS (customer_id)\n   SEQUENCE BY updated_timestamp\n   STORED AS SCD TYPE 2;",
+    "yes "
+  ],
+  "agent_name": "Meridian"
+}

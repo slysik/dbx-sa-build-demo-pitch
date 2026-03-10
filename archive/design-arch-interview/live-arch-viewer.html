@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Retail Bank — Core Banking EDW Migration | Databricks SA Interview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0 }
+    body { font-family:"Nunito",sans-serif;
+            background:#f1f5f9; color:#1e293b }
+    .topbar { background:#FF3621; color:#fff; padding:10px 20px;
+               display:flex; align-items:center; justify-content:space-between;
+               position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.25) }
+    .topbar h1 { font-size:15px; font-weight:700 }
+    .topbar .meta { font-size:11px; opacity:.9; text-align:right; line-height:1.6 }
+    .live-badge { background:#22c55e; color:#fff; font-size:10px; font-weight:700;
+                   padding:3px 10px; border-radius:20px; margin-left:8px }
+    .wrap { padding:16px 18px; max-width:1800px; margin:0 auto }
+    .subtitle { font-size:12px; color:#64748b; margin-bottom:12px; font-style:italic }
+    .diagram-wrap { background:#fff; border-radius:12px; padding:16px;
+                     box-shadow:0 1px 6px rgba(0,0,0,.1); margin-bottom:14px; overflow-x:auto }
+    .diagram-inner { display:flex; align-items:stretch; gap:4px; min-width:1100px }
+    .panel { background:#fff; border-radius:10px; padding:16px 18px;
+              box-shadow:0 1px 4px rgba(0,0,0,.08); margin-bottom:14px; overflow-x:auto }
+    .panel-title { font-size:13px; font-weight:700; color:#0f172a; margin-bottom:12px;
+                    padding-bottom:8px; border-bottom:2px solid #f1f5f9 }
+    .bottom-panels { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px }
+    @media(max-width:1200px) { .bottom-panels { grid-template-columns:1fr 1fr } }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>
+    🔶 &nbsp; Databricks Data Intelligence Platform
+    <span class="live-badge">LIVE</span>
+  </h1>
+  <div class="meta">
+    Retail Bank — Core Banking EDW Migration | Databricks SA Interview<br>
+    2026-02-25 17:47:53 &nbsp;·&nbsp; source: live-arch.md
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="subtitle">Last updated: 2026-02-25 | Interviewer: Steve Lysik</div>
+
+  <!-- ── Main Architecture Diagram ────────────────────────────────────────── -->
+  <div class="diagram-wrap">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;
+                letter-spacing:.08em;margin-bottom:10px">Architecture Diagram</div>
+    <div class="diagram-inner">
+      
+    <div style="
+      background:#dbe4ff;
+      border:1.5px solid #4a9eed;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      flex:1;
+      min-width:0;
+      
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#2563eb;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #4a9eed;
+      ">DATA SOURCES</div>
+      
+      <div style="
+        background:#a5d8ff;
+        border:2px solid #4a9eed;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#1e3a5f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">🏦 Mainframe<br>Core Banking<br>(COBOL / VSAM)</div>
+
+      <div style="
+        background:#a5d8ff;
+        border:2px solid #4a9eed;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#1e3a5f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">🗄️ Netezza EDW<br>(Legacy warehouse<br>replace + offload)</div>
+
+      <div style="
+        background:#a5d8ff;
+        border:2px solid #4a9eed;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#1e3a5f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">💳 OLTP Systems<br>(Transactions<br>Accounts · Loans)</div>
+
+      <div style="
+        background:#a5d8ff;
+        border:2px solid #4a9eed;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#1e3a5f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">📋 Flat File<br>Extracts<br>(Mainframe tapes<br>+ scheduled dumps)</div>
+
+      <div style="
+        background:#a5d8ff;
+        border:2px solid #4a9eed;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#1e3a5f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">🔗 Downstream<br>Apps<br>(read from EDW today)</div>
+
+      <div style="
+        background:#a5d8ff;
+        border:2px solid #4a9eed;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#1e3a5f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">📊 External<br>Feeds<br>(market · ref data)</div>
+    </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#94a3b8;
+      flex-shrink:0;
+      padding:0 2px;
+      margin-top:28px;
+    ">→</div>
+    <div style="
+      background:#fff3e0;
+      border:1.5px solid #f59e0b;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      flex:1;
+      min-width:0;
+      
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#b45309;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #f59e0b;
+      ">INGESTION</div>
+      
+      <div style="
+        background:#ffd8a8;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#7c4a00;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Lakebridge<br>(Netezza SQL<br>transpiler + schema<br>mapping)</div>
+
+      <div style="
+        background:#ffd8a8;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#7c4a00;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">LakeFlow Connect<br>(CDC from OLTP<br>during transition)</div>
+
+      <div style="
+        background:#ffd8a8;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#7c4a00;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Auto Loader<br>(mainframe flat files<br>+ VSAM extracts)</div>
+
+      <div style="
+        background:#ffd8a8;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#7c4a00;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Lakehouse<br>Federation<br>(query legacy EDW<br>in place)</div>
+
+      <div style="
+        background:#ffd8a8;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#7c4a00;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Lakebridge<br>Analyzer<br>(estate assessment<br>+ classify SQL)</div>
+    </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#94a3b8;
+      flex-shrink:0;
+      padding:0 2px;
+      margin-top:28px;
+    ">→</div>
+    <div style="
+      background:#dcfce7;
+      border:1.5px solid #22c55e;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      flex:2.2;
+      min-width:0;
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#15803d;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #22c55e;
+      ">MEDALLION ARCHITECTURE</div>
+      <div style="display:flex;gap:6px;flex:1">
+        <div style="
+          flex:1;
+          background:#ffd8a8;
+          border:2px solid #b45309;
+          border-radius:8px;
+          padding:10px 8px;
+          font-size:11px;
+          font-weight:700;
+          color:#7c2d12;
+          text-align:center;
+          line-height:1.5;
+        "><b>BRONZE</b><br><br>EDW snapshots<br>+ CDC streams<br>Append-only<br>Coexistence mirror<br>No transforms</div>
+        <div style="
+          flex:1;
+          background:#e8e8e8;
+          border:2px solid #757575;
+          border-radius:8px;
+          padding:10px 8px;
+          font-size:11px;
+          font-weight:700;
+          color:#374151;
+          text-align:center;
+          line-height:1.5;
+        "><b>SILVER</b><br><br>3NF Integration<br>(EDW parity)<br>SCD Type 2<br>Auto schema map<br>Dedup + DQ checks</div>
+        <div style="
+          flex:1;
+          background:#fff3bf;
+          border:2px solid #b45309;
+          border-radius:8px;
+          padding:10px 8px;
+          font-size:11px;
+          font-weight:700;
+          color:#78350f;
+          text-align:center;
+          line-height:1.5;
+        "><b>GOLD</b><br><br>Kimball Star /<br>Snowflake Marts<br>Liquid Clustered<br>Materialized Views<br>Domain-specific</div></div>
+      
+    <div style="
+      background:#c3fae8;
+      border:2px solid #06b6d4;
+      border-radius:7px;
+      padding:7px 12px;
+      font-size:11px;
+      font-weight:700;
+      color:#0e4f5c;
+      text-align:center;
+      margin-top:8px;
+    ">Delta Lake — ACID · Time Travel · CDF · Liquid Clustering</div>
+      
+    <div style="
+      background:#d0bfff;
+      border:2px solid #8b5cf6;
+      border-radius:7px;
+      padding:7px 12px;
+      font-size:11px;
+      font-weight:700;
+      color:#3b0764;
+      text-align:center;
+      margin-top:6px;
+    ">Unity Catalog — Lineage · Column Masks · Row Filters · ABAC</div>
+    </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#94a3b8;
+      flex-shrink:0;
+      padding:0 2px;
+      margin-top:28px;
+    ">→</div>
+    <div style="
+      background:#ede9fe;
+      border:1.5px solid #8b5cf6;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      flex:1;
+      min-width:0;
+      
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#6d28d9;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #8b5cf6;
+      ">COMPUTE</div>
+      
+      <div style="
+        background:#d0bfff;
+        border:2px solid #8b5cf6;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#3b0764;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">SQL Warehouse<br><b>Finance</b><br>(dedicated)</div>
+
+      <div style="
+        background:#d0bfff;
+        border:2px solid #8b5cf6;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#3b0764;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">SQL Warehouse<br><b>Risk</b><br>(dedicated)</div>
+
+      <div style="
+        background:#d0bfff;
+        border:2px solid #8b5cf6;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#3b0764;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">SQL Warehouse<br><b>Ops</b><br>(dedicated)</div>
+
+      <div style="
+        background:#d0bfff;
+        border:2px solid #8b5cf6;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#3b0764;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Serverless<br>Compute<br>(pipelines)</div>
+
+      <div style="
+        background:#d0bfff;
+        border:2px solid #8b5cf6;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#3b0764;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Photon Engine<br>+ Lakeflow Jobs<br>(migration orch.)</div>
+    </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#94a3b8;
+      flex-shrink:0;
+      padding:0 2px;
+      margin-top:28px;
+    ">→</div>
+    <div style="
+      background:#fdf2f8;
+      border:1.5px solid #ec4899;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      flex:1.8;
+      min-width:0;
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#9d174d;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #ec4899;
+      ">AI / ML</div>
+      
+      <div style="
+        background:#eebefa;
+        border:2px solid #ec4899;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#6b21a8;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Mosaic AI<br>(future state)</div>
+
+      <div style="
+        background:#eebefa;
+        border:2px solid #ec4899;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#6b21a8;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">MLflow<br>Model Registry</div>
+
+      <div style="
+        background:#eebefa;
+        border:2px solid #ec4899;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#6b21a8;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Feature Store<br>(risk + credit<br>features)</div>
+
+      <div style="
+        background:#eebefa;
+        border:2px solid #ec4899;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#6b21a8;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Model Serving<br>(credit scoring<br>endpoint)</div>
+      
+      <div style="
+        background:#ffc9c9;
+        border:3px solid #ef4444;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:700;
+        color:#7f1d1d;
+        text-align:center;
+        line-height:1.4;
+        margin-top:6px;
+      "><b>AI/BI Genie</b><br>NL → SQL<br>Self-service<br>for analysts</div>
+    </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#94a3b8;
+      flex-shrink:0;
+      padding:0 2px;
+      margin-top:28px;
+    ">→</div>
+    <div style="
+      background:#e0fdf4;
+      border:1.5px solid #06b6d4;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      flex:1;
+      min-width:0;
+      
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#0e7490;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #06b6d4;
+      ">CONSUMPTION</div>
+      
+      <div style="
+        background:#c3fae8;
+        border:2px solid #06b6d4;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#0e4f5c;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Power BI /<br>Tableau<br>(existing semantic<br>layers migrated)</div>
+
+      <div style="
+        background:#c3fae8;
+        border:2px solid #06b6d4;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#0e4f5c;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">DBSQL<br>Reporting<br>(replace EDW<br>SQL reports)</div>
+
+      <div style="
+        background:#c3fae8;
+        border:2px solid #06b6d4;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#0e4f5c;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">JDBC / ODBC<br>(downstream apps<br>repoint to DBSQL<br>not EDW)</div>
+
+      <div style="
+        background:#c3fae8;
+        border:2px solid #06b6d4;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#0e4f5c;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">AI/BI<br>Dashboards<br>(new self-service<br>analytics)</div>
+
+      <div style="
+        background:#c3fae8;
+        border:2px solid #06b6d4;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#0e4f5c;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">Delta Sharing<br>(external partners<br>+ regulators)</div>
+    </div>
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      color:#94a3b8;
+      flex-shrink:0;
+      padding:0 2px;
+      margin-top:28px;
+    ">→</div>
+    <div style="
+      background:#fefce8;
+      border:1.5px solid #f59e0b;
+      border-radius:10px;
+      padding:10px 8px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      flex:1;
+      min-width:0;
+      
+    ">
+      <div style="
+        font-size:11px;font-weight:700;
+        color:#b45309;
+        text-transform:uppercase;
+        letter-spacing:.07em;
+        text-align:center;
+        margin-bottom:10px;
+        padding-bottom:6px;
+        border-bottom:1.5px solid #f59e0b;
+      ">DATA MESH</div>
+      
+      <div style="
+        background:#fff3bf;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#78350f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">🏦 Retail<br>Banking</div>
+
+      <div style="
+        background:#fff3bf;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#78350f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">💰 Finance /<br>Treasury</div>
+
+      <div style="
+        background:#fff3bf;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#78350f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">⚠️ Risk &<br>Credit</div>
+
+      <div style="
+        background:#fff3bf;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#78350f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">📋 Regulatory<br>Reporting</div>
+
+      <div style="
+        background:#fff3bf;
+        border:2px solid #f59e0b;
+        border-radius:8px;
+        padding:8px 10px;
+        font-size:12px;
+        font-weight:600;
+        color:#78350f;
+        text-align:center;
+        line-height:1.4;
+        width:100%;
+        margin-bottom:6px
+      ">⚙️ Operations</div>
+    </div>
+    </div>
+    
+  <div style="
+    background:#1e1e2e;
+    border:1px solid #555555;
+    border-radius:10px;
+    padding:12px 14px;
+    margin-top:10px;
+  ">
+    <div style="
+      font-size:10px;
+      font-weight:700;
+      color:#6b6b9a;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      text-align:center;
+      margin-bottom:10px;
+    ">🛡️ PLATFORM GOVERNANCE &amp; OPERATIONS</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="
+        background:#2d2d4e;
+        border:1px solid #4a4a7a;
+        border-radius:6px;
+        padding:7px 14px;
+        font-size:12px;
+        font-weight:600;
+        color:#c4c4d8;
+        text-align:center;
+        line-height:1.4;
+        flex:1;
+        min-width:0;
+      ">Unity Catalog<br>Lineage · Masks<br>Row Filters</div>
+      <div style="
+        background:#2d2d4e;
+        border:1px solid #4a4a7a;
+        border-radius:6px;
+        padding:7px 14px;
+        font-size:12px;
+        font-weight:600;
+        color:#c4c4d8;
+        text-align:center;
+        line-height:1.4;
+        flex:1;
+        min-width:0;
+      ">Lakehouse<br>Federation<br>(coexistence)</div>
+      <div style="
+        background:#2d2d4e;
+        border:1px solid #4a4a7a;
+        border-radius:6px;
+        padding:7px 14px;
+        font-size:12px;
+        font-weight:600;
+        color:#c4c4d8;
+        text-align:center;
+        line-height:1.4;
+        flex:1;
+        min-width:0;
+      ">Lakebridge<br>Analyzer<br>(estate scan)</div>
+      <div style="
+        background:#2d2d4e;
+        border:1px solid #4a4a7a;
+        border-radius:6px;
+        padding:7px 14px;
+        font-size:12px;
+        font-weight:600;
+        color:#c4c4d8;
+        text-align:center;
+        line-height:1.4;
+        flex:1;
+        min-width:0;
+      ">Security &<br>Compliance<br>SOX · Basel · PCI</div>
+      <div style="
+        background:#2d2d4e;
+        border:1px solid #4a4a7a;
+        border-radius:6px;
+        padding:7px 14px;
+        font-size:12px;
+        font-weight:600;
+        color:#c4c4d8;
+        text-align:center;
+        line-height:1.4;
+        flex:1;
+        min-width:0;
+      ">Migration<br>Observability<br>(progress tracking)</div>
+      <div style="
+        background:#2d2d4e;
+        border:1px solid #4a4a7a;
+        border-radius:6px;
+        padding:7px 14px;
+        font-size:12px;
+        font-weight:600;
+        color:#c4c4d8;
+        text-align:center;
+        line-height:1.4;
+        flex:1;
+        min-width:0;
+      ">Cost<br>Management<br>(EDW vs. DBX TCO)</div></div>
+  </div>
+  </div>
+
+  <!-- ── Discovery + Decisions ─────────────────────────────────────────────── -->
+  
+    <div class="panel">
+      <div class="panel-title">📋 Discovery Status</div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:#f8fafc">
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Category</th>
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Status</th>
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Key Facts</th>
+        </tr></thead>
+        <tbody>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Business Problem</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#22c55e;font-weight:700;font-size:13px">✅</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Replace legacy EDW (Netezza + mainframe) — reduce cost, gain elasticity, enable new analytics</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Current Stack</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#22c55e;font-weight:700;font-size:13px">✅</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Mainframe core banking + Netezza EDW; downstream reporting + semantic layers + apps</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Cloud & Region</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#94a3b8;font-weight:700;font-size:13px">❓</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Not yet captured</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Data Volume</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#94a3b8;font-weight:700;font-size:13px">❓</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Not yet captured</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Latency Needs</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#94a3b8;font-weight:700;font-size:13px">❓</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Not yet captured — SLAs for key reports TBD</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Compliance</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#94a3b8;font-weight:700;font-size:13px">❓</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">FinServ — likely SOX · Basel · PCI-DSS; confirm scope</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Consumers / Users</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#f59e0b;font-weight:700;font-size:13px">⏳</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Reporting users · semantic layer consumers · downstream apps reading from EDW</td>
+                </tr>
+                <tr>
+                  <td style="padding:5px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9;white-space:nowrap">Constraints</td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="color:#f59e0b;font-weight:700;font-size:13px">⏳</span>
+                  </td>
+                  <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#475569;font-size:12px">Coexistence period required; phased domain-by-domain migration (not big-bang)</td>
+                </tr></tbody>
+      </table>
+    </div>
+  
+    <div class="panel">
+      <div class="panel-title">🏛️ Key Architecture Decisions</div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:#f8fafc">
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Decision</th>
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Choice</th>
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Rationale</th>
+          <th style="text-align:left;padding:5px 10px;color:#64748b;font-size:10px;text-transform:uppercase;border-bottom:2px solid #e2e8f0">Trade-off</th>
+        </tr></thead>
+        <tbody>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Migration strategy**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">Phased domain-by-domain</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Reduces blast radius; Finance first (highest ROI), then Risk, then Ops; never all-or-nothing</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Longer coexistence period; dual-write complexity during transition</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Coexistence pattern**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">Lakehouse Federation + parallel run</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Downstream apps keep reading EDW while Gold layer is validated; cutover is a connection-string change</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Federation adds query latency; must maintain EDW until final domain cutover</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Netezza migration**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">Lakebridge Analyzer → transpiler</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Analyzer classifies the full SQL estate first — only migrate actively-used objects; 80% auto-transpile</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">~20% stored procs need manual rework; BTEQ scripts need human review</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Ingestion — EDW snapshots**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">Lakebridge CDC + Auto Loader</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Full snapshot for history load; incremental CDC from OLTP for ongoing; mainframe VSAM → flat file → Auto Loader</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Mainframe CDC direct requires MQ or z/OS tap — flat file extract is safer first step</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Silver modeling**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">3NF Integration Layer</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">EDW parity — existing SQL and semantic layers work against Silver with minimal changes; SCD Type 2 preserves history</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Not as auditable as Data Vault for multi-source reconciliation — acceptable for single-EDW migration</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Gold modeling**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">Kimball Star + Materialized Views</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Matches existing mart structure; BI tools repoint without semantic layer rebuild; MVs replace EDW aggregation tables</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Snowflake schema variant for complex dims; revisit if OBT pattern proves faster for ad-hoc</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Dedicated SQL Warehouses**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">One per domain (Finance · Risk · Ops)</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Mirrors EDW resource group isolation; SLA guarantees per team; no workload interference at month-end</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Higher cost than shared warehouse — justified by regulatory SLA requirements</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;font-weight:600;font-size:12px;border-bottom:1px solid #f1f5f9">**Downstream app cutover**</td>
+                  <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9">
+                    <span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap">JDBC/ODBC repoint (connection string only)</span>
+                  </td>
+                  <td style="padding:6px 10px;color:#374151;font-size:12px;border-bottom:1px solid #f1f5f9">Apps connect to DBSQL instead of Netezza with zero code change; validate with parallel run</td>
+                  <td style="padding:6px 10px;color:#6b7280;font-size:11px;font-style:italic;border-bottom:1px solid #f1f5f9">Requires Gold layer to be 100% query-compatible — Lakebridge validates SQL parity before cutover</td>
+                </tr></tbody>
+      </table>
+    </div>
+
+  <!-- ── Bottom 3-up ──────────────────────────────────────────────────────── -->
+  <div class="bottom-panels">
+    
+    <div class="panel">
+      <div class="panel-title">🔍 Open Questions</div>
+      <ul style="list-style:none;padding:0;margin:0"><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Cloud provider** — Azure, AWS, or GCP? Determines Federation connector and networking path</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Netezza estate size** — TB of data, number of tables, active vs. dormant object count?</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **How many downstream apps** read directly from the EDW today — and do they use JDBC or stored proc calls?</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Report SLAs** — which are the top 5 reports by business criticality? These are the migration sequencing anchors</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Mainframe extract mechanism** — scheduled VSAM dumps, MQ feeds, or IBM CDC (IIDR)?</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Coexistence period** — how long is acceptable? 3 months? 12 months? Drives dual-run cost budget</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Semantic layer tool** — is there a Business Objects / Cognos / MicroStrategy layer sitting above the EDW?</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Compliance scope** — SOX only, or Basel IV capital models also running on Netezza?</li><li style="padding:4px 0;font-size:12px;color:#374151;border-bottom:1px solid #f8fafc">❓ **Migration trigger** — contract renewal, hardware EOL, or cost mandate from CFO?</li></ul>
+    </div>
+    
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "session_id": "c01b44d5-f50a-4efd-bbbe-51d20723913e",
+  "prompts": [
+    "I want to refresh my SQL skills in prep for my SA databricks interview as my focus or spike is DW. create sample data I can load 2-3 tables and go thru each data ingest / medallion layer step by step  and include DW performance features (mv, photon, liquid clustering) with SQL, DDL and with comments as to what DW features are doing. write sql script to steve-sql.sql that I can run in databricks sql serverless workspace.  ",
+    "modify to run in new schema call dwprep . add create new catalog named dw",
+    "review both scripts and see how any databricks SQL might be added to help me prep for DW (MPP , high performance data load optiions, WLM , MPP / DW features I can relate to with my extensive Netezza,  Yellowbrick, anf MD Fabric DW soltion engineer experience.  ",
+    "do all 3 flow or which one do I start with ?",
+    "yes"
+  ],
+  "agent_name": "Meridian"
+}

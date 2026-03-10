@@ -1,0 +1,156 @@
+/**
+ * Interview Gate — Forces Discovery phase discipline
+ *
+ * On session start, asks for the interviewer's prompt. Displays it
+ * as a persistent widget so you never lose sight of the goal.
+ * Injects the prompt into the system context so the AI stays focused.
+ *
+ * Adapted from purpose-gate.ts for Databricks coding interview prep.
+ *
+ * Usage: Auto-loaded from .pi/extensions/
+ */
+
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { Text, truncateToWidth } from "@mariozechner/pi-tui";
+
+// Colors — clean professional look
+function bgBar(s: string): string {
+	return `\x1b[48;2;30;40;60m${s}\x1b[49m`; // dark blue-gray
+}
+function accent(s: string): string {
+	return `\x1b[38;2;100;200;255m${s}\x1b[39m`; // light blue
+}
+function bright(s: string): string {
+	return `\x1b[38;2;255;255;255m${s}\x1b[39m`; // white
+}
+function dim(s: string): string {
+	return `\x1b[38;2;140;140;160m${s}\x1b[39m`; // gray
+}
+function bold(s: string): string {
+	return `\x1b[1m${s}\x1b[22m`;
+}
+
+export default function (pi: ExtensionAPI) {
+	let interviewPrompt: string | undefined;
+	let phase: "discovery" | "building" | "discussing" = "discovery";
+	let startTime: number | undefined;
+
+	async function askForPrompt(ctx: any) {
+		while (!interviewPrompt) {
+			const answer = await ctx.ui.input(
+				"🎯 What is the interviewer's prompt?",
+				'e.g. "Build a pipeline to analyze credit card transactions for fraud detection"'
+			);
+			if (answer && answer.trim()) {
+				interviewPrompt = answer.trim();
+				startTime = Date.now();
+			} else {
+				ctx.ui.notify("Enter the interviewer's prompt to begin.", "warning");
+			}
+		}
+
+		updateWidget(ctx);
+	}
+
+	function updateWidget(ctx: any) {
+		ctx.ui.setWidget("interview-prompt", () => {
+			return {
+				render(width: number): string[] {
+					const elapsed = startTime ? Math.floor((Date.now() - startTime) / 60000) : 0;
+					const timeStr = `${elapsed}m`;
+
+					const phaseEmoji =
+						phase === "discovery" ? "🔍" : phase === "building" ? "🔨" : "💬";
+					const phaseLabel =
+						phase === "discovery"
+							? "DISCOVERY"
+							: phase === "building"
+								? "BUILDING"
+								: "DISCUSSING";
+
+					const pad = bgBar(" ".repeat(width));
+					const line1 = bgBar(
+						truncateToWidth(
+							accent(bold("  🎯 PROMPT: ")) + bright(interviewPrompt!) + " ".repeat(width),
+							width,
+							""
+						)
+					);
+					const line2 = bgBar(
+						truncateToWidth(
+							dim(`  ${phaseEmoji} Phase: ${phaseLabel}  ⏱ ${timeStr} elapsed`) + " ".repeat(width),
+							width,
+							""
+						)
+					);
+					return [pad, line1, line2, pad];
+				},
+				invalidate() {},
+			};
+		});
+	}
+
+	// Register phase-switching command
+	pi.registerCommand("phase", {
+		description: "Switch interview phase: discovery | building | discussing",
+		handler: async (args, ctx) => {
+			const arg = args.trim().toLowerCase();
+			if (arg === "discovery" || arg === "building" || arg === "discussing") {
+				phase = arg;
+				updateWidget(ctx);
+				ctx.ui.notify(`Phase switched to: ${phase.toUpperCase()}`, "success");
+			} else {
+				const choice = await ctx.ui.select("Select Interview Phase", [
+					"discovery — Ask clarifying questions",
+					"building — Generate data & build pipeline",
+					"discussing — Explain execution & scaling",
+				]);
+				if (choice) {
+					phase = choice.split(" —")[0] as any;
+					updateWidget(ctx);
+					ctx.ui.notify(`Phase switched to: ${phase.toUpperCase()}`, "success");
+				}
+			}
+		},
+	});
+
+	pi.on("session_start", async (_event, ctx) => {
+		void askForPrompt(ctx);
+	});
+
+	pi.on("before_agent_start", async (event) => {
+		if (!interviewPrompt) return;
+		const phaseInstructions =
+			phase === "discovery"
+				? "Help the user ask clarifying questions about the prompt. Suggest what to ask about: data volume, columns, use case, batch vs streaming."
+				: phase === "building"
+					? "Generate code for the user. Use Python (Faker) for synthetic data, SQL for all transforms. Include detailed comments explaining every block. Save as Delta tables."
+					: "Help the user explain the code: how Spark executes it, shuffle points, join strategies, scaling considerations.";
+
+		return {
+			systemPrompt:
+				event.systemPrompt +
+				`\n\n<interview-context>
+Interviewer's prompt: "${interviewPrompt}"
+Current phase: ${phase.toUpperCase()}
+${phaseInstructions}
+
+IMPORTANT GUIDELINES:
+- Generate code with DETAILED COMMENTS the user can read aloud as narration
+- Python for data generation ONLY, SQL for ALL transforms
+- Use realistic data distributions (log-normal for amounts, weighted choices for categories)
+- Use DECIMAL for monetary values, never FLOAT
+- Always seed random generators for reproducibility
+- Include Delta table constraints for data quality
+</interview-context>`,
+		};
+	});
+
+	pi.on("input", async (_event, ctx) => {
+		if (!interviewPrompt) {
+			ctx.ui.notify("Enter the interviewer's prompt first.", "warning");
+			return { action: "handled" as const };
+		}
+		return { action: "continue" as const };
+	});
+}

@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "@mariozechner/pi-tui": "^0.56.0"
+  }
+}

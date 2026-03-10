@@ -1,0 +1,17 @@
+{
+  "session_id": "beaee19b-20a8-4b3b-894b-ee7d69d8a126",
+  "prompts": [
+    "what steps are remaining to build?",
+    "how can I do a test end to end simple use case to not burn to many credits? ",
+    "lets do option C and run Run via execute_sql MCP to see if hooks catvh and fix and everthing runs successfully in databricks workspace  ",
+    "how are those learnings kept so next time we learn from it ?",
+    "make sure to rememeber  learnings (feedback loop)  from test use case runs so we can get smarter every time after testing before interview. ",
+    "we may hit syntax errors and til done get them working successfully yet good we don;t hit same issue next time we run into same issue.",
+    "ultrathink about any other rules we can add to be proactive when building executing sqwl/python or anything we build on the databricks workspace  ",
+    "ultathink database objects that I already created yet might not be during my interview. for example, I already created the dbx_weg unity catalog and would like to rename that to dbx-sa",
+    "yes and verify you can create a uc. also, great idea to add \"What catalog should I use?\" and think of other askuserquestions will help steer us all in the highlest alignment of my mission to have a successful SA interview and pass the interview woth flying colors! ",
+    "what does Time budget mean? ",
+    "how do I run a test ? "
+  ],
+  "agent_name": "Prism"
+}

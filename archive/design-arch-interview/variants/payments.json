@@ -1,0 +1,50 @@
+{
+  "title": "FinServ DW Architecture – Payments & Cards",
+  "sources": [
+    "Card Processor (FIS/Fiserv)\n(Auth, Settlement, Chargebacks)",
+    "Payment Switch / Gateway\n(ACH, Wires, RTP, FedNow)",
+    "Fraud / AML Engine\n(Scores, Alerts, SARs)",
+    "Core Banking / Ledger\n(Accounts, Balances, GL)",
+    "Merchant Platform\n(Onboarding, MCC, Terminals)",
+    "Network Feeds (Visa/MC)\n(Interchange, scheme data)"
+  ],
+  "ingestion": [
+    "Batch – EOD Settlement\n(Autoloader from cloud storage)",
+    "CDC via Debezium\n(Account balance changes)",
+    "Kafka Streaming\n(Auth events, <2s latency)",
+    "ISO 20022 / 8583 Parsers\n(schema validated • versioned)"
+  ],
+  "bronze": [
+    "Append-only Raw Delta\n(txn-date partitioned, immutable)",
+    "5yr Retention + PCI Tags\n(PAN masking at ingest)"
+  ],
+  "silver": [
+    "Deduplicate + Idempotency\n(auth ID, trace ID, dedup key)",
+    "DQ Gates + Quarantine\n(amount checks, BIN validation)",
+    "Settlement Reconciliation\n(auth vs. clearing vs. funding)",
+    "Conformed Entities\n(Transaction • Card • Merchant)"
+  ],
+  "gold": [
+    "Star Schema\n(Fact_Authorization, Fact_Settle)",
+    "Fraud & Risk Aggregates\n(velocity, anomaly scores)",
+    "Regulatory Extracts\n(BSA/AML, PCI-DSS evidence)",
+    "Metrics / Semantic Layer\n(approval rate, fraud bps, NII)"
+  ],
+  "compute": [
+    "Databricks Workflows\n(settlement batch • recon DAGs)",
+    "Lakeflow / SDP Pipelines\n(auth → clearing → settlement)",
+    "DBSQL Pro Warehouse\n(fraud queries • ops analytics)"
+  ],
+  "serve": [
+    "DBSQL + AI/BI Dashboards\n(fraud ops, approval rates)",
+    "Tableau / Power BI\n(interchange revenue, disputes)",
+    "Analyst Drill Path\n(metric → txn → raw auth log)",
+    "Delta Sharing\n(networks • regulators • partners)"
+  ],
+  "domain_products": [
+    "Fraud Detection\n(real-time scoring, SAR filing)",
+    "Revenue & Interchange\n(fee analytics, merchant pricing)",
+    "Settlement & Recon\n(funding, exceptions, breaks)",
+    "Merchant Analytics\n(churn, volume, segmentation)"
+  ]
+}

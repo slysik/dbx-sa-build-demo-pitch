@@ -1,0 +1,899 @@
+2026-03-04 21:07:33 | INFO | ==================================================
+2026-03-04 21:07:33 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:07:33 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:07:33 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-04 21:07:33 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:07:46 | INFO | ==================================================
+2026-03-04 21:07:46 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:07:46 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:07:46 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:07:46 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:08:43 | INFO | ==================================================
+2026-03-04 21:08:43 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:08:43 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:08:43 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:08:43 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:08:58 | INFO | ==================================================
+2026-03-04 21:08:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:08:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:08:58 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-04 21:08:58 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:09:09 | INFO | ==================================================
+2026-03-04 21:09:09 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:09:09 | INFO | hook_input keys: ['tool_input']
+2026-03-04 21:09:09 | INFO | file_path: /tmp/test_violations.sql
+2026-03-04 21:09:09 | INFO | RESULT: 6 warning(s)
+2026-03-04 21:09:09 | INFO |   [Rule 1] FLOAT/DOUBLE used for monetary column. Fix: Use DECIMAL(18,2) — e.g. CA...
+2026-03-04 21:09:09 | INFO |   [Rule 2] MERGE INTO without ROW_NUMBER dedup. Fix: Add staging view:
+  CREATE OR...
+2026-03-04 21:09:09 | INFO |   [Rule 3] CREATE TABLE without CHECK constraints. Fix: Add after DDL:
+  ALTER TAB...
+2026-03-04 21:09:09 | INFO |   [Rule 4] CREATE TABLE without CLUSTER BY. Fix: Add after DDL:
+  ALTER TABLE <t> ...
+2026-03-04 21:09:09 | INFO |   [Rule 6] MERGE/INSERT without validation harness. Fix: Add final cells with:
+  -...
+2026-03-04 21:09:09 | INFO |   [Rule 7] SQL block >5 lines without narration comments. Fix: Add -- comments exp...
+2026-03-04 21:14:35 | INFO | ==================================================
+2026-03-04 21:14:35 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:14:35 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:14:35 | INFO | file_path: /Users/slysik/databricks/test_pipeline.sql
+2026-03-04 21:14:35 | INFO | RESULT: 6 warning(s)
+2026-03-04 21:14:35 | INFO |   [Rule 1] FLOAT/DOUBLE used for monetary column. Fix: Use DECIMAL(18,2) — e.g. CA...
+2026-03-04 21:14:35 | INFO |   [Rule 2] MERGE INTO without ROW_NUMBER dedup. Fix: Add staging view:
+  CREATE OR...
+2026-03-04 21:14:35 | INFO |   [Rule 3] CREATE TABLE without CHECK constraints. Fix: Add after DDL:
+  ALTER TAB...
+2026-03-04 21:14:35 | INFO |   [Rule 4] CREATE TABLE without CLUSTER BY. Fix: Add after DDL:
+  ALTER TABLE <t> ...
+2026-03-04 21:14:35 | INFO |   [Rule 6] MERGE/INSERT without validation harness. Fix: Add final cells with:
+  -...
+2026-03-04 21:14:35 | INFO |   [Rule 7] SQL block >5 lines without narration comments. Fix: Add -- comments exp...
+2026-03-04 21:15:02 | INFO | ==================================================
+2026-03-04 21:15:02 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:15:02 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:15:02 | INFO | file_path: /Users/slysik/databricks/test_pipeline.sql
+2026-03-04 21:15:02 | INFO | RESULT: 1 warning(s)
+2026-03-04 21:15:02 | INFO |   [Rule 7] SQL block >5 lines without narration comments. Fix: Add -- comments exp...
+2026-03-04 21:18:45 | INFO | ==================================================
+2026-03-04 21:18:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:18:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:18:45 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 21:18:45 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:18:52 | INFO | ==================================================
+2026-03-04 21:18:52 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:18:52 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:18:52 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:18:52 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:18:57 | INFO | ==================================================
+2026-03-04 21:18:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:18:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:18:57 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:18:57 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:19:02 | INFO | ==================================================
+2026-03-04 21:19:02 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:19:02 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:19:02 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-04 21:19:02 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:20:59 | INFO | ==================================================
+2026-03-04 21:20:59 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:20:59 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:20:59 | INFO | file_path: /Users/slysik/.claude/.context/core/rules.md
+2026-03-04 21:20:59 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:21:05 | INFO | ==================================================
+2026-03-04 21:21:05 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:21:05 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:21:05 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 21:21:05 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:22:17 | INFO | ==================================================
+2026-03-04 21:22:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:22:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:22:17 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 21:22:17 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:22:29 | INFO | ==================================================
+2026-03-04 21:22:29 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:22:29 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:22:29 | INFO | file_path: /Users/slysik/.claude/.context/core/rules.md
+2026-03-04 21:22:29 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:24:45 | INFO | ==================================================
+2026-03-04 21:24:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:24:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:24:45 | INFO | file_path: /Users/slysik/.claude/.context/core/rules.md
+2026-03-04 21:24:45 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:24:55 | INFO | ==================================================
+2026-03-04 21:24:55 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:24:55 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:24:55 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:24:55 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:25:03 | INFO | ==================================================
+2026-03-04 21:25:03 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:25:03 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:25:03 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-04 21:25:03 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:25:24 | INFO | ==================================================
+2026-03-04 21:25:24 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:25:24 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:25:24 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/validators/dbx_best_practices_validator.py
+2026-03-04 21:25:24 | INFO | RESULT: 1 warning(s)
+2026-03-04 21:25:24 | INFO |   [Rule 5] mode('overwrite') detected — use window rebuild instead. Fix: Replace w...
+2026-03-04 21:25:37 | INFO | ==================================================
+2026-03-04 21:25:37 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:25:37 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:25:37 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/validators/dbx_best_practices_validator.py
+2026-03-04 21:25:37 | INFO | RESULT: 3 warning(s)
+2026-03-04 21:25:37 | INFO |   [Rule 5] mode('overwrite') detected — use window rebuild instead. Fix: Replace w...
+2026-03-04 21:25:37 | INFO |   [Rule 8] MERGE with UPDATE SET * — this pulls extra columns (e.g. rn from ROW_NU...
+2026-03-04 21:25:37 | INFO |   [Rule 9] Unqualified table name(s): pathlib, with, without. Fix: Use fully quali...
+2026-03-04 21:25:45 | INFO | ==================================================
+2026-03-04 21:25:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:25:45 | INFO | hook_input keys: ['tool_input']
+2026-03-04 21:25:45 | INFO | file_path: /tmp/test_new_rules.sql
+2026-03-04 21:25:45 | INFO | RESULT: 6 warning(s)
+2026-03-04 21:25:45 | INFO |   [Rule 2] MERGE INTO without ROW_NUMBER dedup. Fix: Add staging view:
+  CREATE OR...
+2026-03-04 21:25:45 | INFO |   [Rule 3] CREATE TABLE without CHECK constraints. Fix: Add after DDL:
+  ALTER TAB...
+2026-03-04 21:25:45 | INFO |   [Rule 4] CREATE TABLE without CLUSTER BY. Fix: Add after DDL:
+  ALTER TABLE <t> ...
+2026-03-04 21:25:45 | INFO |   [Rule 6] MERGE/INSERT without validation harness. Fix: Add final cells with:
+  -...
+2026-03-04 21:25:45 | INFO |   [Rule 8] MERGE with UPDATE SET * — this pulls extra columns (e.g. rn from ROW_NU...
+2026-03-04 21:25:45 | INFO |   [Rule 9] Unqualified table name(s): payments, payments. Fix: Use fully qualified...
+2026-03-04 21:25:55 | INFO | ==================================================
+2026-03-04 21:25:55 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:25:55 | INFO | hook_input keys: ['tool_input']
+2026-03-04 21:25:55 | INFO | file_path: /tmp/test_clean.sql
+2026-03-04 21:25:55 | INFO | RESULT: 1 warning(s)
+2026-03-04 21:25:55 | INFO |   [Rule 7] SQL block >5 lines without narration comments. Fix: Add -- comments exp...
+2026-03-04 21:32:36 | INFO | ==================================================
+2026-03-04 21:32:36 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:32:36 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:32:36 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:32:36 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:32:44 | INFO | ==================================================
+2026-03-04 21:32:44 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:32:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:32:44 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:32:44 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:32:45 | INFO | ==================================================
+2026-03-04 21:32:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:32:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:32:45 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:32:45 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:32:49 | INFO | ==================================================
+2026-03-04 21:32:49 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:32:49 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:32:49 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-04 21:32:49 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:32:50 | INFO | ==================================================
+2026-03-04 21:32:50 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:32:50 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:32:50 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-04 21:32:50 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:32:58 | INFO | ==================================================
+2026-03-04 21:32:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:32:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:32:58 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-04 21:32:58 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:33:06 | INFO | ==================================================
+2026-03-04 21:33:06 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:33:06 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:33:06 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-04 21:33:06 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:33:17 | INFO | ==================================================
+2026-03-04 21:33:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:33:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:33:17 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 21:33:17 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:33:28 | INFO | ==================================================
+2026-03-04 21:33:28 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:33:28 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:33:28 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 21:33:28 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:33:35 | INFO | ==================================================
+2026-03-04 21:33:35 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:33:35 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:33:35 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-04 21:33:35 | INFO | Skipping non-Python/SQL file
+2026-03-04 21:56:04 | INFO | ==================================================
+2026-03-04 21:56:04 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 21:56:04 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 21:56:04 | INFO | file_path: /Users/slysik/databricks/Justfile
+2026-03-04 21:56:04 | INFO | Skipping non-Python/SQL file
+2026-03-04 22:00:09 | INFO | ==================================================
+2026-03-04 22:00:09 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 22:00:09 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 22:00:09 | INFO | file_path: /Users/slysik/databricks/Justfile
+2026-03-04 22:00:09 | INFO | Skipping non-Python/SQL file
+2026-03-04 22:24:48 | INFO | ==================================================
+2026-03-04 22:24:48 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 22:24:48 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 22:24:48 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 22:24:48 | INFO | Skipping non-Python/SQL file
+2026-03-04 22:24:53 | INFO | ==================================================
+2026-03-04 22:24:53 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 22:24:53 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 22:24:53 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 22:24:53 | INFO | Skipping non-Python/SQL file
+2026-03-04 22:24:56 | INFO | ==================================================
+2026-03-04 22:24:56 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 22:24:56 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 22:24:56 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-04 22:24:56 | INFO | Skipping non-Python/SQL file
+2026-03-04 22:30:45 | INFO | ==================================================
+2026-03-04 22:30:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-04 22:30:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-04 22:30:45 | INFO | file_path: /Users/slysik/databricks/notebooks/finserv_medallion_pipeline.py
+2026-03-04 22:30:45 | INFO | RESULT: 2 warning(s)
+2026-03-04 22:30:45 | INFO |   [Rule 7] SQL block >5 lines without narration comments. Fix: Add -- comments exp...
+2026-03-04 22:30:45 | INFO |   [Rule 9] Unqualified table name(s): source, production, event_ts. Fix: Use fully...
+2026-03-05 12:15:36 | INFO | ==================================================
+2026-03-05 12:15:36 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:15:36 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:15:36 | INFO | file_path: /Users/slysik/.claude/plans/precious-snuggling-whistle.md
+2026-03-05 12:15:36 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:19:08 | INFO | ==================================================
+2026-03-05 12:19:08 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:19:08 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:19:08 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-05 12:19:08 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:19:33 | INFO | ==================================================
+2026-03-05 12:19:33 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:19:33 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:19:33 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-05 12:19:33 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:19:46 | INFO | ==================================================
+2026-03-05 12:19:46 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:19:46 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:19:46 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-05 12:19:46 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:20:01 | INFO | ==================================================
+2026-03-05 12:20:01 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:20:01 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:20:01 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 12:20:01 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:20:08 | INFO | ==================================================
+2026-03-05 12:20:08 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:20:08 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:20:08 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/session_start.py
+2026-03-05 12:20:08 | INFO | RESULT: 1 warning(s)
+2026-03-05 12:20:08 | INFO |   [Rule 9] Unqualified table name(s): pathlib, datetime, dotenv. Fix: Use fully qu...
+2026-03-05 12:20:21 | INFO | ==================================================
+2026-03-05 12:20:21 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:20:21 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:20:21 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/user_prompt_submit.py
+2026-03-05 12:20:21 | INFO | RESULT: 1 warning(s)
+2026-03-05 12:20:21 | INFO |   [Rule 9] Unqualified table name(s): pathlib, dotenv, each. Fix: Use fully qualif...
+2026-03-05 12:20:30 | INFO | ==================================================
+2026-03-05 12:20:30 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:20:30 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:20:30 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/post_tool_use_failure.py
+2026-03-05 12:20:30 | INFO | RESULT: 1 warning(s)
+2026-03-05 12:20:30 | INFO |   [Rule 9] Unqualified table name(s): datetime, pathlib, dotenv. Fix: Use fully qu...
+2026-03-05 12:20:39 | INFO | ==================================================
+2026-03-05 12:20:39 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:20:39 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:20:39 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/post_tool_use_failure.py
+2026-03-05 12:20:39 | INFO | RESULT: 1 warning(s)
+2026-03-05 12:20:39 | INFO |   [Rule 9] Unqualified table name(s): datetime, pathlib, dotenv. Fix: Use fully qu...
+2026-03-05 12:20:51 | INFO | ==================================================
+2026-03-05 12:20:51 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:20:51 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:20:51 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/validators/dbx_best_practices_validator.py
+2026-03-05 12:20:51 | INFO | RESULT: 3 warning(s)
+2026-03-05 12:20:51 | INFO |   [Rule 5] mode('overwrite') detected — use window rebuild instead. Fix: Replace w...
+2026-03-05 12:20:51 | INFO |   [Rule 8] MERGE with UPDATE SET * — this pulls extra columns (e.g. rn from ROW_NU...
+2026-03-05 12:20:51 | INFO |   [Rule 9] Unqualified table name(s): pathlib, with, without. Fix: Use fully quali...
+2026-03-05 12:21:11 | INFO | ==================================================
+2026-03-05 12:21:11 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:21:11 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:21:11 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 12:21:11 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:21:16 | INFO | ==================================================
+2026-03-05 12:21:16 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:21:16 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:21:16 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 12:21:16 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:32:25 | INFO | ==================================================
+2026-03-05 12:32:25 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:32:25 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:32:25 | INFO | file_path: /Users/slysik/databricks/test-prompts/01-streaming-payments-dedup.md
+2026-03-05 12:32:25 | INFO | Skipping non-Python/SQL file
+2026-03-05 12:34:44 | INFO | ==================================================
+2026-03-05 12:34:44 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 12:34:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 12:34:44 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 12:34:44 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:48:06 | INFO | ==================================================
+2026-03-05 13:48:06 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:48:06 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:48:06 | INFO | file_path: /Users/slysik/.claude/plans/cheeky-humming-moth.md
+2026-03-05 13:48:06 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:50:48 | INFO | ==================================================
+2026-03-05 13:50:48 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:50:48 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:50:48 | INFO | file_path: /Users/slysik/.claude/.context/core/identity.md
+2026-03-05 13:50:48 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:50:56 | INFO | ==================================================
+2026-03-05 13:50:56 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:50:56 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:50:56 | INFO | file_path: /Users/slysik/.claude/.context/core/rules.md
+2026-03-05 13:50:56 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:51:02 | INFO | ==================================================
+2026-03-05 13:51:02 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:51:02 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:51:02 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-05 13:51:02 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:51:11 | INFO | ==================================================
+2026-03-05 13:51:11 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:51:11 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:51:11 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 13:51:11 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:51:17 | INFO | ==================================================
+2026-03-05 13:51:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:51:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:51:17 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 13:51:17 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:51:24 | INFO | ==================================================
+2026-03-05 13:51:24 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:51:24 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:51:24 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 13:51:24 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:52:28 | INFO | ==================================================
+2026-03-05 13:52:28 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:52:28 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:52:28 | INFO | file_path: /Users/slysik/databricks/vertical-quick-swap.md
+2026-03-05 13:52:28 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:54:16 | INFO | ==================================================
+2026-03-05 13:54:16 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:54:16 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:54:16 | INFO | file_path: /Users/slysik/databricks/dbx-best-practices.md
+2026-03-05 13:54:16 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:56:04 | INFO | ==================================================
+2026-03-05 13:56:04 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:56:04 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:56:04 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-05 13:56:04 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:57:24 | INFO | ==================================================
+2026-03-05 13:57:24 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:57:24 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:57:24 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-05 13:57:24 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:57:32 | INFO | ==================================================
+2026-03-05 13:57:32 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:57:32 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:57:32 | INFO | file_path: /Users/slysik/databricks/CLAUDE.md
+2026-03-05 13:57:32 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:57:43 | INFO | ==================================================
+2026-03-05 13:57:43 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:57:43 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:57:43 | INFO | file_path: /Users/slysik/databricks/CLAUDE.md
+2026-03-05 13:57:43 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:57:48 | INFO | ==================================================
+2026-03-05 13:57:48 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:57:48 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:57:48 | INFO | file_path: /Users/slysik/databricks/CLAUDE.md
+2026-03-05 13:57:48 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:58:02 | INFO | ==================================================
+2026-03-05 13:58:02 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:58:02 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:58:02 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 13:58:02 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:58:07 | INFO | ==================================================
+2026-03-05 13:58:07 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:58:07 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:58:07 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 13:58:07 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:58:17 | INFO | ==================================================
+2026-03-05 13:58:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:58:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:58:17 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 13:58:17 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:58:32 | INFO | ==================================================
+2026-03-05 13:58:32 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:58:32 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:58:32 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/SKILL.md
+2026-03-05 13:58:32 | INFO | Skipping non-Python/SQL file
+2026-03-05 13:58:57 | INFO | ==================================================
+2026-03-05 13:58:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 13:58:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 13:58:57 | INFO | file_path: /Users/slysik/databricks/practice-run-checklist.md
+2026-03-05 13:58:57 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:46:33 | INFO | ==================================================
+2026-03-05 14:46:33 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:46:33 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:46:33 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 14:46:33 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:46:39 | INFO | ==================================================
+2026-03-05 14:46:39 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:46:39 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:46:39 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 14:46:39 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:46:45 | INFO | ==================================================
+2026-03-05 14:46:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:46:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:46:45 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 14:46:45 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:46:56 | INFO | ==================================================
+2026-03-05 14:46:56 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:46:56 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:46:56 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 14:46:56 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:49:17 | INFO | ==================================================
+2026-03-05 14:49:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:49:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:49:17 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-03-05 14:49:17 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:54:45 | INFO | ==================================================
+2026-03-05 14:54:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:54:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:54:45 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-05 14:54:45 | INFO | Skipping non-Python/SQL file
+2026-03-05 14:58:01 | INFO | ==================================================
+2026-03-05 14:58:01 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:01 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:01 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/01_Data_Gen.py
+2026-03-05 14:58:01 | INFO | RESULT: 1 warning(s)
+2026-03-05 14:58:01 | INFO |   [Rule 10] Pipeline mentions bronze/silver/gold but missing VALIDATION HARNESS se...
+2026-03-05 14:58:16 | INFO | ==================================================
+2026-03-05 14:58:16 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:16 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:16 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/02_Bronze_Silver.py
+2026-03-05 14:58:16 | INFO | RESULT: 1 warning(s)
+2026-03-05 14:58:16 | INFO |   [Rule 9] Unqualified table name(s): column. Fix: Use fully qualified names: cata...
+2026-03-05 14:58:25 | INFO | ==================================================
+2026-03-05 14:58:25 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:25 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:25 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/03_Gold.py
+2026-03-05 14:58:25 | INFO | RESULT: 1 warning(s)
+2026-03-05 14:58:25 | INFO |   [Rule 6] MERGE/INSERT without validation harness. Fix: Add final cells with:
+  -...
+2026-03-05 14:58:38 | INFO | ==================================================
+2026-03-05 14:58:38 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:38 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:38 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/04_Validation.py
+2026-03-05 14:58:38 | INFO | RESULT: PASS — no best-practice violations
+2026-03-05 14:58:44 | INFO | ==================================================
+2026-03-05 14:58:44 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:44 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/01_Data_Gen.py
+2026-03-05 14:58:44 | INFO | RESULT: 1 warning(s)
+2026-03-05 14:58:44 | INFO |   [Rule 10] Pipeline mentions bronze/silver/gold but missing VALIDATION HARNESS se...
+2026-03-05 14:58:51 | INFO | ==================================================
+2026-03-05 14:58:51 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:51 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:51 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/01_Data_Gen.py
+2026-03-05 14:58:51 | INFO | RESULT: 1 warning(s)
+2026-03-05 14:58:51 | INFO |   [Rule 10] Pipeline mentions bronze/silver/gold but missing VALIDATION HARNESS se...
+2026-03-05 14:58:54 | INFO | ==================================================
+2026-03-05 14:58:54 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 14:58:54 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 14:58:54 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_demo/01_Data_Gen.py
+2026-03-05 14:58:54 | INFO | RESULT: 1 warning(s)
+2026-03-05 14:58:54 | INFO |   [Rule 10] Pipeline mentions bronze/silver/gold but missing VALIDATION HARNESS se...
+2026-03-05 15:03:52 | INFO | ==================================================
+2026-03-05 15:03:52 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:03:52 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:03:52 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 15:03:52 | INFO | Skipping non-Python/SQL file
+2026-03-05 15:03:57 | INFO | ==================================================
+2026-03-05 15:03:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:03:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:03:57 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 15:03:57 | INFO | Skipping non-Python/SQL file
+2026-03-05 15:04:02 | INFO | ==================================================
+2026-03-05 15:04:02 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:04:02 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:04:02 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-05 15:04:02 | INFO | Skipping non-Python/SQL file
+2026-03-05 15:04:07 | INFO | ==================================================
+2026-03-05 15:04:07 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:04:07 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:04:07 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 15:04:07 | INFO | Skipping non-Python/SQL file
+2026-03-05 15:04:11 | INFO | ==================================================
+2026-03-05 15:04:11 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:04:11 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:04:11 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 15:04:11 | INFO | Skipping non-Python/SQL file
+2026-03-05 15:10:38 | INFO | ==================================================
+2026-03-05 15:10:38 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:10:38 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:10:38 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 15:10:38 | INFO | Skipping non-Python/SQL file
+2026-03-05 15:10:40 | INFO | ==================================================
+2026-03-05 15:10:40 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 15:10:40 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 15:10:40 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-05 15:10:40 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:05:52 | INFO | ==================================================
+2026-03-05 16:05:52 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:05:52 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:05:52 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:05:52 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:05:57 | INFO | ==================================================
+2026-03-05 16:05:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:05:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:05:57 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:05:57 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:06:31 | INFO | ==================================================
+2026-03-05 16:06:31 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:06:31 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:06:31 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/6-volumes.md
+2026-03-05 16:06:31 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:06:46 | INFO | ==================================================
+2026-03-05 16:06:46 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:06:46 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:06:46 | INFO | file_path: /Users/slysik/databricks/.claude/skills/excalidraw-architect/SKILL.md
+2026-03-05 16:06:46 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:06:58 | INFO | ==================================================
+2026-03-05 16:06:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:06:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:06:58 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/sql-scripting.md
+2026-03-05 16:06:58 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:07:17 | INFO | ==================================================
+2026-03-05 16:07:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:07:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:07:17 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/7-data-profiling.md
+2026-03-05 16:07:17 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:07:53 | INFO | ==================================================
+2026-03-05 16:07:53 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:07:53 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:07:53 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/materialized-views-pipes.md
+2026-03-05 16:07:53 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:08:58 | INFO | ==================================================
+2026-03-05 16:08:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:08:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:08:58 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/references/complete-example.md
+2026-03-05 16:08:58 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:08:58 | INFO | ==================================================
+2026-03-05 16:08:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:08:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:08:58 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/references/complete-example.md
+2026-03-05 16:08:58 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:09:15 | INFO | ==================================================
+2026-03-05 16:09:15 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:09:15 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:09:15 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/geospatial-collations.md
+2026-03-05 16:09:15 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:09:36 | INFO | ==================================================
+2026-03-05 16:09:36 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:09:36 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:09:36 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/references/distributions.md
+2026-03-05 16:09:36 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:09:44 | INFO | ==================================================
+2026-03-05 16:09:44 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:09:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:09:44 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/references/widget-patterns.md
+2026-03-05 16:09:44 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:10:09 | INFO | ==================================================
+2026-03-05 16:10:09 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:10:09 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:10:09 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/references/troubleshooting.md
+2026-03-05 16:10:09 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:10:23 | INFO | ==================================================
+2026-03-05 16:10:23 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:10:23 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:10:23 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/references/faker-patterns.md
+2026-03-05 16:10:23 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:10:31 | INFO | ==================================================
+2026-03-05 16:10:31 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:10:31 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:10:31 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/ai-functions.md
+2026-03-05 16:10:31 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:11:17 | INFO | ==================================================
+2026-03-05 16:11:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:11:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:11:17 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/SKILL.md
+2026-03-05 16:11:17 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:11:41 | INFO | ==================================================
+2026-03-05 16:11:41 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:11:41 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:11:41 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/SKILL.md
+2026-03-05 16:11:41 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:11:48 | INFO | ==================================================
+2026-03-05 16:11:48 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:11:48 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:11:48 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/best-practices.md
+2026-03-05 16:11:48 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:20:05 | INFO | ==================================================
+2026-03-05 16:20:05 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:20:05 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:05 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-genie/evals/trigger-eval.json
+2026-03-05 16:20:05 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:20:14 | INFO | ==================================================
+2026-03-05 16:20:14 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:20:14 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:14 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/evals/trigger-eval.json
+2026-03-05 16:20:14 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:20:21 | INFO | ==================================================
+2026-03-05 16:20:21 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:20:21 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:21 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/evals/evals.json
+2026-03-05 16:20:21 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:20:29 | INFO | ==================================================
+2026-03-05 16:20:29 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:20:29 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:29 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/evals/evals.json
+2026-03-05 16:20:29 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:20:35 | INFO | ==================================================
+2026-03-05 16:20:35 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:20:35 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:35 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/evals/evals.json
+2026-03-05 16:20:35 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:23:12 | INFO | ==================================================
+2026-03-05 16:23:12 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:23:12 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:23:12 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data.py
+2026-03-05 16:23:12 | INFO | RESULT: 1 warning(s)
+2026-03-05 16:23:12 | INFO |   [Rule 9] Unqualified table name(s): datetime, faker. Fix: Use fully qualified na...
+2026-03-05 16:23:39 | INFO | ==================================================
+2026-03-05 16:23:39 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:23:39 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:23:39 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data.py
+2026-03-05 16:23:39 | INFO | RESULT: 1 warning(s)
+2026-03-05 16:23:39 | INFO |   [Rule 9] Unqualified table name(s): datetime, faker. Fix: Use fully qualified na...
+2026-03-05 16:24:21 | INFO | ==================================================
+2026-03-05 16:24:21 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:24:21 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:24:21 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-genie/SKILL.md
+2026-03-05 16:24:21 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:24:26 | INFO | ==================================================
+2026-03-05 16:24:26 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:24:26 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:24:26 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:24:26 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:24:57 | INFO | ==================================================
+2026-03-05 16:24:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:24:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:24:57 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-genie/SKILL.md
+2026-03-05 16:24:57 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:25:05 | INFO | ==================================================
+2026-03-05 16:25:05 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:25:05 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:25:05 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:25:05 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:36:13 | INFO | ==================================================
+2026-03-05 16:36:13 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:36:13 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:36:13 | INFO | file_path: /Users/slysik/databricks/scripts/02_zerobus_trickle_ingest.py
+2026-03-05 16:36:13 | INFO | RESULT: 1 warning(s)
+2026-03-05 16:36:13 | INFO |   [Rule 9] Unqualified table name(s): datetime. Fix: Use fully qualified names: ca...
+2026-03-05 16:37:36 | INFO | ==================================================
+2026-03-05 16:37:36 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:37:36 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:37:36 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-05 16:37:36 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:37:46 | INFO | ==================================================
+2026-03-05 16:37:46 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:37:46 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:37:46 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-05 16:37:46 | INFO | Skipping non-Python/SQL file
+2026-03-05 16:39:49 | INFO | ==================================================
+2026-03-05 16:39:49 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:39:49 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:39:49 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data_v2.py
+2026-03-05 16:39:49 | INFO | RESULT: 1 warning(s)
+2026-03-05 16:39:49 | INFO |   [Rule 9] Unqualified table name(s): datetime, faker. Fix: Use fully qualified na...
+2026-03-05 16:39:57 | INFO | ==================================================
+2026-03-05 16:39:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 16:39:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:39:57 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data_v2.py
+2026-03-05 16:39:57 | INFO | RESULT: 1 warning(s)
+2026-03-05 16:39:57 | INFO |   [Rule 9] Unqualified table name(s): datetime, faker. Fix: Use fully qualified na...
+2026-03-05 19:06:44 | INFO | ==================================================
+2026-03-05 19:06:44 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-05 19:06:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 19:06:44 | INFO | file_path: /Users/slysik/databricks/CLAUDE.md
+2026-03-05 19:06:44 | INFO | Skipping non-Python/SQL file
+2026-03-08 13:59:29 | INFO | ==================================================
+2026-03-08 13:59:29 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 13:59:29 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 13:59:29 | INFO | file_path: /Users/slysik/databricks/dbx-tools/dbx_toolkit.py
+2026-03-08 13:59:29 | INFO | RESULT: 1 warning(s)
+2026-03-08 13:59:29 | INFO |   [Rule 9] Unqualified table name(s): typing. Fix: Use fully qualified names: cata...
+2026-03-08 14:28:12 | INFO | ==================================================
+2026-03-08 14:28:12 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 14:28:12 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 14:28:12 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-08 14:28:12 | INFO | Skipping non-Python/SQL file
+2026-03-08 14:47:05 | INFO | ==================================================
+2026-03-08 14:47:05 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 14:47:05 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 14:47:05 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_data_gen.py
+2026-03-08 14:47:05 | INFO | RESULT: PASS — no best-practice violations
+2026-03-08 14:47:16 | INFO | ==================================================
+2026-03-08 14:47:16 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 14:47:16 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 14:47:16 | INFO | file_path: /Users/slysik/databricks/notebooks/retail_data_gen.py
+2026-03-08 14:47:16 | INFO | RESULT: PASS — no best-practice violations
+2026-03-08 19:24:53 | INFO | ==================================================
+2026-03-08 19:24:53 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 19:24:53 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 19:24:53 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-08 19:24:53 | INFO | Skipping non-Python/SQL file
+2026-03-08 19:25:01 | INFO | ==================================================
+2026-03-08 19:25:01 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 19:25:01 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 19:25:01 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-08 19:25:01 | INFO | Skipping non-Python/SQL file
+2026-03-08 19:53:08 | INFO | ==================================================
+2026-03-08 19:53:08 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 19:53:08 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 19:53:08 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/SKILL.md
+2026-03-08 19:53:08 | INFO | Skipping non-Python/SQL file
+2026-03-08 19:53:12 | INFO | ==================================================
+2026-03-08 19:53:12 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 19:53:12 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 19:53:12 | INFO | file_path: /Users/slysik/databricks/.pi/agents/databricks-code-gen.md
+2026-03-08 19:53:12 | INFO | Skipping non-Python/SQL file
+2026-03-08 19:53:23 | INFO | ==================================================
+2026-03-08 19:53:23 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 19:53:23 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 19:53:23 | INFO | file_path: /Users/slysik/databricks/dbx-best-practices.md
+2026-03-08 19:53:23 | INFO | Skipping non-Python/SQL file
+2026-03-08 19:53:41 | INFO | ==================================================
+2026-03-08 19:53:41 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-08 19:53:41 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-08 19:53:41 | INFO | file_path: /Users/slysik/databricks/dbx-best-practices.md
+2026-03-08 19:53:41 | INFO | Skipping non-Python/SQL file
+2026-03-09 19:16:54 | INFO | ==================================================
+2026-03-09 19:16:54 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 19:16:54 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 19:16:54 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/commands/discovery.md
+2026-03-09 19:16:54 | INFO | Skipping non-Python/SQL file
+2026-03-09 19:17:23 | INFO | ==================================================
+2026-03-09 19:17:23 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 19:17:23 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 19:17:23 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/commands/distributed-computing-review.md
+2026-03-09 19:17:23 | INFO | Skipping non-Python/SQL file
+2026-03-09 19:17:49 | INFO | ==================================================
+2026-03-09 19:17:49 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 19:17:49 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 19:17:49 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/commands/builder-best-friend.md
+2026-03-09 19:17:49 | INFO | Skipping non-Python/SQL file
+2026-03-09 19:32:13 | INFO | ==================================================
+2026-03-09 19:32:13 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 19:32:13 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 19:32:13 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/commands/bail.md
+2026-03-09 19:32:13 | INFO | Skipping non-Python/SQL file
+2026-03-09 19:40:40 | INFO | ==================================================
+2026-03-09 19:40:40 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 19:40:40 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 19:40:40 | INFO | file_path: /Users/slysik/.claude/CLAUDE.md
+2026-03-09 19:40:40 | INFO | Skipping non-Python/SQL file
+2026-03-09 19:47:58 | INFO | ==================================================
+2026-03-09 19:47:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 19:47:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 19:47:58 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/commands/build.md
+2026-03-09 19:47:58 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:31:56 | INFO | ==================================================
+2026-03-09 20:31:56 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:31:56 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:31:56 | INFO | file_path: /Users/slysik/databricks/.claude/commands/discovery.md
+2026-03-09 20:31:56 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:32:11 | INFO | ==================================================
+2026-03-09 20:32:11 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:32:11 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:32:11 | INFO | file_path: /Users/slysik/databricks/.claude/commands/bail.md
+2026-03-09 20:32:11 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:32:25 | INFO | ==================================================
+2026-03-09 20:32:25 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:32:25 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:32:25 | INFO | file_path: /Users/slysik/databricks/.claude/commands/builder-best-friend.md
+2026-03-09 20:32:25 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:32:48 | INFO | ==================================================
+2026-03-09 20:32:48 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:32:48 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:32:48 | INFO | file_path: /Users/slysik/databricks/.claude/commands/distributed-computing-review.md
+2026-03-09 20:32:48 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:36:17 | INFO | ==================================================
+2026-03-09 20:36:17 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:36:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:36:17 | INFO | file_path: /Users/slysik/databricks/.claude/commands/build.md
+2026-03-09 20:36:17 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:54:41 | INFO | ==================================================
+2026-03-09 20:54:41 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:54:41 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:54:41 | INFO | file_path: /Users/slysik/databricks/specs/discovery-brief.md
+2026-03-09 20:54:41 | INFO | Skipping non-Python/SQL file
+2026-03-09 20:55:37 | INFO | ==================================================
+2026-03-09 20:55:37 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 20:55:37 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 20:55:37 | INFO | file_path: /Users/slysik/databricks/specs/retail-10row-dataset.md
+2026-03-09 20:55:37 | INFO | Skipping non-Python/SQL file
+2026-03-09 21:06:42 | INFO | ==================================================
+2026-03-09 21:06:42 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:06:42 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:06:42 | INFO | file_path: /Users/slysik/databricks/src/retail_10row_dataset.py
+2026-03-09 21:06:42 | INFO | RESULT: PASS — no best-practice violations
+2026-03-09 21:06:47 | INFO | ==================================================
+2026-03-09 21:06:47 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:06:47 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:06:47 | INFO | file_path: /Users/slysik/databricks/src/retail_10row_dataset.py
+2026-03-09 21:06:47 | INFO | RESULT: PASS — no best-practice violations
+2026-03-09 21:06:58 | INFO | ==================================================
+2026-03-09 21:06:58 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:06:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:06:58 | INFO | file_path: /Users/slysik/databricks/src/retail_10row_dataset.py
+2026-03-09 21:06:58 | INFO | RESULT: PASS — no best-practice violations
+2026-03-09 21:36:45 | INFO | ==================================================
+2026-03-09 21:36:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:36:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:36:45 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-09 21:36:45 | INFO | Skipping non-Python/SQL file
+2026-03-09 21:36:52 | INFO | ==================================================
+2026-03-09 21:36:52 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:36:52 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:36:52 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-09 21:36:52 | INFO | Skipping non-Python/SQL file
+2026-03-09 21:37:01 | INFO | ==================================================
+2026-03-09 21:37:01 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:37:01 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:37:01 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-09 21:37:01 | INFO | Skipping non-Python/SQL file
+2026-03-09 21:43:09 | INFO | ==================================================
+2026-03-09 21:43:09 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:43:09 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:43:09 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-09 21:43:09 | INFO | Skipping non-Python/SQL file
+2026-03-09 21:43:14 | INFO | ==================================================
+2026-03-09 21:43:14 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:43:14 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:43:14 | INFO | file_path: /Users/slysik/databricks/tasks/lessons.md
+2026-03-09 21:43:14 | INFO | Skipping non-Python/SQL file
+2026-03-09 21:52:03 | INFO | ==================================================
+2026-03-09 21:52:03 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-09 21:52:03 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-09 21:52:03 | INFO | file_path: /Users/slysik/.claude/projects/-Users-slysik-databricks/memory/MEMORY.md
+2026-03-09 21:52:03 | INFO | Skipping non-Python/SQL file
+2026-03-10 10:38:33 | INFO | ==================================================
+2026-03-10 10:38:33 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:38:33 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:38:33 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/utils/agent_tracker.py
+2026-03-10 10:38:33 | INFO | RESULT: 1 warning(s)
+2026-03-10 10:38:33 | INFO |   [Rule 9] Unqualified table name(s): datetime, pathlib, the. Fix: Use fully quali...
+2026-03-10 10:38:37 | INFO | ==================================================
+2026-03-10 10:38:37 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:38:37 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:38:37 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/utils/agent_tracker.py
+2026-03-10 10:38:37 | INFO | RESULT: 1 warning(s)
+2026-03-10 10:38:37 | INFO |   [Rule 9] Unqualified table name(s): datetime, the. Fix: Use fully qualified name...
+2026-03-10 10:38:43 | INFO | ==================================================
+2026-03-10 10:38:43 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:38:43 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:38:43 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/subagent_start.py
+2026-03-10 10:38:43 | INFO | RESULT: 1 warning(s)
+2026-03-10 10:38:43 | INFO |   [Rule 9] Unqualified table name(s): docs, datetime, pathlib. Fix: Use fully qual...
+2026-03-10 10:38:49 | INFO | ==================================================
+2026-03-10 10:38:49 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:38:49 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:38:49 | INFO | file_path: /Users/slysik/databricks/.claude/hooks/subagent_stop.py
+2026-03-10 10:38:49 | INFO | RESULT: 1 warning(s)
+2026-03-10 10:38:49 | INFO |   [Rule 9] Unqualified table name(s): pathlib, typing, datetime. Fix: Use fully qu...
+2026-03-10 10:38:57 | INFO | ==================================================
+2026-03-10 10:38:57 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:38:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:38:57 | INFO | file_path: /Users/slysik/databricks/.claude/status_lines/status_line_v14.py
+2026-03-10 10:38:57 | INFO | RESULT: 1 warning(s)
+2026-03-10 10:38:57 | INFO |   [Rule 9] Unqualified table name(s): stdin. Fix: Use fully qualified names: catal...
+2026-03-10 10:39:13 | INFO | ==================================================
+2026-03-10 10:39:13 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:39:13 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:39:13 | INFO | file_path: /Users/slysik/databricks/.claude/status_lines/status_line_v14.py
+2026-03-10 10:39:13 | INFO | RESULT: 1 warning(s)
+2026-03-10 10:39:13 | INFO |   [Rule 9] Unqualified table name(s): tracker, stdin. Fix: Use fully qualified nam...
+2026-03-10 10:54:22 | INFO | ==================================================
+2026-03-10 10:54:22 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 10:54:22 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 10:54:22 | INFO | file_path: /Users/slysik/databricks/.claude/settings.local.json
+2026-03-10 10:54:22 | INFO | Skipping non-Python/SQL file
+2026-03-10 11:24:37 | INFO | ==================================================
+2026-03-10 11:24:37 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 11:24:37 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 11:24:37 | INFO | file_path: /Users/slysik/databricks/.gitignore
+2026-03-10 11:24:37 | INFO | Skipping non-Python/SQL file
+2026-03-10 11:28:45 | INFO | ==================================================
+2026-03-10 11:28:45 | INFO | DBX BEST PRACTICES VALIDATOR TRIGGERED
+2026-03-10 11:28:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 11:28:45 | INFO | file_path: /Users/slysik/databricks/.gitignore
+2026-03-10 11:28:45 | INFO | Skipping non-Python/SQL file

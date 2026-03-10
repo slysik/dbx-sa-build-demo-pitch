@@ -1,0 +1,50 @@
+{
+  "title": "FinServ DW Architecture – Insurance",
+  "sources": [
+    "Policy Admin (Guidewire/Duck Creek)\n(Policies, Endorsements, Renewals)",
+    "Claims System (ClaimCenter)\n(FNOL, Reserves, Payments)",
+    "Billing / Premium Engine\n(Invoices, Collections, Comm.)",
+    "Actuarial / Reserving\n(Triangles, IBNR, Loss Ratios)",
+    "Agent / Broker Portal\n(Submissions, Quotes, Binds)",
+    "Third-Party / Vendor\n(Cat models, DMV, weather)"
+  ],
+  "ingestion": [
+    "Batch – Nightly + Monthly\n(Autoloader from cloud storage)",
+    "CDC via Qlik / Debezium\n(Policy changes → Kafka)",
+    "Event Streaming\n(FNOL, claims status, <30s)",
+    "ACORD Standards + Contracts\n(XML/JSON schema enforced)"
+  ],
+  "bronze": [
+    "Append-only Raw Delta\n(policy-period partitioned)",
+    "10yr Retention + PII Tags\n(state DOI audit compliance)"
+  ],
+  "silver": [
+    "Deduplicate + Conform Keys\n(policy ID, claim ID, party ID)",
+    "DQ Gates + Quarantine\n(coverage gaps, rate integrity)",
+    "Recon Controls\n(premium earned vs. collected)",
+    "Conformed Entities\n(Policy • Claim • Party • Agent)"
+  ],
+  "gold": [
+    "Star Schema\n(Fact_Claim, Fact_Premium)",
+    "Actuarial Aggregates\n(Loss Ratio, Combined Ratio)",
+    "Regulatory / Statutory\n(NAIC, state filings, ORSA)",
+    "Metrics / Semantic Layer\n(GWP, NWP, loss ratio defs)"
+  ],
+  "compute": [
+    "Databricks Workflows\n(monthly close • quarterly filings)",
+    "Lakeflow / SDP Pipelines\n(claims → reserves → triangles)",
+    "DBSQL Pro Warehouse\n(actuarial queries • UW analytics)"
+  ],
+  "serve": [
+    "DBSQL + AI/BI Dashboards\n(claims ops, UW performance)",
+    "Power BI / Tableau\n(exec loss ratio dashboards)",
+    "Analyst Drill Path\n(ratio → LOB → claim → FNOL)",
+    "Delta Sharing\n(reinsurers • state regulators)"
+  ],
+  "domain_products": [
+    "Claims Analytics\n(severity, frequency, fraud)",
+    "Underwriting & Pricing\n(risk selection, rate adequacy)",
+    "Actuarial / Reserving\n(IBNR, triangles, LDAE)",
+    "Distribution / Agency\n(producer performance, retention)"
+  ]
+}

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Governance Framework — Interview Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1419; color: #e0e0e0; padding: 24px; }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* Back link */
+  .back-link { display: inline-block; margin-bottom: 16px; font-size: 13px; color: #E8763A; text-decoration: none; padding: 6px 14px; border: 1px solid #E8763A; border-radius: 6px; transition: all 0.2s; }
+  .back-link:hover { background: #E8763A; color: #fff; }
+
+  /* Header */
+  .header { margin-bottom: 36px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; margin-bottom: 12px; }
+  .tag-technical { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .tag-governance { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .tag-retail { background: rgba(232,118,58,0.15); color: #fb923c; }
+  h1 { color: #fff; font-size: 21px; line-height: 1.4; margin-bottom: 8px; }
+  .meta { color: #6b7b8d; font-size: 13px; }
+
+  /* Pocket Answer */
+  .pocket { background: linear-gradient(135deg, #1a2a3a 0%, #1e3348 100%); border: 1px solid #2a4a6a; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+  .pocket::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: rgba(232,118,58,0.04); border-radius: 50%; transform: translate(60px, -60px); }
+  .pocket-label { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; background: rgba(232,118,58,0.9); color: #fff; margin-bottom: 14px; }
+  .pocket-timer { display: inline-block; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.08); color: #8899aa; margin-left: 8px; }
+  .pocket-script { font-size: 15px; line-height: 1.9; color: #c8d8e8; font-style: italic; }
+  .pocket-script .pk { color: #fbbf24; font-style: normal; font-weight: 700; }
+  .pocket-script .pk-green { color: #4ade80; font-style: normal; font-weight: 600; }
+  .pocket-script .pk-blue { color: #60a5fa; font-style: normal; font-weight: 600; }
+  .pocket-note { margin-top: 16px; font-size: 12px; color: #556677; border-top: 1px solid #2a3a4a; padding-top: 12px; }
+
+  /* Why Card */
+  .why-card { background: linear-gradient(135deg, #1a1f2e 0%, #1e2a3a 100%); border: 1px solid #2a3a4a; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .why-card h2 { color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .why-card p { color: #a0b0c0; font-size: 14px; line-height: 1.7; }
+  .signals { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .signal { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #3a4a5a; color: #8899aa; }
+
+  /* Section headers */
+  .section-header { color: #E8763A; font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid rgba(232,118,58,0.3); }
+
+  /* Architecture Diagram */
+  .diagram { background: #141820; border: 1px solid #2a3040; border-radius: 12px; padding: 28px; margin-bottom: 32px; }
+  .diagram-title { color: #fff; font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 24px; }
+
+  .gov-layers { display: flex; flex-direction: column; gap: 16px; }
+  .gov-layer { border-radius: 10px; padding: 18px 20px; border: 1px solid; }
+  .gov-layer-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .gov-layer-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .gov-item { font-size: 12px; padding: 6px 12px; border-radius: 6px; background: rgba(255,255,255,0.05); }
+
+  .layer-classify { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.04); }
+  .layer-classify .gov-layer-label { color: #f87171; }
+  .layer-classify .gov-item { color: #fca5a5; }
+
+  .layer-protect { border-color: rgba(168,85,247,0.3); background: rgba(168,85,247,0.04); }
+  .layer-protect .gov-layer-label { color: #c084fc; }
+  .layer-protect .gov-item { color: #d8b4fe; }
+
+  .layer-govern { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.04); }
+  .layer-govern .gov-layer-label { color: #4ade80; }
+  .layer-govern .gov-item { color: #86efac; }
+
+  .layer-enable { border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.04); }
+  .layer-enable .gov-layer-label { color: #60a5fa; }
+  .layer-enable .gov-item { color: #93c5fd; }
+
+  .arrow-center { text-align: center; color: #3a4a5a; font-size: 14px; padding: 4px 0; }
+
+  /* Script blocks */
+  .script { background: #141820; border-radius: 8px; padding: 16px 18px; margin: 12px 0; border-left: 3px solid #3b82f6; font-size: 14px; line-height: 1.8; color: #c8d8e8; }
+  .script .hl { color: #fbbf24; font-weight: 600; }
+  .script .hl-green { color: #4ade80; font-weight: 600; }
+  .script .hl-orange { color: #fb923c; font-weight: 600; }
+  .script .hl-blue { color: #60a5fa; font-weight: 600; }
+  .script .hl-purple { color: #c084fc; font-weight: 600; }
+  .script .hl-red { color: #f87171; font-weight: 600; }
+
+  /* Part labels */
+  .part { display: inline-block; background: #E8763A; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 4px; margin: 20px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Data Classification Table */
+  .class-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  .class-table th { text-align: left; padding: 10px 12px; background: #1a1f2e; color: #8899aa; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .class-table td { padding: 10px 12px; border-bottom: 1px solid #1e2536; color: #b0c0d0; }
+  .class-table .tier-red { color: #f87171; font-weight: 700; }
+  .class-table .tier-orange { color: #fb923c; font-weight: 700; }
+  .class-table .tier-green { color: #4ade80; font-weight: 700; }
+  .class-table .tier-blue { color: #60a5fa; font-weight: 700; }
+
+  /* Experience Bridge */
+  .bridge { background: linear-gradient(135deg, #1a2332 0%, #1a1f2e 100%); border: 1px solid #2a3a4a; border-radius: 10px; padding: 18px 20px; margin-top: 14px; }
+  .bridge-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #E8763A; margin-bottom: 8px; }
+  .bridge p { font-size: 13px; color: #8899aa; line-height: 1.6; }
+  .bridge .exp { color: #60a5fa; font-weight: 600; }
+
+  /* Principle cards */
+  .principles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 32px; }
+  .principle { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; padding: 18px; }
+  .principle .p-icon { font-size: 24px; margin-bottom: 8px; }
+  .principle .p-title { color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .principle .p-desc { color: #8899aa; font-size: 12px; line-height: 1.5; }
+
+  /* Follow-up cards */
+  .fq-card { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; margin-bottom: 16px; overflow: hidden; cursor: pointer; }
+  .fq-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .fq-header:hover { background: #1e2536; }
+  .fq-q { font-size: 14px; color: #e0e0e0; font-weight: 600; flex: 1; }
+  .fq-chevron { color: #6b7b8d; font-size: 18px; transition: transform 0.2s; flex-shrink: 0; margin-left: 12px; }
+  .fq-card.open .fq-chevron { transform: rotate(180deg); }
+  .fq-body { display: none; padding: 0 20px 20px; }
+  .fq-card.open .fq-body { display: block; }
+
+  /* Coaching box */
+  .coaching { background: linear-gradient(135deg, #2a1a1a 0%, #1a1f2e 100%); border: 1px solid #E8763A; border-radius: 10px; padding: 20px 24px; margin-bottom: 32px; }
+  .coaching h3 { color: #E8763A; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .coaching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .do-col h4 { color: #4ade80; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .dont-col h4 { color: #f87171; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .coaching-item { font-size: 13px; color: #a0b0c0; margin-bottom: 8px; padding-left: 16px; position: relative; line-height: 1.5; }
+  .coaching-item::before { content: ''; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; }
+  .do-col .coaching-item::before { background: #4ade80; }
+  .dont-col .coaching-item::before { background: #f87171; }
+
+  /* Closing */
+  .closing { background: linear-gradient(135deg, #1a2520 0%, #1a1f2e 100%); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .closing h2 { color: #4ade80; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+  @media (max-width: 700px) {
+    .coaching-grid, .principles { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back-link" href="file:///Users/slysik/databricks/Wegmans_Interview_Study_Guide.html">← Back to Study Guide</a>
+
+  <!-- Header -->
+  <div class="header">
+    <span class="tag tag-technical">Technical</span>
+    <span class="tag tag-governance">Governance</span>
+    <span class="tag tag-retail">Retail / Compliance</span>
+    <h1>"Wegmans handles sensitive customer data — loyalty programs, purchasing history, payment information — plus employee and supplier data. How would you design a data governance framework on Databricks that balances security and compliance with enabling self-service analytics?"</h1>
+    <div class="meta">Wegmans Solutions Architect Prep &nbsp;·&nbsp; Steve Lysik &nbsp;·&nbsp; ~4 min answer</div>
+  </div>
+
+  <!-- POCKET ANSWER -->
+  <div class="pocket">
+    <span class="pocket-label">Pocket Answer</span>
+    <span class="pocket-timer">30–45 sec</span>
+    <div class="pocket-script">
+      "I'd build governance around <span class="pk">Unity Catalog as the single control plane</span> with a four-tier data classification system — Restricted for PCI and PII like payment data, Confidential for loyalty purchase history and employee records, Internal for aggregated store metrics, and Public for published reports. Each tier maps to specific <span class="pk-green">Unity Catalog controls</span>: row-level security, column masking on PII fields, and attribute-based access by team role. The key design principle is <span class="pk">governance as infrastructure, not process</span> — controls are automated through Unity Catalog policies and DLT quality expectations, not manual reviews. Business teams get <span class="pk-blue">self-service SQL Warehouses</span> that operate within pre-defined governance boundaries, so they can explore freely without ever seeing raw PII. Column-level lineage in Unity Catalog means we can trace any metric back to its source for audit. I built this exact pattern at <span class="pk-blue">Microsoft for financial services clients</span> where regulatory requirements were even stricter."
+    </div>
+    <div class="pocket-note">This is the quick version. Scroll down for the full 4-minute scripted answer with architecture diagram, data classification table, and follow-up Q&A.</div>
+  </div>
+
+  <!-- Why They're Asking -->
+  <div class="why-card">
+    <h2>Why They're Asking This</h2>
+    <p>Wegmans processes millions of transactions across 100+ stores, runs a loyalty program with customer PII, handles PCI-regulated payment data, and manages sensitive employee and supplier information. They need an architect who can build a governance framework that <em>doesn't</em> become a bottleneck for their analytics teams. This question reveals whether you think of governance as a lock on the door or as guardrails on a highway — one stops movement, the other enables it safely.</p>
+    <div class="signals">
+      <span class="signal">Data classification</span>
+      <span class="signal">PCI-DSS awareness</span>
+      <span class="signal">Unity Catalog depth</span>
+      <span class="signal">Self-service enablement</span>
+      <span class="signal">Retail data sensitivity</span>
+      <span class="signal">Audit & lineage</span>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <div class="section-header">Governance Architecture — Four Layers</div>
+  <div class="diagram">
+    <div class="diagram-title">Classify → Protect → Govern → Enable</div>
+    <div class="gov-layers">
+
+      <div class="gov-layer layer-classify">
+        <div class="gov-layer-label">Layer 1 — Classify</div>
+        <div class="gov-layer-items">
+          <div class="gov-item">🔴 Restricted (PCI, PII)</div>
+          <div class="gov-item">🟠 Confidential (loyalty, employee)</div>
+          <div class="gov-item">🟢 Internal (store metrics)</div>
+          <div class="gov-item">🔵 Public (published reports)</div>
+          <div class="gov-item">Unity Catalog Tags</div>
+          <div class="gov-item">Automated discovery via DLT</div>
+        </div>
+      </div>
+
+      <div class="arrow-center">▼ Tags drive policies automatically ▼</div>
+
+      <div class="gov-layer layer-protect">
+        <div class="gov-layer-label">Layer 2 — Protect</div>
+        <div class="gov-layer-items">
+          <div class="gov-item">Column masking (PII → hashed/redacted)</div>
+          <div class="gov-item">Row-level security (store → regional access)</div>
+          <div class="gov-item">Dynamic views (role-based projection)</div>
+          <div class="gov-item">Encryption at rest (ADLS)</div>
+          <div class="gov-item">Network isolation (VNet / Private Link)</div>
+        </div>
+      </div>
+
+      <div class="arrow-center">▼ Lineage connects everything ▼</div>
+
+      <div class="gov-layer layer-govern">
+        <div class="gov-layer-label">Layer 3 — Govern & Audit</div>
+        <div class="gov-layer-items">
+          <div class="gov-item">Unity Catalog 3-level namespace</div>
+          <div class="gov-item">Column-level lineage</div>
+          <div class="gov-item">Audit logs (who accessed what, when)</div>
+          <div class="gov-item">Data quality expectations (DLT)</div>
+          <div class="gov-item">Retention policies</div>
+          <div class="gov-item">AI/ML model lineage</div>
+        </div>
+      </div>
+
+      <div class="arrow-center">▼ Business teams work within boundaries ▼</div>
+
+      <div class="gov-layer layer-enable">
+        <div class="gov-layer-label">Layer 4 — Enable Self-Service</div>
+        <div class="gov-layer-items">
+          <div class="gov-item">SQL Warehouses (governed compute)</div>
+          <div class="gov-item">Curated Gold catalog for analysts</div>
+          <div class="gov-item">Data marketplace (discoverable datasets)</div>
+          <div class="gov-item">Sandbox schemas for experimentation</div>
+          <div class="gov-item">Power BI governed connection</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripted Answer -->
+  <div class="section-header">Scripted Answer — Four Parts</div>
+
+  <span class="part">Part 1 — Frame the Problem: Two Goals, Not One (30s)</span>
+  <div class="script">
+    "The way I think about governance is that it has <span class="hl">two jobs, not one</span>. The obvious job is protection — making sure PCI data, customer PII, and sensitive employee information are locked down. But the less obvious and equally important job is <span class="hl-green">enablement</span> — making sure your store analytics teams, merchandising analysts, and data scientists can actually <em>use</em> the data without filing a ticket every time they need a new column.<br><br>
+
+    If governance only does the first job, you end up with a data platform nobody uses. If it only does the second, you end up on the front page. <span class="hl-blue">The architecture has to do both simultaneously.</span>"
+  </div>
+
+  <span class="part">Part 2 — Data Classification: The Foundation (60s)</span>
+  <div class="script">
+    "Everything starts with <span class="hl">data classification</span>. I'd establish four tiers, and these tiers drive every downstream policy automatically through Unity Catalog tags.<br><br>
+
+    <span class="hl-red">Restricted</span> — PCI cardholder data, SSNs, raw payment transactions. Zero self-service access to raw data. Tokenized or masked views only. This is non-negotiable for PCI-DSS compliance.<br><br>
+
+    <span class="hl-orange">Confidential</span> — Loyalty program purchase history, employee HR data, supplier contracts, individual customer profiles. Accessible to authorized roles with column masking on identifiable fields.<br><br>
+
+    <span class="hl-green">Internal</span> — Aggregated store performance, category sales by region, inventory levels, demand forecasts. This is where most analysts live. Broadly accessible within the organization.<br><br>
+
+    <span class="hl-blue">Public</span> — Published dashboards, annual metrics, investor-ready data. No restrictions.<br><br>
+
+    In Unity Catalog, these tiers become <span class="hl">tags on tables, columns, and schemas</span>. A column tagged <code>pii:restricted</code> automatically gets a masking policy applied — analysts querying that table see <code>****</code> instead of the raw value. No manual process, no approval queue."
+  </div>
+
+  <!-- Data Classification Table -->
+  <table class="class-table">
+    <tr><th>Tier</th><th>Wegmans Examples</th><th>Who Can Access</th><th>Unity Catalog Control</th></tr>
+    <tr>
+      <td class="tier-red">Restricted</td>
+      <td>Card numbers, CVVs, SSNs, raw payment logs</td>
+      <td>Security team + PCI-scoped service accounts only</td>
+      <td>Column masking, row-level security, dedicated schema, audit-only</td>
+    </tr>
+    <tr>
+      <td class="tier-orange">Confidential</td>
+      <td>Loyalty member profiles, purchase history, employee records, supplier pricing</td>
+      <td>Authorized analysts with role-based access</td>
+      <td>Column masking on PII (name, email → hashed), row filters by region/store</td>
+    </tr>
+    <tr>
+      <td class="tier-green">Internal</td>
+      <td>Daily sales by store/category, inventory positions, demand forecasts, supplier scorecards</td>
+      <td>All internal analysts and data teams</td>
+      <td>Schema-level grants, no masking needed, full self-service</td>
+    </tr>
+    <tr>
+      <td class="tier-blue">Public</td>
+      <td>Published dashboards, annual reports, press-released metrics</td>
+      <td>Anyone</td>
+      <td>Read-only catalog, Power BI embedded</td>
+    </tr>
+  </table>
+
+  <span class="part">Part 3 — The Protection Layer: How Unity Catalog Enforces It (90s)</span>
+  <div class="script">
+    "Unity Catalog gives us <span class="hl-green">three enforcement mechanisms</span> that map directly to these tiers.<br><br>
+
+    <span class="hl-purple">Column masking</span> — for Confidential and Restricted data. A loyalty analyst querying the customer table sees <code>customer_id</code> and <code>purchase_category</code> but the <code>email</code> column returns a SHA-256 hash and <code>payment_card</code> returns <code>XXXX-XXXX-XXXX-1234</code>. The masking function is defined once in Unity Catalog and enforced everywhere — notebooks, SQL Warehouses, Power BI, AI agents via MCP. <span class="hl">There's no way to bypass it</span> because it's applied at the catalog level, not the query level.<br><br>
+
+    <span class="hl-blue">Row-level security</span> — a regional merchandising manager sees only data for their stores. A store manager sees only their location. This is critical for Wegmans' organizational structure — you don't want a Rochester store manager browsing Buffalo's supplier contracts. Implemented as dynamic filters in Unity Catalog tied to user attributes.<br><br>
+
+    <span class="hl">Attribute-based access control</span> — rather than granting access table-by-table, I'd use role-based grants at the schema level. The <code>wegmans_retail.gold_analytics</code> schema is open to all analysts. The <code>wegmans_retail.pci_restricted</code> schema requires a specific security role plus audit logging on every query. This is <span class="hl-green">scalable governance</span> — you're not managing thousands of individual table permissions."
+  </div>
+
+  <div class="bridge">
+    <div class="bridge-label">Your Experience Bridge</div>
+    <p>"At <span class="exp">Microsoft, I designed governance frameworks for financial services clients</span> — ExxonMobil for energy trading data, FedEx for shipment PII. Financial services has even stricter requirements than retail, so the patterns translate directly. The key lesson: <span class="exp">governance that requires human approval for every access request doesn't scale</span>. You need policy-driven automation."</p>
+  </div>
+
+  <span class="part">Part 4 — The Enablement Layer: Self-Service Within Guardrails (60s)</span>
+  <div class="script">
+    "Now the part that makes this <span class="hl-green">actually useful</span> for business teams, not just compliant.<br><br>
+
+    I'd create a <span class="hl-blue">curated Gold catalog</span> — <code>wegmans_retail.gold_analytics</code> — that contains pre-built, governed views of the data. Daily sales by store by category. Inventory positions. Demand forecasts. Supplier scorecards. All the masking and row filters are already baked in. A merchandising analyst connects Power BI to this catalog and <span class="hl">they're productive in minutes</span>, not days.<br><br>
+
+    For more exploratory work, I'd provide <span class="hl-orange">sandbox schemas</span> — <code>wegmans_retail.sandbox_{team}</code> — where analysts can create their own tables, run experiments, join datasets. They still can't see restricted data because masking is enforced at the source, but they have freedom to explore within their classification tier.<br><br>
+
+    And for discoverability, Unity Catalog's <span class="hl-green">data marketplace</span> feature lets teams publish curated datasets with descriptions, sample queries, and usage guidelines. Instead of asking 'who owns this table?' in Slack, they search the catalog. <span class="hl">Self-service doesn't mean ungoverned. It means governed access that doesn't require a ticket.</span>"
+  </div>
+
+  <div class="bridge">
+    <div class="bridge-label">Your Experience Bridge</div>
+    <p>"This is where my work at <span class="exp">Hopewell on NL2SQL with vector indexes</span> connects directly. We built semantic data discovery so business users could find and query governed datasets using natural language. MCP Servers in Wegmans' JD are the next evolution — <span class="exp">AI agents accessing the curated Gold catalog through Unity Catalog governance</span>, so even AI-driven analytics respect the classification tiers."</p>
+  </div>
+
+  <!-- Core Principles -->
+  <div class="section-header">Core Principles</div>
+  <div class="principles">
+    <div class="principle">
+      <div class="p-icon">🛡️</div>
+      <div class="p-title">Governance as Infrastructure</div>
+      <div class="p-desc">Controls live in Unity Catalog policies, not in approval workflows. Automated, not manual.</div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🏷️</div>
+      <div class="p-title">Tags Drive Policy</div>
+      <div class="p-desc">Classify once, enforce everywhere. A PII tag triggers masking in every query surface automatically.</div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🔍</div>
+      <div class="p-title">Lineage = Trust</div>
+      <div class="p-desc">Column-level lineage lets you trace any Gold metric back to Bronze. Critical for audit and debugging.</div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🚀</div>
+      <div class="p-title">Enable by Default</div>
+      <div class="p-desc">Internal-tier data is open. Restriction is the exception, not the rule. Make analysts productive, not blocked.</div>
+    </div>
+  </div>
+
+  <!-- Follow-up Questions -->
+  <div class="section-header">Likely Follow-Ups</div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"How do you handle PCI-DSS specifically? Payment data has strict requirements."</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "PCI-DSS is about <span class="hl-red">minimizing the cardholder data environment</span>. My approach: payment data never lands in the lakehouse in its raw form. The POS system tokenizes at the point of capture — what lands in Bronze is already tokenized. The token-to-card mapping lives in a separate <span class="hl-purple">PCI-scoped vault</span> outside Databricks entirely.<br><br>
+
+        In the lakehouse, the <code>pci_restricted</code> schema contains only tokenized transaction records. Analysts can do full sales analysis on amounts, timestamps, product associations — everything they need — without ever seeing a card number. If a fraud investigation requires de-tokenization, that's a separate, audited process through the vault, not through Databricks.<br><br>
+
+        This architecture <span class="hl-green">keeps the Databricks environment out of PCI scope entirely</span>, which dramatically simplifies compliance. The platform processes transactions, not cardholder data."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"What about the loyalty program data? Customers share personal info — how do you balance analytics with privacy?"</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "Loyalty data is the most valuable and sensitive intersection. Customers share their shopping patterns, dietary preferences, email, phone — that's <span class="hl-orange">Confidential tier</span>.<br><br>
+
+        The architecture creates two views of the same data. The <span class="hl-blue">analytics view</span> in Gold strips PII — you see <code>loyalty_segment</code>, <code>purchase_frequency</code>, <code>preferred_categories</code>, but not <code>name</code> or <code>email</code>. This is what merchandising teams use for category planning and promotional targeting.<br><br>
+
+        The <span class="hl-purple">marketing view</span> retains identifiable fields but is restricted to the CRM team with explicit access grants and full audit logging. They need the email for campaign delivery, but they access it through a governed view, not raw tables.<br><br>
+
+        Unity Catalog's column masking makes this seamless — <span class="hl-green">same underlying table, different projections based on the querying user's role</span>. No data duplication, no sync issues."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"How do you get business teams to actually adopt the governed platform instead of building shadow IT?"</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "Shadow IT happens when the governed path is slower than the ungoverned path. My approach is to make the <span class="hl-green">governed path the fastest path</span>.<br><br>
+
+        That means: curated Gold datasets that answer 80% of questions out of the box. SQL Warehouse access that connects to Power BI in one click. Sandbox schemas where analysts can experiment without filing tickets. Data marketplace so they can discover what's available.<br><br>
+
+        The first 90 days, I'd identify what analysts are currently pulling from spreadsheets, manual exports, or direct database queries — and make sure those use cases are <span class="hl">the first things available in the governed catalog</span>. If the platform doesn't serve their immediate needs, no amount of governance policy will prevent workarounds."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"How does this governance model work with AI agents and MCP Servers?"</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "This is where Unity Catalog really shines. <span class="hl-blue">MCP Servers in Databricks query through Unity Catalog</span>, which means every AI agent inherits the same governance framework as a human analyst. An AI agent answering 'what were our top-selling categories last week?' queries the Gold catalog and gets the same masked, row-filtered view that a human analyst would.<br><br>
+
+        The agent's <span class="hl">service principal</span> in Unity Catalog has specific grants — it can access <code>gold_analytics</code> but not <code>pci_restricted</code>. Every query is audit-logged. Model lineage tracks which data trained which model.<br><br>
+
+        This is the future of data governance — <span class="hl-green">it's not just about human access anymore, it's about governing AI access with the same rigor</span>. The classification tiers and Unity Catalog controls I described work identically for AI agents. That's by design."
+      </div>
+    </div>
+  </div>
+
+  <!-- Coaching -->
+  <div class="coaching">
+    <h3>Coaching Notes</h3>
+    <div class="coaching-grid">
+      <div class="do-col">
+        <h4>Do This</h4>
+        <div class="coaching-item">Lead with "two jobs, not one" — immediately signals you won't over-index on security at the expense of usability</div>
+        <div class="coaching-item">Name Wegmans-specific data types (loyalty, POS, supplier contracts) — shows you've thought about their world</div>
+        <div class="coaching-item">Emphasize "governance as infrastructure, not process" — this is the line they'll remember</div>
+        <div class="coaching-item">Connect MCP Servers to governance — ties back to their JD and shows forward thinking</div>
+        <div class="coaching-item">Reference financial services experience — regulated industries carry credibility for data protection</div>
+      </div>
+      <div class="dont-col">
+        <h4>Avoid This</h4>
+        <div class="coaching-item">Don't recite PCI-DSS requirements like a checklist — they have compliance people for that. You're the architect.</div>
+        <div class="coaching-item">Don't say "we'd lock everything down" — that's the opposite of what they want to hear</div>
+        <div class="coaching-item">Don't ignore the self-service side — if 80% of your answer is about protection, you've missed the point</div>
+        <div class="coaching-item">Don't get lost in Unity Catalog syntax — concepts over SQL statements</div>
+        <div class="coaching-item">Don't forget employee and supplier data — the question mentions it, so address it (Confidential tier)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closing -->
+  <div class="closing">
+    <h2>Strong Closing Line</h2>
+    <div class="script" style="border-left-color: #22c55e; margin-bottom: 0;">
+      "The best governance framework is one that <span class="hl-green">analysts don't even notice</span>. They connect to the catalog, they find the data they need, they build their analysis — and behind the scenes, every access is classified, masked appropriately, logged, and traceable. The security team sleeps well, the analytics team is productive, and the architecture handles the tension between those two goals automatically. That's what Unity Catalog enables when it's designed correctly."
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Follow-up cards toggle via onclick in HTML
+</script>
+</body>
+</html>

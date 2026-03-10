@@ -1,0 +1,335 @@
+/**
+ * Coding Interview Tasks — Task tracker for the 60-minute coding interview
+ *
+ * Updated for the CODING interview (not Design & Architecture).
+ * Key differences: emphasis on working code, pair programming vibe,
+ * "think out loud" narration, and scaling discussion.
+ *
+ * Commands:
+ *   /tasks          — Show task list
+ *   /done <number>  — Mark task as done
+ *   /next           — Start the next task
+ *   /reset-tasks    — Restart timer and tasks
+ *
+ * Usage: pi -e .pi/extensions/coding-interview-tasks.ts
+ */
+
+import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import { Type } from "@sinclair/typebox";
+
+interface Task {
+	id: number;
+	text: string;
+	detail: string; // what to say out loud
+	status: "pending" | "active" | "done";
+	startedAt?: number;
+	doneAt?: number;
+	budgetMin: number; // target minutes for this phase
+}
+
+// Colors
+function bgBar(s: string): string {
+	return `\x1b[48;2;25;35;50m${s}\x1b[49m`;
+}
+function green(s: string): string {
+	return `\x1b[38;2;80;220;120m${s}\x1b[39m`;
+}
+function yellow(s: string): string {
+	return `\x1b[38;2;255;200;50m${s}\x1b[39m`;
+}
+function red(s: string): string {
+	return `\x1b[38;2;255;80;80m${s}\x1b[39m`;
+}
+function dimGray(s: string): string {
+	return `\x1b[38;2;100;100;120m${s}\x1b[39m`;
+}
+function white(s: string): string {
+	return `\x1b[38;2;220;220;230m${s}\x1b[39m`;
+}
+function orange(s: string): string {
+	return `\x1b[38;2;255;106;0m${s}\x1b[39m`;
+}
+function bold(s: string): string {
+	return `\x1b[1m${s}\x1b[22m`;
+}
+
+const CODING_INTERVIEW_TASKS: Omit<Task, "id">[] = [
+	{
+		text: "Discovery — Clarify prompt & scope",
+		detail: "Ask: business key? volume? batch/streaming? what does 'correct' mean?",
+		status: "pending",
+		budgetMin: 5,
+	},
+	{
+		text: "Data Gen — PySpark synthetic dataset",
+		detail: "spark.range() + hash categoricals + Faker for names. 100k rows. Narrate distributed approach.",
+		status: "pending",
+		budgetMin: 10,
+	},
+	{
+		text: "Bronze — Land raw Delta tables",
+		detail: "Write to catalog.bronze. No transforms. Mention schema evolution.",
+		status: "pending",
+		budgetMin: 5,
+	},
+	{
+		text: "Silver — Clean, deduplicate, constrain",
+		detail: "ROW_NUMBER MERGE, CHECK constraints, Liquid Clustering, OPTIMIZE. Explain MERGE under the hood.",
+		status: "pending",
+		budgetMin: 12,
+	},
+	{
+		text: "Gold — Business aggregations",
+		detail: "Idempotent window rebuild. GROUP BY, window functions. Explain shuffle + partial aggregation.",
+		status: "pending",
+		budgetMin: 10,
+	},
+	{
+		text: "Validate — Prove correctness",
+		detail: "Row counts, uniqueness, constraint test, pruning proof. This IS the deliverable.",
+		status: "pending",
+		budgetMin: 8,
+	},
+	{
+		text: "Discuss — Scaling & execution",
+		detail: "How does this scale to 1M+? Narrow vs wide transforms. Join strategies. Streaming pivot.",
+		status: "pending",
+		budgetMin: 10,
+	},
+];
+
+export default function (pi: ExtensionAPI) {
+	let tasks: Task[] = [];
+	let sessionStart: number = Date.now();
+
+	function initTasks() {
+		sessionStart = Date.now();
+		tasks = CODING_INTERVIEW_TASKS.map((t, i) => ({ ...t, id: i + 1 }));
+	}
+
+	function formatElapsed(): string {
+		const mins = Math.floor((Date.now() - sessionStart) / 60000);
+		const secs = Math.floor(((Date.now() - sessionStart) % 60000) / 1000);
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
+	}
+
+	function elapsedMinutes(): number {
+		return Math.floor((Date.now() - sessionStart) / 60000);
+	}
+
+	function updateWidget(ctx: any) {
+		ctx.ui.setWidget("coding-tasks", () => ({
+			render(width: number): string[] {
+				const done = tasks.filter((t) => t.status === "done").length;
+				const total = tasks.length;
+				const active = tasks.find((t) => t.status === "active");
+				const elapsed = formatElapsed();
+				const mins = elapsedMinutes();
+
+				const lines: string[] = [];
+				const pad = bgBar(" ".repeat(width));
+				lines.push(pad);
+
+				// Header with progress + timer (red if >50 min)
+				const progressFilled = Math.round((done / total) * 14);
+				const progressBar =
+					green("█".repeat(progressFilled)) + dimGray("░".repeat(14 - progressFilled));
+				const timeColor = mins >= 50 ? red : mins >= 40 ? yellow : white;
+				const header = bgBar(
+					truncateToWidth(
+						orange(bold("  ⚡ CODING INTERVIEW ")) +
+							progressBar +
+							dimGray(` ${done}/${total}`) +
+							" ".repeat(Math.max(1, width - 42 - elapsed.length)) +
+							timeColor(`⏱ ${elapsed} `) ,
+						width,
+						""
+					)
+				);
+				lines.push(header);
+
+				// Task list with budget info
+				for (const task of tasks) {
+					const icon =
+						task.status === "done"
+							? green("✓")
+							: task.status === "active"
+								? yellow("▶")
+								: dimGray("○");
+
+					let timeInfo = "";
+					if (task.status === "active" && task.startedAt) {
+						const taskMins = Math.floor((Date.now() - task.startedAt) / 60000);
+						const overBudget = taskMins > task.budgetMin;
+						timeInfo = overBudget
+							? red(` [${taskMins}/${task.budgetMin}m ⚠]`)
+							: dimGray(` [${taskMins}/${task.budgetMin}m]`);
+					} else if (task.status === "done" && task.startedAt && task.doneAt) {
+						const taskMins = Math.floor((task.doneAt - task.startedAt) / 60000);
+						timeInfo = dimGray(` [${taskMins}m]`);
+					}
+
+					const text =
+						task.status === "done"
+							? dimGray(task.text)
+							: task.status === "active"
+								? yellow(bold(task.text))
+								: white(task.text);
+
+					lines.push(
+						bgBar(
+							truncateToWidth(
+								`  ${icon} ${task.id}. ${text}${timeInfo}` + " ".repeat(width),
+								width,
+								""
+							)
+						)
+					);
+
+					// Show detail hint for active task
+					if (task.status === "active") {
+						lines.push(
+							bgBar(
+								truncateToWidth(
+									`     ${orange("💬 " + task.detail)}` + " ".repeat(width),
+									width,
+									""
+								)
+							)
+						);
+					}
+				}
+
+				lines.push(pad);
+				return lines;
+			},
+			invalidate() {},
+		}));
+	}
+
+	// /next — advance to next task
+	pi.registerCommand("next", {
+		description: "Start the next interview task",
+		handler: async (_args, ctx) => {
+			const active = tasks.find((t) => t.status === "active");
+			if (active) {
+				active.status = "done";
+				active.doneAt = Date.now();
+			}
+			const next = tasks.find((t) => t.status === "pending");
+			if (next) {
+				next.status = "active";
+				next.startedAt = Date.now();
+				updateWidget(ctx);
+				ctx.ui.notify(`▶ ${next.text}\n💬 ${next.detail}`, "success");
+			} else {
+				updateWidget(ctx);
+				ctx.ui.notify("🎉 All tasks complete!", "success");
+			}
+		},
+	});
+
+	// /done <n> — mark specific task done
+	pi.registerCommand("done", {
+		description: "Mark a task as done by number",
+		handler: async (args, ctx) => {
+			const id = parseInt(args.trim());
+			const task = tasks.find((t) => t.id === id);
+			if (task) {
+				task.status = "done";
+				task.doneAt = Date.now();
+				updateWidget(ctx);
+				ctx.ui.notify(`✓ ${task.text}`, "success");
+			} else {
+				ctx.ui.notify(`Task #${id} not found`, "warning");
+			}
+		},
+	});
+
+	// /tasks — show full list
+	pi.registerCommand("tasks", {
+		description: "Show interview task list with details",
+		handler: async (_args, ctx) => {
+			const lines = tasks.map((t) => {
+				const icon = t.status === "done" ? "✓" : t.status === "active" ? "▶" : "○";
+				return `${icon} ${t.id}. ${t.text} (${t.budgetMin}m)\n   💬 ${t.detail}`;
+			});
+			ctx.ui.notify(lines.join("\n"), "info");
+		},
+	});
+
+	// /reset-tasks
+	pi.registerCommand("reset-tasks", {
+		description: "Reset all tasks and restart timer",
+		handler: async (_args, ctx) => {
+			const ok = await ctx.ui.confirm("Reset", "Reset all tasks and timer?");
+			if (ok) {
+				initTasks();
+				updateWidget(ctx);
+				ctx.ui.notify("Reset!", "success");
+			}
+		},
+	});
+
+	// Tool for AI agent to manage tasks
+	pi.registerTool({
+		name: "interview_task",
+		label: "Interview Task",
+		description:
+			"Mark interview tasks as done or get current status. Use after completing each interview phase.",
+		parameters: Type.Object({
+			action: Type.Union(
+				[Type.Literal("next"), Type.Literal("done"), Type.Literal("status")],
+				{ description: "next = start next task, done = complete current task, status = show progress" }
+			),
+			task_id: Type.Optional(
+				Type.Number({ description: "Task ID to mark done (for action=done)" })
+			),
+		}),
+		handler: async (params, ctx) => {
+			if (params.action === "next") {
+				const active = tasks.find((t) => t.status === "active");
+				if (active) {
+					active.status = "done";
+					active.doneAt = Date.now();
+				}
+				const next = tasks.find((t) => t.status === "pending");
+				if (next) {
+					next.status = "active";
+					next.startedAt = Date.now();
+					updateWidget(ctx);
+					return `Started task ${next.id}: ${next.text}\n💬 ${next.detail}`;
+				}
+				updateWidget(ctx);
+				return "All tasks complete!";
+			}
+
+			if (params.action === "done" && params.task_id) {
+				const task = tasks.find((t) => t.id === params.task_id);
+				if (task) {
+					task.status = "done";
+					task.doneAt = Date.now();
+					updateWidget(ctx);
+					return `Completed: ${task.text}`;
+				}
+				return `Task #${params.task_id} not found`;
+			}
+
+			// status
+			const done = tasks.filter((t) => t.status === "done").length;
+			const active = tasks.find((t) => t.status === "active");
+			const mins = elapsedMinutes();
+			return `Progress: ${done}/${tasks.length} done. Active: ${active?.text || "none"}. Elapsed: ${formatElapsed()} (${mins >= 50 ? "⚠ WRAP UP" : mins >= 40 ? "⚠ entering final stretch" : "on track"})`;
+		},
+	});
+
+	pi.on("session_start", async (_event, ctx) => {
+		initTasks();
+		updateWidget(ctx);
+		ctx.ui.notify(
+			"⚡ Coding interview tasks loaded.\n/next to start | /done <n> to complete | /tasks to see all",
+			"info"
+		);
+	});
+}

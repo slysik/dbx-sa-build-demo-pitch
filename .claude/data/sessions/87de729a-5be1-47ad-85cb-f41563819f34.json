@@ -1,0 +1,15 @@
+{
+  "session_id": "87de729a-5be1-47ad-85cb-f41563819f34",
+  "prompts": [
+    "does CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS still need to be set?",
+    "/prime",
+    "/architect:discovery",
+    "why don't I see these / commands that were created : discovery, plan /build / bail",
+    "could they have been created at project level",
+    "yes , prev session built them",
+    "keep looking as I daved this from prev session :   Your full interview command chain is now:\n  1. /discovery \u2192 scope the prompt\n  2. /plan \u2192 architecture\n  3. Build interactively\n  4. /bail \u2192 rescue when stuck\n  5. /builder-best-friend \u2192 explain under the hood\n  6. /distributed-computing-review \u2192 demo scaling\n",
+    "yes",
+    "yes"
+  ],
+  "agent_name": "Prism"
+}

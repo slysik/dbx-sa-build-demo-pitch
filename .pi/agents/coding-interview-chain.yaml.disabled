@@ -1,0 +1,99 @@
+coding-interview-pipeline:
+  description: "Coding interview pipeline: discover → generate data → Bronze → Silver → Gold → validate → discuss"
+  steps:
+    - agent: databricks-code-gen
+      prompt: |
+        Phase 1 — Generate a synthetic dataset using PySpark based on this interviewer prompt: $ORIGINAL
+
+        Vertical auto-detected. Catalog: dbx_weg.
+
+        Requirements:
+        - spark.range(100_000) as distributed scaffold
+        - F.hash(col, lit("salt")) % N for all categoricals, FKs, amounts, timestamps
+        - Faker UDFs ONLY for names/addresses (minimize usage, seed with 42)
+        - DECIMAL(18,2) for monetary values
+        - Realistic weighted distributions (85/10/5 splits, not uniform)
+        - Write directly to catalog.bronze as raw Delta tables
+        - Include TALK + SCALING narration comments on every block
+
+        Output: Complete PySpark notebook cells with narration comments.
+
+    - agent: databricks-code-gen
+      prompt: |
+        Phase 2 — Build Silver layer SQL transforms.
+
+        Original prompt: $ORIGINAL
+        Previous step (Bronze data): $INPUT
+
+        Build SQL cells for:
+        1. CREATE TABLE IF NOT EXISTS with proper types (DECIMAL for money, no FLOAT)
+        2. ROW_NUMBER dedup → MERGE INTO with EXPLICIT column lists (never SET *)
+        3. COALESCE nulls, UPPER/TRIM strings, CAST types
+        4. CHECK constraints (ALTER TABLE ADD CONSTRAINT)
+        5. Liquid Clustering on (business_key, event_date) + OPTIMIZE + ANALYZE
+        6. TALK + SCALING narration comments on every block
+
+        Rules:
+        - Fully qualify all tables as dbx_weg.silver.{table}
+        - Backtick reserved words (timestamp, date, type, status, value, key, order)
+        - IF NOT EXISTS / IF EXISTS for rerunability
+        - Inline subqueries, not TEMP VIEWs (MCP/serverless compatibility)
+
+    - agent: databricks-code-gen
+      prompt: |
+        Phase 3 — Build Gold layer + Validation harness.
+
+        Original prompt: $ORIGINAL
+        Previous steps (Bronze + Silver): $INPUT
+
+        GOLD LAYER:
+        1. CREATE TABLE with DECIMAL(38,2) for aggregated amounts
+        2. Idempotent window rebuild: DELETE WHERE date >= date_sub(current_date(), 14) then INSERT
+        3. GROUP BY aggregations, window functions (running avg, rank), CASE WHEN conditional aggregates
+        4. CHECK constraints + Liquid Clustering + OPTIMIZE + ANALYZE
+        5. TALK + SCALING narration on every block
+
+        VALIDATION HARNESS (mandatory):
+        A) Row counts across all 3 layers
+        B) Uniqueness check (GROUP BY HAVING count > 1 = 0 rows)
+        C) Rule violation counts
+        D) Constraint enforcement proof: INSERT bad data → CHECK rejects it
+        E) Pruning proof: sample query with EXPLAIN showing files pruned
+        F) Idempotency proof: run Gold rebuild twice, compare counts
+        G) Time travel: DESCRIBE HISTORY + VERSION AS OF
+
+    - agent: spark-explainer
+      prompt: |
+        Phase 4 — Create discussion talking points for the full pipeline.
+
+        Original prompt: $ORIGINAL
+        Full pipeline code: $INPUT
+
+        For each major code block, prepare what the user should SAY:
+
+        1. Data Generation
+           - Why spark.range() is distributed (vs pandas driver bottleneck)
+           - Why F.hash() over random() (deterministic, no UDF serialization)
+           - "What if 1M rows?" → just change N, same code
+
+        2. MERGE (Silver)
+           - ROW_NUMBER triggers shuffle (wide transform)
+           - MERGE is a read-modify-write (scan + shuffle + write)
+           - Liquid Clustering pre-sorts for merge-join locality
+           - Integrity story: "Delta doesn't enforce PK/FK, so I build it in..."
+
+        3. Gold Aggregation
+           - Partial aggregation → shuffle → final aggregation
+           - Window rebuild vs full overwrite (I/O comparison)
+           - DECIMAL(38,2) prevents overflow at scale
+
+        4. Scaling Discussion
+           - What becomes the bottleneck at 1B rows?
+           - When to pivot from batch to streaming
+           - Liquid Clustering vs partitioning tradeoffs
+
+        5. The 30-Second Opening
+           Coach a natural "think out loud" opener for the interview.
+
+        Format: Conversational talking points, not textbook definitions.
+        Use "You'd say:" prefix for each talking point.

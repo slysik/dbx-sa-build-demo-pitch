@@ -1,0 +1,50 @@
+{
+  "title": "FinServ DW Architecture – Capital Markets",
+  "sources": [
+    "Order Mgmt (OMS/EMS)\n(Trades, Fills, Allocations)",
+    "Risk Engine (Murex/Calypso)\n(P&L, Greeks, Sensitivities)",
+    "Market Data (Bloomberg/Reuters)\n(Ticks, EOD Prices, Curves)",
+    "Reference Data (GoldenSource)\n(Instruments, Counterparties)",
+    "Compliance / RegTech\n(KYC, AML, Trade Surveillance)",
+    "Custodian / Settlement\n(DTCC, Omgeo, SWIFT msgs)"
+  ],
+  "ingestion": [
+    "Batch – EOD + T+1 Recon\n(Autoloader from ADLS/S3)",
+    "CDC via Debezium / HVR\n(OMS position changes → Kafka)",
+    "Kafka Streaming\n(Tick data, trade events, <1s)",
+    "FIX / SWIFT Adapters\n(schema pinned • idempotent)"
+  ],
+  "bronze": [
+    "Append-only Raw Delta\n(trade-date partitioned)",
+    "7yr+ Retention + PII Tags\n(MiFID II / Dodd-Frank audit)"
+  ],
+  "silver": [
+    "Trade Enrichment + Matching\n(counterparty, instrument xref)",
+    "DQ Gates + Break Mgmt\n(trade breaks, NAV tolerance)",
+    "Position Reconciliation\n(vs. custodian, vs. risk engine)",
+    "Conformed Entities\n(Instrument • Counterparty • Book)"
+  ],
+  "gold": [
+    "Star Schema\n(Fact_Trade, Fact_Position)",
+    "Risk Aggregates\n(VaR, Greeks, PnL Attribution)",
+    "Regulatory Extracts\n(MiFID II, EMIR, Dodd-Frank)",
+    "Metrics / Semantic Layer\n(Sharpe, Alpha, NAV, AUM)"
+  ],
+  "compute": [
+    "Databricks Workflows\n(EOD batch • T+1 recon chain)",
+    "Lakeflow / SDP Pipelines\n(trade lifecycle transforms)",
+    "DBSQL Pro Warehouse\n(risk queries • desk analytics)"
+  ],
+  "serve": [
+    "DBSQL + AI/BI Dashboards\n(desk-level P&L, risk heatmaps)",
+    "Tableau / Power BI\n(portfolio & CRO dashboards)",
+    "Analyst Drill Path\n(PnL → trade → market data)",
+    "Delta Sharing\n(prime brokers • regulators)"
+  ],
+  "domain_products": [
+    "Market Risk\n(VaR, stress testing, limits)",
+    "Trade Lifecycle\n(booking → settlement → recon)",
+    "Regulatory Reporting\n(MiFID, EMIR, Dodd-Frank)",
+    "Investment Analytics\n(attribution, alpha, AUM)"
+  ]
+}

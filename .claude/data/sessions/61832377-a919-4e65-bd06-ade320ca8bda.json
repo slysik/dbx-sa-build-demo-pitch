@@ -1,0 +1,9 @@
+{
+  "session_id": "61832377-a919-4e65-bd06-ade320ca8bda",
+  "prompts": [
+    "why aew we getting 401 Credential was not sent or was of an unsupported type for this API. [ReqId: 7aa8a129-063b-4e70-8cf4-565e80a9fbee]",
+    "where is my databricks workspace url stored?",
+    "/distributed-computing-review"
+  ],
+  "agent_name": "Vortex"
+}

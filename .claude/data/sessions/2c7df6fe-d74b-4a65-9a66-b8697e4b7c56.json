@@ -1,0 +1,7 @@
+{
+  "session_id": "2c7df6fe-d74b-4a65-9a66-b8697e4b7c56",
+  "prompts": [
+    "/dbx-interview-playbook Before generating code, run Step 0: Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3) Time budget? Then generate the full pipeline for: create a retail dataset with 1k rows, then medallion sdp, and create metric views. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol \u2014 verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary]."
+  ],
+  "agent_name": "Meridian"
+}

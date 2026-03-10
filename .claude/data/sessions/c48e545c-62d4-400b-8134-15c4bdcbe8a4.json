@@ -1,0 +1,10 @@
+{
+  "session_id": "c48e545c-62d4-400b-8134-15c4bdcbe8a4",
+  "prompts": [
+    "what is the interview tool chain called? how can I test . suggeest 3-4 prompt from the 10 uses case I thhink we have  ",
+    "save # 1 . this is functionality test and not volume so only need 1000 records plus keep serverless cost down. ",
+    "will \"just interview test-prompts/01-streaming-payments-dedup.md\" be interactive with clarifying questions? ",
+    "I need the new orchestration features to be here :  just interview-interactive test-prompts/01-streaming-payments-dedup.md"
+  ],
+  "agent_name": "Prism"
+}

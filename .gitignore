@@ -1,0 +1,25 @@
+# Secrets
+.env
+.env.back
+.env.*
+
+# OS
+.DS_Store
+
+# Logs
+logs/
+excalidraw.log
+
+# Cache
+.ruff_cache/
+__pycache__/
+*.pyc
+
+# Playwright
+.playwright-mcp/
+
+# Databricks resources (local state)
+.databricks-resources.json
+
+# Large files (>100MB GitHub limit)
+archive/design-arch-interview/azure-databricks.pdf

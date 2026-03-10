@@ -1,0 +1,10 @@
+{
+  "session_id": "9839e95f-fc08-4c7b-bd79-d5b9c12182dc",
+  "prompts": [
+    "how can I easily use the dbx-tools like dbx_skew to run during my interview against the dataframe dataset so I can just run these tools as after initial dataframe with 50k rows created.",
+    "yes",
+    "yes",
+    "lets verify everthing is optimized for my Databricks Coding Interview_Candidate_Prep.pdf. updates on interview flow. ### Interview Format & Scope\n\n- Problem statement details:\n  1. Three available prompts (retail, media, one other vertical)\n  2. No financial services specific scenarios\n  3. Interviewer selects prompt at start of session\n  4. Single paragraph/prompt format\n- Data generation requirements\n  - Create synthetic dataset using AI tools\n  - Target ~100k rows initially\n  - Focus on working dataset by end of call\n\n### Technical Requirements & Evaluation Focus\n\n- PySpark strongly preferred over SQL for dataset creation\n  - Previous candidates dinged for SQL-only approach\n  - All customer work uses PySpark in production\n  - SQL acceptable for other objects (dashboards, medallion layers).   I want to first have the   dataset built using dataframe then have a interactive session and not build out end to end right away yet after dataframe / dataset is what is need then build out remaining steps like medallian layer processing . I might be asked questions about the dataframe and add columns , optimize , run commands to see # of part."
+  ],
+  "agent_name": "Prism"
+}

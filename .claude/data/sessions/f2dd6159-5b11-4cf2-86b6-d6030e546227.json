@@ -1,0 +1,16 @@
+{
+  "session_id": "f2dd6159-5b11-4cf2-86b6-d6030e546227",
+  "prompts": [
+    "Hey",
+    "Walk me through what Lakebridge Analyzer actually outputs so I can describe it\n confidently",
+    "what is this and how does it map to autoloader, SDP.. ",
+    "How many lakeflow connectors are there?",
+    "Create a matrix comparison of their Lakeville connectors, Lake flow connectors across AWS, GCP, and measure",
+    "Across , aws , gcp and Azure",
+    "Can autoloader bulk load compressed files and is that faster",
+    "What\u2019s the fastest method to load files in parallel to Databricks Delta tables and the fastest load method to achieve the line speed of say a terabyte an hour or Yellowbrick data like load speed",
+    "How do I size Databricks  serverless   compute size?",
+    "Is SQL warehouse t-shirt size for reads only ? The largest disease a client is an eight rack system. What might that equate to as far as servers T-shirt size so there\u2019s 50 users and they\u2019re going against very very large tables and small and large queries at the same time throughout the day."
+  ],
+  "agent_name": "Meridian"
+}

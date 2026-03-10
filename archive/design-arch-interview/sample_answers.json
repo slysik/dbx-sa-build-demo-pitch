@@ -1,0 +1,50 @@
+{
+  "title": "FinServ DW Discovery – Acme Bank – 2026-03-02",
+  "sources": [
+    "Core Banking (FIS)\n(Loans, Deposits, Accts)",
+    "SAP GL / Finance\n(Journal Entries, Balances)",
+    "Fiserv Card Switch\n(Auth, Settlement, Disputes)",
+    "Salesforce CRM\n(Customer, KYC, Onboarding)",
+    "Bloomberg / Moody's\n(Rates, Credit Scores)",
+    "Vendor CSV / SFTP\n(Regulatory filings, 3rd party)"
+  ],
+  "ingestion": [
+    "Batch – EOD + Intraday\n(Autoloader from ADLS)",
+    "CDC via Debezium\n(Core Banking → Kafka → Bronze)",
+    "Kafka Streaming\n(Card auth events, <5s latency)",
+    "Schema Registry + Contracts\n(Confluent • version pinned)"
+  ],
+  "bronze": [
+    "Append-only Raw Delta\n(full replay from source)",
+    "7yr retention • PII tagged\n(Unity Catalog tags)"
+  ],
+  "silver": [
+    "Deduplicate + Conform Keys\n(golden customer ID)",
+    "Great Expectations DQ\n(quarantine on fail)",
+    "GL Recon Controls\n(daily balance tie-out)",
+    "Conformed Dims\n(Customer • Account • Product)"
+  ],
+  "gold": [
+    "Star Schema\n(Fact_Transaction, Dim_Customer)",
+    "Portfolio Risk Aggregates\n(VaR, PD/LGD, Concentration)",
+    "CCAR / CECL Packs\n(Fed submission extracts)",
+    "Databricks Metrics Layer\n(single source of truth KPIs)"
+  ],
+  "compute": [
+    "Databricks Workflows\n(DAG orchestration, retries)",
+    "Lakeflow SDP Pipelines\n(Bronze→Silver→Gold)",
+    "DBSQL Pro Warehouse\n(T-shirt sized, auto-scale)"
+  ],
+  "serve": [
+    "DBSQL + AI/BI Dashboards\n(self-service analytics)",
+    "Power BI DirectLake\n(exec dashboards)",
+    "Analyst Drill Path\n(KPI → txn → raw evidence)",
+    "Delta Sharing\n(Fed regulators, downstream)"
+  ],
+  "domain_products": [
+    "Credit Risk\n(PD/LGD/EAD models)",
+    "Finance & Treasury\n(GL, liquidity, ALM)",
+    "Customer 360\n(segmentation, LTV)",
+    "Payments & Cards\n(fraud, settlement)"
+  ]
+}

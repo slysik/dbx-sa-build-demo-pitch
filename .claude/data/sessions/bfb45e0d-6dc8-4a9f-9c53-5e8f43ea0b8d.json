@@ -1,0 +1,10 @@
+{
+  "session_id": "bfb45e0d-6dc8-4a9f-9c53-5e8f43ea0b8d",
+  "prompts": [
+    "/prime ",
+    "1. and I don't need to see the text below after entering just ..  slysik@Steves-MacBook-Air databricks % just interview-interactive\n  \"create a dataset with 10,00 rows, then end to end medlalion layet sdp , then create\n  metric view and dashboard\"\n  claude --model opus \"/dbx-interview-playbook Before generating code, run Step 0:\n  Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3)\n  Time budget? Then generate the full pipeline for: $(cat create a dataset with 10,00\n  rows, then end to end medlalion layet sdp , then create metric view and dashboard).\n  Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for\n  interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol \u2014\n  verify each stage gate before advancing. (B) Use subagents for dashboard query\n  testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes\n  table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE\n  [name] -- GATE [PASS/FAIL] -- [summary].\"",
+    "can I also run the same like this ? just interview-interactive prompt1.md",
+    "yes and rename interview-interactive-file to dbx-coding-agent-interactive-file"
+  ],
+  "agent_name": "Lumin"
+}

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wegmans Lakehouse Architecture - Interview Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; color: #333; padding: 24px; }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  h1 { color: #1B3A5C; font-size: 28px; margin-bottom: 6px; }
+  .subtitle { color: #666; font-size: 14px; margin-bottom: 32px; }
+
+  /* Architecture Diagram */
+  .arch-section { margin-bottom: 40px; }
+  .arch-title { color: #1B3A5C; font-size: 20px; font-weight: 700; margin-bottom: 16px; border-bottom: 3px solid #E8763A; padding-bottom: 8px; display: inline-block; }
+
+  .diagram { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+  /* Source Layer */
+  .layer { margin-bottom: 24px; position: relative; }
+  .layer-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #999; margin-bottom: 8px; }
+
+  .source-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .source-box { flex: 1; min-width: 140px; padding: 14px 16px; border-radius: 8px; text-align: center; }
+  .source-box.sap { background: linear-gradient(135deg, #1a5276, #2980b9); color: white; }
+  .source-box.pos { background: linear-gradient(135deg, #7d3c98, #a569bd); color: white; }
+  .source-box.web { background: linear-gradient(135deg, #1e8449, #27ae60); color: white; }
+  .source-box.ext { background: linear-gradient(135deg, #b7950b, #f1c40f); color: #333; }
+  .source-box .src-title { font-weight: 700; font-size: 14px; }
+  .source-box .src-detail { font-size: 11px; opacity: 0.9; margin-top: 4px; }
+
+  /* Arrow */
+  .arrow-down { text-align: center; padding: 8px 0; color: #ccc; font-size: 24px; }
+
+  /* Ingestion Layer */
+  .ingestion-row { display: flex; gap: 12px; }
+  .ingest-box { flex: 1; padding: 14px 16px; border-radius: 8px; border: 2px solid; text-align: center; }
+  .ingest-box.batch { border-color: #2C5F8A; background: #EDF4F9; }
+  .ingest-box.stream { border-color: #E8763A; background: #FFF5EF; }
+  .ingest-box .ing-title { font-weight: 700; font-size: 13px; }
+  .ingest-box .ing-detail { font-size: 11px; color: #666; margin-top: 4px; }
+
+  /* Medallion Layers */
+  .medallion { display: flex; gap: 16px; margin-top: 4px; }
+  .medal-col { flex: 1; border-radius: 10px; padding: 18px; position: relative; overflow: hidden; }
+  .medal-col::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+  .medal-col.bronze { background: #FBF3E8; }
+  .medal-col.bronze::before { background: #CD7F32; }
+  .medal-col.silver { background: #F0F2F5; }
+  .medal-col.silver::before { background: #A8A9AD; }
+  .medal-col.gold { background: #FFF9E6; }
+  .medal-col.gold::before { background: #DAA520; }
+
+  .medal-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .medal-col.bronze .medal-name { color: #8B5E3C; }
+  .medal-col.silver .medal-name { color: #5A5B5E; }
+  .medal-col.gold .medal-name { color: #8B6914; }
+  .medal-purpose { font-size: 12px; color: #666; margin-bottom: 10px; font-style: italic; }
+  .medal-items { list-style: none; padding: 0; }
+  .medal-items li { font-size: 12px; padding: 3px 0; padding-left: 16px; position: relative; color: #444; }
+  .medal-items li::before { content: '›'; position: absolute; left: 0; font-weight: 700; color: #999; }
+
+  /* Governance Bar */
+  .governance-bar { background: linear-gradient(90deg, #1B3A5C, #2C5F8A); color: white; border-radius: 8px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .gov-title { font-weight: 700; font-size: 14px; }
+  .gov-items { display: flex; gap: 20px; flex-wrap: wrap; }
+  .gov-item { font-size: 12px; padding: 4px 12px; background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+  /* Consumption */
+  .consume-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .consume-box { flex: 1; min-width: 120px; padding: 14px; border-radius: 8px; text-align: center; border: 2px solid #ddd; background: white; }
+  .consume-box .con-title { font-weight: 700; font-size: 13px; color: #1B3A5C; }
+  .consume-box .con-detail { font-size: 11px; color: #888; margin-top: 4px; }
+  .consume-box.highlight { border-color: #E8763A; background: #FFF8F3; }
+
+  /* Answer Section */
+  .answer-section { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-top: 32px; }
+  .answer-section h2 { color: #1B3A5C; font-size: 20px; margin-bottom: 16px; border-bottom: 3px solid #E8763A; padding-bottom: 8px; display: inline-block; }
+  .answer-section h3 { color: #2C5F8A; font-size: 16px; margin: 20px 0 8px 0; }
+
+  .script-box { background: #F0F6FA; border-left: 4px solid #2C5F8A; padding: 20px 24px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+  .script-box p { font-size: 14px; line-height: 1.7; color: #333; }
+  .script-box .label { font-weight: 700; color: #2C5F8A; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+  .callout { background: #FFF8F3; border: 1px solid #F0D4BC; border-top: 3px solid #E8763A; border-radius: 0 0 8px 8px; padding: 16px 20px; margin: 16px 0; }
+  .callout .callout-title { font-weight: 700; color: #1B3A5C; font-size: 13px; margin-bottom: 6px; }
+  .callout ul { padding-left: 18px; margin: 0; }
+  .callout li { font-size: 13px; padding: 3px 0; color: #444; }
+
+  .part-label { display: inline-block; background: #E8763A; color: white; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 4px; margin-bottom: 6px; }
+
+  /* Pocket Answer */
+  .pocket { background: linear-gradient(135deg, #1B3A5C 0%, #2C5F8A 100%); border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; color: white; position: relative; overflow: hidden; }
+  .pocket::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: rgba(255,255,255,0.04); border-radius: 50%; transform: translate(60px, -60px); }
+  .pocket-label { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; background: rgba(232,118,58,0.9); color: #fff; margin-bottom: 14px; }
+  .pocket-timer { display: inline-block; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); margin-left: 8px; }
+  .pocket-script { font-size: 15px; line-height: 1.9; color: rgba(255,255,255,0.95); font-style: italic; }
+  .pocket-script .pk { color: #fbbf24; font-style: normal; font-weight: 700; }
+  .pocket-script .pk-green { color: #86efac; font-style: normal; font-weight: 600; }
+  .pocket-note { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; }
+
+  @media print { body { padding: 12px; } .diagram, .answer-section { box-shadow: none; border: 1px solid #ddd; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="file:///Users/slysik/databricks/Wegmans_Interview_Study_Guide.html" style="display: inline-block; margin-bottom: 16px; font-size: 13px; color: #E8763A; text-decoration: none; padding: 6px 14px; border: 1px solid #E8763A; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='#E8763A';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#E8763A'">← Back to Study Guide</a>
+  <h1>Wegmans Lakehouse Architecture</h1>
+  <p class="subtitle">Interview Reference — "Walk us through how you'd design a data lakehouse architecture on Databricks for a large retail organization."</p>
+
+  <!-- POCKET ANSWER (30-45 sec) -->
+  <div class="pocket">
+    <span class="pocket-label">Pocket Answer</span>
+    <span class="pocket-timer">30–45 sec</span>
+    <div class="pocket-script">
+      "I'd build a <span class="pk">Delta Lakehouse on Databricks</span> with a medallion architecture — Bronze for raw ingestion, Silver for cleansed and conformed, Gold for business-ready analytics. Ingestion splits two ways: <span class="pk">batch CDC from SAP</span> via Azure Data Factory's SAP connector for inventory, sales, and finance data, and <span class="pk-green">real-time streaming</span> from POS and smart carts through Event Hubs into Structured Streaming. <span class="pk">Unity Catalog</span> governs everything — three-level namespace, column-level lineage, row masking for PII. Delta Live Tables manage pipeline orchestration with <span class="pk-green">data quality expectations at every layer transition</span>. Consumption serves Power BI for store managers, SQL for analysts, and feature tables for ML models like demand forecasting. And critically, it's a <span class="pk">round trip</span> — enriched data flows back to SAP via Delta Sharing. I built this exact pattern at Microsoft for FedEx and ExxonMobil."
+    </div>
+    <div class="pocket-note">This is the quick version. Scroll down for the full 5–7 minute scripted answer with architecture diagram, timing cues, and follow-up Q&A.</div>
+  </div>
+
+  <!-- ARCHITECTURE DIAGRAM -->
+  <div class="arch-section">
+    <div class="arch-title">Architecture Overview</div>
+    <div class="diagram">
+
+      <!-- Source Systems -->
+      <div class="layer">
+        <div class="layer-label">Source Systems</div>
+        <div class="source-row">
+          <div class="source-box sap">
+            <div class="src-title">SAP S/4 HANA</div>
+            <div class="src-detail">MM • SD • FI • CO<br>Inventory, Sales, Finance</div>
+          </div>
+          <div class="source-box pos">
+            <div class="src-title">POS / In-Store</div>
+            <div class="src-detail">Transaction streams<br>Caper Cart events</div>
+          </div>
+          <div class="source-box web">
+            <div class="src-title">Digital / E-Commerce</div>
+            <div class="src-detail">Wegmans.com, App<br>Clickstream, orders</div>
+          </div>
+          <div class="source-box ext">
+            <div class="src-title">External Data</div>
+            <div class="src-detail">Weather, GS1 supply chain<br>Competitor pricing</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼ ▼ ▼ ▼</div>
+
+      <!-- Ingestion Layer -->
+      <div class="layer">
+        <div class="layer-label">Ingestion Layer</div>
+        <div class="ingestion-row">
+          <div class="ingest-box batch">
+            <div class="ing-title">Batch / CDC</div>
+            <div class="ing-detail">Azure Data Factory → SAP CDC Connector (ODP)<br>Auto Loader for file-based sources<br>Scheduled: hourly for SAP, daily for external</div>
+          </div>
+          <div class="ingest-box stream">
+            <div class="ing-title">Real-Time Streaming</div>
+            <div class="ing-detail">Azure Event Hubs → Structured Streaming<br>POS transactions, cart events, inventory updates<br>Sub-minute latency for operational dashboards</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <!-- Storage -->
+      <div class="layer">
+        <div class="layer-label" style="margin-bottom: 2px;">Azure Data Lake Storage Gen2 — Delta Lake</div>
+        <div style="font-size: 11px; color: #999; margin-bottom: 12px;">Managed via Delta Live Tables with data quality expectations at every transition</div>
+        <div class="medallion">
+          <div class="medal-col bronze">
+            <div class="medal-name">Bronze — Raw</div>
+            <div class="medal-purpose">"Land it exactly as it arrived"</div>
+            <ul class="medal-items">
+              <li>Raw SAP extracts (ODP deltas)</li>
+              <li>POS transaction JSON</li>
+              <li>Clickstream events</li>
+              <li>Weather API responses</li>
+              <li>Schema-on-read, append-only</li>
+              <li>Full history for replay/audit</li>
+            </ul>
+          </div>
+          <div class="medal-col silver">
+            <div class="medal-name">Silver — Cleansed</div>
+            <div class="medal-purpose">"One version of the truth"</div>
+            <ul class="medal-items">
+              <li>Deduplicated, null-handled</li>
+              <li>Cross-source joins (SAP + POS)</li>
+              <li>Conformed dimensions (store, product, supplier, customer)</li>
+              <li>DLT quality expectations: nulls &lt;1%, referential integrity checks</li>
+              <li>SCD Type 2 for slowly changing dimensions</li>
+            </ul>
+          </div>
+          <div class="medal-col gold">
+            <div class="medal-name">Gold — Business-Ready</div>
+            <div class="medal-purpose">"Answer business questions directly"</div>
+            <ul class="medal-items">
+              <li>Daily sales by store × category × SKU</li>
+              <li>Inventory position by store (real-time)</li>
+              <li>Supplier performance scorecard</li>
+              <li>Margin analysis by product/store</li>
+              <li>Feature tables for ML models</li>
+              <li>Z-ordered on common query patterns</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <!-- Governance -->
+      <div class="layer">
+        <div class="layer-label">Governance — Unity Catalog</div>
+        <div class="governance-bar">
+          <div class="gov-title">Unity Catalog — Spans All Layers</div>
+          <div class="gov-items">
+            <div class="gov-item">3-Level Namespace</div>
+            <div class="gov-item">Column-Level Lineage</div>
+            <div class="gov-item">Row/Column Masking</div>
+            <div class="gov-item">Audit Logging</div>
+            <div class="gov-item">Data Quality Rules</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-down">▼</div>
+
+      <!-- Consumption -->
+      <div class="layer">
+        <div class="layer-label">Consumption Layer</div>
+        <div class="consume-row">
+          <div class="consume-box">
+            <div class="con-title">BI / Dashboards</div>
+            <div class="con-detail">Power BI via Databricks SQL<br>Store ops dashboards</div>
+          </div>
+          <div class="consume-box">
+            <div class="con-title">SQL Analytics</div>
+            <div class="con-detail">Databricks SQL Warehouses<br>Ad-hoc exploration</div>
+          </div>
+          <div class="consume-box highlight">
+            <div class="con-title">ML / AI</div>
+            <div class="con-detail">Demand forecasting<br>Waste prediction<br>Price optimization</div>
+          </div>
+          <div class="consume-box">
+            <div class="con-title">AI Agents (MCP)</div>
+            <div class="con-detail">MCP Servers → Unity Catalog<br>NL2SQL for business users</div>
+          </div>
+          <div class="consume-box highlight">
+            <div class="con-title">Back to SAP</div>
+            <div class="con-detail">Delta Sharing → SAP BDC<br>ML predictions, forecasts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTED ANSWER -->
+  <div class="answer-section">
+    <h2>Your Answer — Scripted with Transitions</h2>
+    <p style="color: #666; font-size: 13px; margin-bottom: 16px;">Practice this as a 5–7 minute walkthrough. Use the diagram above as your whiteboard reference. Each part is a natural pause point where they might ask follow-up questions.</p>
+
+    <!-- Part 1 -->
+    <span class="part-label">Part 1 — Frame the Problem (30 sec)</span>
+    <div class="script-box">
+      <div class="label">What You Say</div>
+      <p>"Before I draw anything, let me frame the problem. A grocery retailer like Wegmans has four primary data domains: transactional data from SAP — inventory, sales, finance, procurement — that's your system of record. Real-time operational data from POS systems and smart carts. Digital channel data from the website and app. And external data like weather and supply chain feeds. The architecture needs to unify all of these into a single governed platform that serves both operational dashboards and advanced analytics like demand forecasting. That's what the lakehouse gives us."</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Why This Opening Works</div>
+      <ul>
+        <li>Shows you think about business context before technology</li>
+        <li>Demonstrates retail domain knowledge (the four data domains)</li>
+        <li>Names SAP specifically — signals you understand their stack</li>
+        <li>Sets up the architecture rationale: unification + governance + analytics</li>
+      </ul>
+    </div>
+
+    <!-- Part 2 -->
+    <span class="part-label">Part 2 — Ingestion: Batch + Real-Time (60 sec)</span>
+    <div class="script-box">
+      <div class="label">What You Say</div>
+      <p>"For ingestion, I'd split into two paths. Batch and CDC for SAP data — using Azure Data Factory with the SAP CDC connector, which uses ODP for delta-aware extraction. This means we're only moving changed records, not full table dumps. I'd schedule SAP extracts hourly for high-velocity tables like sales and inventory, daily for slower-moving data like supplier master records.</p>
+      <p style="margin-top: 10px;">For real-time, POS transactions and smart cart events flow through Azure Event Hubs into Databricks Structured Streaming. This gives us sub-minute latency for operational use cases — like real-time inventory position by store, which is critical for omnichannel fulfillment.</p>
+      <p style="margin-top: 10px;">Both paths land in ADLS Gen2 as Delta Lake tables. The key architectural decision here is that batch and streaming write to the same Delta tables — Delta Lake's ACID transactions handle the merge cleanly. This is something I designed at Microsoft for FedEx, where we had the same pattern of CDC batch plus real-time event streams landing in a unified lakehouse."</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Why This Section Works</div>
+      <ul>
+        <li>Addresses both batch AND real-time — directly answers what they asked</li>
+        <li>SAP CDC + ODP shows you know the extraction pattern for their stack</li>
+        <li>The "same Delta tables" point is architecturally important — no separate real-time vs batch stores</li>
+        <li>FedEx reference = proof you've built this at comparable scale</li>
+      </ul>
+    </div>
+
+    <!-- Part 3 -->
+    <span class="part-label">Part 3 — Medallion Architecture (90 sec)</span>
+    <div class="script-box">
+      <div class="label">What You Say</div>
+      <p>"I'd structure the lakehouse in three layers — the medallion architecture. Bronze is raw. Everything lands exactly as it arrived — raw SAP ODP deltas, POS JSON, clickstream events. Schema-on-read, append-only. We keep full history here for replay and audit. This is your insurance policy.</p>
+      <p style="margin-top: 10px;">Silver is where we create one version of the truth. Deduplication, null handling, cross-source joins — matching SAP sales records with POS transactions, for example. We build conformed dimensions here: product, store, supplier, customer. I'd use SCD Type 2 for slowly changing dimensions like product attributes or store details. This is also where Delta Live Tables earns its keep — I'd set data quality expectations at every transition. For example, null rates below 1% on key fields, referential integrity between fact and dimension tables.</p>
+      <p style="margin-top: 10px;">Gold is business-ready. Pre-aggregated tables purpose-built for specific use cases: daily sales by store by category by SKU for demand forecasting, real-time inventory position for operations dashboards, supplier performance scorecards, margin analysis by product and store. I'd Z-order Gold tables on the most common query patterns — probably store_id and date for most retail analytics. And this is where feature tables live for ML models — structured so data scientists can pull training data efficiently.</p>
+      <p style="margin-top: 10px;">All three layers are managed by Delta Live Tables as declarative pipelines. The advantage is that DLT handles orchestration, retries, and data quality monitoring — you define what the data should look like, not how to get there. That's a significant operational simplification at scale."</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Why This Section Works</div>
+      <ul>
+        <li>Each layer has a clear purpose AND retail-specific examples — not generic</li>
+        <li>DLT quality expectations show you think about data reliability, not just data movement</li>
+        <li>Z-ordering is a Databricks-specific optimization — shows platform depth</li>
+        <li>Feature tables for ML ties the architecture to their analytics ambitions</li>
+        <li>The "insurance policy" framing for Bronze resonates with risk-conscious enterprises</li>
+      </ul>
+    </div>
+
+    <!-- Part 4 -->
+    <span class="part-label">Part 4 — Governance (60 sec)</span>
+    <div class="script-box">
+      <div class="label">What You Say</div>
+      <p>"Governance spans all three layers through Unity Catalog. Three-level namespace — catalog, schema, table — so we can organize by domain: wegmans_retail.sales.daily_transactions, for example. Column-level lineage means we can trace any Gold metric back through Silver to its Bronze source. Row and column masking for PII — customer data, employee data. Audit logging for compliance.</p>
+      <p style="margin-top: 10px;">One thing I'd call out specifically: Unity Catalog isn't just access control. It's the foundation for AI governance too. When we build ML models on demand forecasting or pricing, the lineage tracks which data trained which model version. And with Databricks' SQL-managed MCP servers, AI agents query through Unity Catalog — they get governed access, not raw table access. That ties into the MCP architecture from the job description."</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Why This Section Works</div>
+      <ul>
+        <li>Concrete namespace example — not abstract</li>
+        <li>Connects governance to AI/ML — forward-looking, not just compliance</li>
+        <li>MCP callback to the JD shows you read it carefully</li>
+        <li>PII masking is relevant (Wegmans collects customer data via loyalty programs and biometrics)</li>
+      </ul>
+    </div>
+
+    <!-- Part 5 -->
+    <span class="part-label">Part 5 — Consumption + Feedback Loop (60 sec)</span>
+    <div class="script-box">
+      <div class="label">What You Say</div>
+      <p>"For consumption, the lakehouse serves multiple personas. Store managers get operational dashboards via Power BI connected to Databricks SQL Warehouses — inventory levels, sales trends, staffing indicators. The data team gets SQL-based access for ad-hoc analysis. Data scientists access feature tables for ML — demand forecasting, waste prediction, price optimization.</p>
+      <p style="margin-top: 10px;">And here's the piece that closes the loop: the return path to SAP. Databricks pushes enriched data — demand forecasts, supplier scores, ML predictions — back to SAP Business Data Cloud via Delta Sharing. So the forecasting model we train in Databricks directly informs the replenishment logic running in SAP. The data doesn't just flow in one direction — it's a round trip."</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Why This Section Works</div>
+      <ul>
+        <li>Multiple consumption patterns show you think about all stakeholders</li>
+        <li>The bidirectional SAP flow is a differentiating point — most candidates only think about ingestion</li>
+        <li>Connecting ML predictions to SAP replenishment shows you understand the business impact</li>
+        <li>Strong close: "round trip" is memorable and architecturally accurate</li>
+      </ul>
+    </div>
+
+    <!-- Close -->
+    <span class="part-label">Close — Tie It Back (15 sec)</span>
+    <div class="script-box">
+      <div class="label">What You Say</div>
+      <p>"This is the same medallion pattern I've designed and deployed across Fortune 500 accounts at Microsoft — FedEx, UPS, ExxonMobil. The data sources differ, but the architectural principles are identical. The key advantage of this approach for Wegmans is that you get a single platform for everything from operational dashboards to demand forecasting to AI agents — governed consistently, scaled efficiently."</p>
+    </div>
+
+    <h3 style="margin-top: 32px;">Likely Follow-Up Questions</h3>
+
+    <div style="margin-top: 12px;">
+      <p style="font-weight: 700; color: #2C5F8A; font-size: 14px;">"How would you handle schema changes from SAP?"</p>
+      <p style="font-size: 13px; color: #444; margin: 6px 0 16px 0;">Delta Lake schema evolution in Bronze (mergeSchema option), with DLT quality gates in Silver to catch breaking changes before they propagate. Alert on schema drift, don't silently fail.</p>
+    </div>
+
+    <div>
+      <p style="font-weight: 700; color: #2C5F8A; font-size: 14px;">"What about data freshness SLAs?"</p>
+      <p style="font-size: 13px; color: #444; margin: 6px 0 16px 0;">Different layers have different SLAs. Bronze: within minutes of source change (streaming) or within 1 hour (batch CDC). Silver: typically 15–30 minutes behind Bronze. Gold: depends on use case — real-time inventory is near-instant, demand forecasting aggregates refresh daily. DLT pipeline monitoring tracks freshness against SLAs.</p>
+    </div>
+
+    <div>
+      <p style="font-weight: 700; color: #2C5F8A; font-size: 14px;">"How do you handle late-arriving data?"</p>
+      <p style="font-size: 13px; color: #444; margin: 6px 0 16px 0;">Structured Streaming watermarks for the real-time path — define how late you'll accept events before dropping them. For batch, Delta Lake's merge (UPSERT) handles late arrivals cleanly. Bronze is append-only so nothing is ever lost; Silver merge logic reconciles.</p>
+    </div>
+
+    <div>
+      <p style="font-weight: 700; color: #2C5F8A; font-size: 14px;">"How would you size the compute?"</p>
+      <p style="font-size: 13px; color: #444; margin: 6px 0 16px 0;">Serverless SQL Warehouses for BI/SQL consumption — auto-scale to zero when not in use, no cluster management. Jobs clusters for DLT pipelines with auto-scaling. Separate compute for ML training. Unity Catalog governs who can use which compute pools. Start small, monitor, scale based on actual usage — not theoretical projections.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

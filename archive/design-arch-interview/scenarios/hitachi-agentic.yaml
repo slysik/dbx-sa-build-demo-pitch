@@ -1,0 +1,117 @@
+# Hitachi Solutions — SSP Agentic Automation Interview
+# Interview with: Joel Lindstrom
+# Role: Solution Sales Professional — Agentic Automation
+
+name: "Hitachi Solutions"
+role: "Solution Sales Professional — Agentic Automation"
+interviewer: "Joel Lindstrom"
+
+description: >
+  Hitachi Solutions is scaling their AI practice from basic chatbots to sophisticated
+  autonomous agentic workflows. They need a Technical Seller who can bridge data
+  architecture with executive-level value conversations across Azure, Dynamics 365
+  (F&O and CE), and Microsoft Foundry.
+
+key_responsibilities:
+  - Lead strategic discovery & workshops to identify business friction → agentic AI opportunities
+  - Design agentic frameworks using MCP server task lists, RPA, and traditional automation
+  - Cross-platform integration across Azure AI, Dynamics 365 (F&O/CE), and Foundry Data Agents
+  - Outcome validation — confirm agentic outcomes are technically viable and ROI-positive
+  - Drive $5M+ annual agentic bookings via "AI Factory" model
+
+ideal_profile:
+  bridge: "Talk shop with data engineers, pivot to talk value with COO/CFO"
+  data_background: "Data architecture, analytics, AI modeling"
+  ecosystem: "Microsoft stack — Azure + Dynamics (inherently agentic)"
+  facilitator: "White-boarding sessions: vague idea → concrete technical roadmap"
+
+steve_angles:
+  microsoft_experience: >
+    3.5 years at Microsoft Data & AI — worked M+ Azure Data deals at Fortune 500s.
+    Understands the Microsoft EA relationship and how to position within it.
+    Deep Azure AI Services, Synapse/Fabric, and data platform expertise.
+  ibm_background: >
+    8 years IBM/Netezza — enterprise data architecture, DW modernization.
+    Understands legacy-to-cloud migration pain firsthand.
+  finserv_domain: >
+    FinServ vertical depth — regulatory workflows (Basel, PCI, SARs) are
+    prime candidates for agentic automation.
+  technical_seller: >
+    Can whiteboard architecture AND build working demos. Built a full
+    Medallion pipeline with MLflow for Databricks interview prep.
+
+microsoft_ecosystem:
+  azure_ai:
+    - Azure OpenAI Service (GPT-4o, o1, embeddings)
+    - Azure AI Foundry (model catalog, prompt flow, evaluations)
+    - Azure AI Search (vector + hybrid search, RAG pattern)
+    - Azure Machine Learning (training, endpoints, MLOps)
+    - Azure Cognitive Services (Document Intelligence, Speech, Vision)
+  dynamics_365:
+    f_and_o:
+      description: "Finance & Operations — ERP for financials, supply chain, manufacturing"
+      agentic_plays:
+        - Autonomous invoice processing and AP workflows
+        - Predictive inventory management agents
+        - Financial close automation agents
+        - Supply chain disruption response agents
+    ce:
+      description: "Customer Engagement — CRM for sales, service, marketing, field service"
+      agentic_plays:
+        - Autonomous lead qualification and routing
+        - Customer service agents (beyond basic chatbots)
+        - Proactive case resolution agents
+        - Field service scheduling optimization agents
+  copilot_stack:
+    - Microsoft Copilot Studio (low-code agent builder)
+    - Copilot for Dynamics 365 (embedded AI in F&O and CE)
+    - Microsoft 365 Copilot (productivity agents)
+    - Custom Copilots via Azure AI Foundry
+  foundry:
+    description: "Microsoft Foundry — the data agent platform"
+    capabilities:
+      - Foundry Data Agents — autonomous data retrieval and analysis
+      - Grounded in enterprise data (Fabric, Dataverse, SQL)
+      - Integrates with Copilot Studio for orchestration
+      - MCP server compatibility for tool integration
+  mcp:
+    description: "Model Context Protocol — open standard for tool/context integration"
+    relevance:
+      - Standardized way for agents to discover and call tools
+      - Server task lists define what an agent CAN do
+      - Bridges Azure AI agents with Dynamics/ERP/CRM data
+      - RPA actions exposed as MCP tools for agent orchestration
+
+agentic_maturity_model:
+  level_1: "Basic Chatbots — FAQ, simple Q&A, no autonomy"
+  level_2: "Copilots — AI-assisted human workflows, suggestions"
+  level_3: "Agents — Autonomous task execution with human oversight"
+  level_4: "Agentic Workflows — Multi-agent orchestration, cross-system automation"
+  level_5: "AI Factory — Agentic at scale, self-improving, enterprise-wide"
+
+interview_prep:
+  likely_questions:
+    - "Tell me about your experience selling complex technical solutions"
+    - "How would you run a discovery workshop for a customer interested in AI agents?"
+    - "Walk me through how you'd architect an agentic solution on the Microsoft stack"
+    - "How do you bridge the gap between technical teams and executive stakeholders?"
+    - "What's your understanding of MCP and how agents use it?"
+    - "How would you take a customer from basic chatbots to agentic workflows?"
+    - "Describe a deal you've driven from discovery to close"
+    - "How familiar are you with Dynamics 365 F&O and CE?"
+    - "What does the 'AI Factory' model mean to you?"
+    - "How do you handle technical objections in a sales cycle?"
+  
+  steve_stories:
+    technical_seller:
+      situation: "At Microsoft, led Azure Data & AI deals at Fortune 500 financial institutions"
+      action: "Ran whiteboard architecture sessions with CDOs then presented ROI to CFOs"
+      result: "Closed M+ Azure commitments by connecting technical architecture to business outcomes"
+    workshop_facilitator:
+      situation: "Customers had vague 'we want AI' requests"
+      action: "Developed structured discovery → roadmap workshop methodology"
+      result: "Converted ambiguity into phased technical roadmaps with clear ROI milestones"
+    legacy_modernization:
+      situation: "Enterprise customers stuck on legacy DW (Netezza/Teradata) with manual reporting"
+      action: "Designed cloud migration architectures, positioned automation wins"
+      result: "Customers saw 10x reduction in manual processes, unlocked AI/ML capabilities"

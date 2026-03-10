@@ -1,0 +1,18 @@
+{
+  "session_id": "0bd4d44e-1dd7-4f6b-8b34-3f565d6fac67",
+  "prompts": [
+    "/prime",
+    "aM I running in agent mode?",
+    "what is in my context usage?",
+    "see databricks-coding-interview.md and ask me questions . I want to make sure memory is fully aligned with goal of passing the interview.",
+    "1)  running Claude Code in a terminal side-by-side.  2) discovery - perhaps I need a command created /discovery and I provide the prompt and then get asked questions to help build out the prompt prior to running a /plan 4) no , I would like an agent created /distrubuted-computing-review <table_name> or <sql_statements> as parm1 that does the \"Distributed Reasoning\" and provides suggestions and syntax to try 5) igonore free edition comment as I can use my   Azure workspace (adb-7405613453749188) 6) create a command builder-best-friend that will \"Explain exactly what it's doing under the hood\"",
+    "Problem Solve",
+    "ultrathink of a /command that can be created and I  can use to bail me out",
+    "do a complete check of my commands, hooks, agents, skills and mcp tools to verify everything is highlest alignment with my primary goal : databricks-coding-interview.md. ask me questions. want to remove any context usage that is not in alignment with goal for this project/interview.",
+    "1) good cartch you can remove those Crypto commands. 2)  sentient.md - I will remove 3) yes 4) disable 5)  Disable all for interview prep 6) Temporarily blank",
+    "where are the new commands stored? /discovery",
+    " ultrathink how the current /build can be enhanced to use as step 3:   1. /discovery \u2192 scope the prompt\n  2. /plan \u2192 architecture\n  3. Build interactively",
+    "yes"
+  ],
+  "agent_name": "Pulse"
+}

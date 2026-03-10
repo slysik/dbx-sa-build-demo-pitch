@@ -1,0 +1,13 @@
+{
+  "session_id": "a806c97b-51e9-4ab8-9432-2cdd5ab25f3c",
+  "prompts": [
+    "/prime ",
+    "how can I best use the live-arch.md during interview? want to ask discovery questions after they provide a use case then type in  answers into a MD  and see  the diagram get updated right away ",
+    "How do I explain SCD Type 2 with AUTO CDC to a team coming off Informatica PowerCenter?",
+    "create an amazing  DW perf feature  matrix comparsion guide excalidraw diagram across  Dataupia, Netezza, Yellowbrick, Fabric Datawarehouse ==> Databricks SQL. include Databricks DW\nfeatures like liquid clustering and photon and other DW features across performance, simplicity, cost and scalability angles.",
+    "ask questions if you need to understand better my intent ",
+    "ask questions if you need to understand better my intent ",
+    "1) slidev 2) prep for my Databricks SA interview - see  Design-Architecture-Interview-Candidate-Prep.pdf 3) matrix table 4) yes all those features plu include a link to sample DDL, syntax for say typical bazel fin serv customer - simple 7 tables.. that I can run on my databricks SQL 5) yes start and test excalidraw. "
+  ],
+  "agent_name": "Meridian"
+}

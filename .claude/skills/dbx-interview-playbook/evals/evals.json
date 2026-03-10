@@ -1,0 +1,29 @@
+{
+  "skill_name": "dbx-interview-playbook",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up a retail interview pipeline with order events flowing through bronze, silver, gold",
+      "expected_output": "PySpark data gen with spark.range + Faker UDFs for bronze, SQL transforms for silver/gold, TALK/SCALING/DW-BRIDGE comments throughout",
+      "assertions": [
+        {"text": "Data generation uses PySpark spark.range, not SQL INSERT", "type": "structural"},
+        {"text": "Contains TALK narration comments", "type": "contains"},
+        {"text": "Contains SCALING discussion comments", "type": "contains"},
+        {"text": "Uses DECIMAL for monetary amounts, never DOUBLE", "type": "structural"},
+        {"text": "Silver layer uses MERGE with ROW_NUMBER dedup", "type": "semantic"},
+        {"text": "Gold layer has CHECK constraints", "type": "semantic"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Generate 100k media streaming events for an interview demo",
+      "expected_output": "PySpark data gen with Faker UDFs, ~100k rows, media vertical entities",
+      "assertions": [
+        {"text": "Uses spark.range for row generation", "type": "structural"},
+        {"text": "Registers Faker UDFs for realistic data", "type": "structural"},
+        {"text": "Row count is approximately 100k", "type": "semantic"},
+        {"text": "Entities are media-specific (streams, episodes, watch events)", "type": "semantic"}
+      ]
+    }
+  ]
+}

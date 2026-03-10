@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teradata to Databricks: 7 Migration Pitfalls</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0e1a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header .badge {
+    display: inline-block;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #f8fafc 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+
+  header .subtitle {
+    font-size: 16px;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  header .source {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 36px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .legend-dot.pitfall { background: #ef4444; }
+  .legend-dot.fix { background: #22c55e; }
+  .legend-dot.finserv { background: #f59e0b; }
+
+  .pitfall-card {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .pitfall-card:hover {
+    border-color: #334155;
+    transform: translateY(-2px);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 28px 0;
+  }
+
+  .card-number {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    flex-shrink: 0;
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .card-title-area h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f1f5f9;
+    line-height: 1.3;
+  }
+
+  .card-title-area .tagline {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  .card-body {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    padding: 20px 28px 28px;
+    align-items: start;
+  }
+
+  .side {
+    padding: 20px;
+    border-radius: 12px;
+    min-height: 100%;
+  }
+
+  .side.teradata {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.12);
+  }
+
+  .side.databricks {
+    background: rgba(34, 197, 94, 0.06);
+    border: 1px solid rgba(34, 197, 94, 0.12);
+  }
+
+  .side-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .side.teradata .side-label { color: #f87171; }
+  .side.databricks .side-label { color: #4ade80; }
+
+  .side p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #cbd5e1;
+  }
+
+  .side code {
+    display: block;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #e2e8f0;
+    margin-top: 10px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 40px;
+  }
+
+  .arrow-col svg {
+    width: 32px;
+    height: 32px;
+    color: #475569;
+  }
+
+  .finserv-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: 8px;
+  }
+
+  .finserv-callout .icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+  }
+
+  .finserv-callout p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #fbbf24;
+  }
+
+  .modern-fix {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .modern-fix .modern-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #a78bfa;
+    margin-bottom: 10px;
+  }
+
+  .modern-fix .modern-label svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .modern-fix p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c4b5fd;
+  }
+
+  .modern-fix code {
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #e2e8f0;
+    margin-top: 10px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .legend-dot.modern { background: #8b5cf6; }
+
+  .bottom-quote {
+    text-align: center;
+    margin-top: 48px;
+    padding: 32px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 16px;
+  }
+
+  .bottom-quote blockquote {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #c4b5fd;
+    font-style: italic;
+    max-width: 700px;
+    margin: 0 auto 12px;
+  }
+
+  .bottom-quote .attribution {
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 32px;
+    font-size: 12px;
+    color: #334155;
+  }
+
+  @media (max-width: 768px) {
+    .card-body {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .arrow-col {
+      padding-top: 0;
+      transform: rotate(90deg);
+    }
+    header h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">Databricks SA Interview Prep</div>
+    <h1>Teradata to Databricks<br>7 Migration Pitfalls & Fixes</h1>
+    <p class="subtitle">What breaks when you move from built-in discipline to earned discipline &mdash; and how to architect around it.</p>
+    <p class="source">Based on Jeff Wilts, "Teradata to Databricks (Without Regretting It Later)" &mdash; Feb 2026</p>
+  </header>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot pitfall"></div> Teradata Behavior</div>
+    <div class="legend-item"><div class="legend-dot fix"></div> Databricks Fix</div>
+    <div class="legend-item"><div class="legend-dot finserv"></div> FinServ Risk</div>
+    <div class="legend-item"><div class="legend-dot modern"></div> Modern Databricks</div>
+  </div>
+
+  <!-- Pitfall 1 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">1</div>
+      <div class="card-title-area">
+        <h2>Primary Keys & Uniqueness</h2>
+        <div class="tagline">Constraints that inform vs. constraints that enforce</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>PK = enforced. Duplicate INSERT = hard error. The engine guarantees uniqueness.</p>
+        <code>INSERT INTO customer VALUES (1, 'Alice');
+INSERT INTO customer VALUES (1, 'Bob');
+-- Result: ERROR. Constraint enforced.</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>PK is informational only. Enforce uniqueness via MERGE from staging tables in your pipeline.</p>
+        <code>MERGE INTO customer t
+USING staging_customer s
+ON t.customer_id = s.customer_id
+WHEN MATCHED THEN UPDATE SET *
+WHEN NOT MATCHED THEN INSERT *</code>
+        <div class="modern-fix">
+          <div class="modern-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Modern: Spark Declarative Pipelines (AUTO CDC)</div>
+          <p>4 lines replace 50 lines of manual MERGE. Keys enforce identity, sequence handles ordering, SCD Type 2 preserves full audit history.</p>
+          <code>AUTO CDC INTO gold.dim_customer
+FROM STREAM silver.customers_clean
+KEYS (customer_id)
+SEQUENCE BY updated_timestamp
+STORED AS SCD TYPE 2;</code>
+        </div>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>Duplicate customer records = "customer count" becomes an opinion, not a fact. Regulatory reporting requires single source of truth.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitfall 2 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">2</div>
+      <div class="card-title-area">
+        <h2>Duplicate Rejection (SET Tables)</h2>
+        <div class="tagline">Automatic dedup vs. explicit dedup</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>SET tables automatically reject full-row duplicates on insert. No extra logic needed.</p>
+        <code>CREATE SET TABLE orders (
+  order_id INTEGER,
+  amount DECIMAL(10,2)
+);
+-- Duplicate rows silently rejected</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>Use SELECT DISTINCT for batch or dropDuplicates() for streaming to explicitly remove duplicates.</p>
+        <code>-- Batch
+CREATE OR REPLACE TABLE orders_clean AS
+SELECT DISTINCT * FROM staging_orders;
+
+-- Streaming
+df.dropDuplicates(["order_id"])</code>
+        <div class="modern-fix">
+          <div class="modern-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Modern: AUTO CDC handles dedup automatically</div>
+          <p>KEYS clause defines what makes a record unique. SEQUENCE BY resolves out-of-order arrivals. The platform handles dedup &mdash; you declare intent.</p>
+          <code>AUTO CDC INTO gold.fact_transactions
+FROM STREAM silver.transactions_clean
+KEYS (transaction_id)
+SEQUENCE BY event_timestamp;</code>
+        </div>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>Duplicate transactions in a banking ledger inflate balances. Duplicates accumulate quietly until reconciliation exposes the gap.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitfall 3 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">3</div>
+      <div class="card-title-area">
+        <h2>Collation & Case Sensitivity</h2>
+        <div class="tagline">The quiet way to break trust</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>Case-insensitive by default. <code style="display:inline;background:none;padding:0;margin:0;font-size:inherit;">WHERE name = 'alice'</code> matches Alice, ALICE, alice.</p>
+        <code>SELECT * FROM customers
+WHERE name = 'alice';
+-- Matches: Alice, ALICE, alice</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>Define a collation strategy. Don't sprinkle LOWER() everywhere &mdash; document comparison rules centrally.</p>
+        <code>-- Bad: ad-hoc workaround
+ON LOWER(a.name) = LOWER(b.name)
+
+-- Good: collation strategy
+-- Normalize at Silver layer ingestion
+-- Document rules in data contract</code>
+        <div class="modern-fix">
+          <div class="modern-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Modern: COLLATE — one line, solves the whole problem</div>
+          <p>Declare case-insensitive collation at the column level. No LOWER() wrappers, no Silver-layer normalization, no drift across teams. Schema-level intent.</p>
+          <code>CREATE TABLE customers (
+  customer_id INT,
+  name STRING COLLATE UTF8_LCASE,
+  email STRING COLLATE UTF8_LCASE
+);
+
+-- Now this just works:
+SELECT * FROM customers
+WHERE name = 'alice';
+-- Matches: Alice, ALICE, alice</code>
+        </div>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>JOINs silently drop rows post-migration. Distinct counts drift. Analysts add workarounds. Dashboards look "randomly" wrong.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitfall 4 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">4</div>
+      <div class="card-title-area">
+        <h2>DECIMAL Precision Drift</h2>
+        <div class="tagline">"It loaded" is not the same as "it's right"</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>Strict typing with DECIMAL(38,10). Precision preserved through aggregations. What you put in is what you get out.</p>
+        <code>-- Teradata fact table
+amount DECIMAL(38,10)
+
+SELECT SUM(amount) FROM fact_sales;
+-- Precise to 10 decimal places</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>Explicit CAST on aggregations + reconciliation tables to catch drift. Test pathological rows (max precision, negatives, nulls).</p>
+        <code>SELECT CAST(SUM(amount) AS DECIMAL(38,10))
+FROM fact_sales;
+
+-- Reconciliation check
+SELECT old_sum, new_sum,
+  old_sum - new_sum AS delta
+FROM reconciliation_table;</code>
+        <div class="modern-fix">
+          <div class="modern-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Modern: Double CAST — input AND output</div>
+          <p>Cast the input before aggregation AND the output after. Prevents Spark from silently promoting to DOUBLE mid-calculation. Matches Teradata to the penny.</p>
+          <code>-- Double CAST: prevent mid-calc promotion
+SELECT CAST(
+  SUM(CAST(amount AS DECIMAL(38,10)))
+  AS DECIMAL(38,10)
+)
+FROM fact_sales;</code>
+        </div>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>A 0.01% rounding drift in transaction totals = regulatory audit finding. In FinServ, "close enough" doesn't exist.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitfall 5 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">5</div>
+      <div class="card-title-area">
+        <h2>ACID Transactions</h2>
+        <div class="tagline">All-or-nothing vs. one-at-a-time</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>Multi-statement transactions are all-or-nothing. If step 3 of 4 fails, everything rolls back. No partial state.</p>
+        <code>BEGIN TRANSACTION;
+  UPDATE dimension ...
+  INSERT INTO facts ...
+  INSERT INTO audit_log ...
+  UPDATE completion_flag ...
+COMMIT;
+-- All succeed or all fail</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>Design for atomicity explicitly: stage &rarr; validate &rarr; publish via REPLACE TABLE or Delta version swap. Make pipelines idempotent.</p>
+        <code>-- 1. Stage
+CREATE TABLE fact_staging AS SELECT ...
+
+-- 2. Validate
+SELECT COUNT(*) FROM fact_staging;
+
+-- 3. Publish atomically
+REPLACE TABLE fact_production AS
+SELECT * FROM fact_staging;</code>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>Half-published facts in a trading system or risk model = incorrect exposure calculations. Partial state is unacceptable in regulated environments.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitfall 6 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">6</div>
+      <div class="card-title-area">
+        <h2>Time Zones</h2>
+        <div class="tagline">Decide early or pay forever</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>Native TIMESTAMP WITH TIME ZONE support. Time zone semantics are explicit and enforced at the type level.</p>
+        <code>INTERVAL '01:30:00' HOUR TO SECOND
+TIMESTAMP WITH TIME ZONE
+-- Zone-aware by design</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>Store UTC instant + original timezone string. Convert at display time. Decide what timestamps <em>mean</em> before you store them.</p>
+        <code>-- Store event instant
+event_ts_utc TIMESTAMP
+
+-- Store original zone
+event_tz STRING  -- e.g., "America/New_York"
+
+-- Display conversion
+SELECT from_utc_timestamp(
+  event_ts_utc, event_tz
+)</code>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>Global banks operate across time zones. DST shifts cause audit drift and inconsistent trade timestamps. A semantic contract, not a technical detail.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitfall 7 -->
+  <div class="pitfall-card">
+    <div class="card-header">
+      <div class="card-number">7</div>
+      <div class="card-title-area">
+        <h2>SQL Differences</h2>
+        <div class="tagline">The death of a thousand paper cuts</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="side teradata">
+        <div class="side-label">Teradata</div>
+        <p>Volatile tables, macros, triggers, UPDATE...FROM...SET, stored procedures. Decades of procedural patterns baked in.</p>
+        <code>-- Volatile tables
+CREATE VOLATILE TABLE temp AS (...);
+
+-- Update-with-join
+UPDATE target t
+FROM source s
+SET t.value = s.value
+WHERE t.id = s.id;</code>
+      </div>
+      <div class="arrow-col">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="side databricks">
+        <div class="side-label">Databricks Fix</div>
+        <p>Systematic rewrite strategy: TEMP VIEWs, MERGE INTO, Databricks SQL scripting or dbt. Decide the approach once, not per-query.</p>
+        <code>-- Volatile -> Temp View
+CREATE OR REPLACE TEMP VIEW temp AS (...);
+
+-- Update-join -> MERGE
+MERGE INTO target t
+USING source s ON t.id = s.id
+WHEN MATCHED THEN UPDATE SET
+  value = s.value</code>
+        <div class="finserv-callout">
+          <svg class="icon" viewBox="0 0 20 20" fill="#f59e0b"><path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+          <p>Inconsistent procedural logic patterns across teams = maintenance costs explode. FinServ auditors expect documented, repeatable processes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Quote -->
+  <div class="bottom-quote">
+    <blockquote>"The lakehouse does not eliminate the need for discipline. It removes the guardrails that forced it."</blockquote>
+    <div class="attribution">&mdash; Jeff Wilts, Chief Architect, Ness Digital Engineering</div>
+  </div>
+
+  <footer>
+    <p>Databricks SA Interview Prep &bull; Steve Lysik &bull; FinServ Vertical &bull; Feb 2026</p>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "session_id": "4036914f-dc12-41ce-838c-63474def7191",
+  "prompts": [
+    "/dbx-interview-playbook Before generating code, run Step 0: Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3) Time budget? Then generate the full pipeline for: create a dataset with 10k rows. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol \u2014 verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary].",
+    "retail_demo, retail 30 min , none",
+    "1",
+    "provide a link to the dataframe created",
+    "only create a dataset with 100 retail rows and provide a link to the notebook",
+    "what do you use for memory?",
+    "can you see my CLAUDE databricks skills and use them? I believe you have additonal databricks .pi/skills",
+    "lets optimize for Coding Interview_Candidate_Prep.pdf. updates on interview flow. ### Interview Format & Scope\n\n- Problem statement details:\n  1. Three available prompts (retail, media, one other vertical)\n  2. No financial services specific scenarios\n  3. Interviewer selects prompt at start of session\n  4. Single paragraph/prompt format\n- Data generation requirements\n  - Create synthetic dataset using AI tools\n  - Target ~100k rows initially\n  - Focus on working dataset by end of call\n\n### Technical Requirements & Evaluation Focus\n\n- PySpark strongly preferred over SQL for dataset creation\n  - Previous candidates dinged for SQL-only approach\n  - All customer work uses PySpark in production\n  - SQL acceptable for other objects (dashboards, medallion layers).  these two can be removed : .pi/skills/dynamics-365/SKILL.md and .pi/skills/microsoft-foundry-agents/SKILL.md. I want to first have the   dataset built using dataframe then have a interactive session and not build out end to end. I might be asked questions about the dataframe and add columns , optimize , run commands to see # of part.",
+    "yes"
+  ],
+  "agent_name": "Meridian"
+}

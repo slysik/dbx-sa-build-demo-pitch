@@ -1,0 +1,242 @@
+/**
+ * Interview Tasks — Lightweight task tracker for the 60-minute interview
+ *
+ * Simplified version of tilldone.ts focused on interview time management.
+ * Pre-loads the standard interview phases as tasks. Shows elapsed time
+ * and completion status in a persistent widget.
+ *
+ * Commands:
+ *   /tasks          — Show task list
+ *   /done <number>  — Mark task as done
+ *   /next           — Start the next task
+ *
+ * Usage: Auto-loaded from .pi/extensions/
+ */
+
+import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
+import { Type } from "@sinclair/typebox";
+
+interface Task {
+	id: number;
+	text: string;
+	status: "pending" | "active" | "done";
+	startedAt?: number;
+	doneAt?: number;
+}
+
+// Colors
+function bgBar(s: string): string {
+	return `\x1b[48;2;25;35;50m${s}\x1b[49m`;
+}
+function green(s: string): string {
+	return `\x1b[38;2;80;220;120m${s}\x1b[39m`;
+}
+function yellow(s: string): string {
+	return `\x1b[38;2;255;200;50m${s}\x1b[39m`;
+}
+function dimGray(s: string): string {
+	return `\x1b[38;2;100;100;120m${s}\x1b[39m`;
+}
+function white(s: string): string {
+	return `\x1b[38;2;220;220;230m${s}\x1b[39m`;
+}
+function bold(s: string): string {
+	return `\x1b[1m${s}\x1b[22m`;
+}
+
+const DEFAULT_TASKS: Omit<Task, "id">[] = [
+	{ text: "Discovery — Ask clarifying questions (0-10 min)", status: "pending" },
+	{ text: "Generate synthetic dataset with Faker (10-20 min)", status: "pending" },
+	{ text: "Bronze — Land raw data as Delta tables", status: "pending" },
+	{ text: "Silver — Clean, validate, deduplicate (SQL)", status: "pending" },
+	{ text: "Gold — Business aggregations & features (SQL)", status: "pending" },
+	{ text: "Discuss — Explain execution & scaling (45-60 min)", status: "pending" },
+];
+
+export default function (pi: ExtensionAPI) {
+	let tasks: Task[] = [];
+	let sessionStart: number = Date.now();
+
+	function initTasks() {
+		sessionStart = Date.now();
+		tasks = DEFAULT_TASKS.map((t, i) => ({ ...t, id: i + 1 }));
+	}
+
+	function formatElapsed(): string {
+		const mins = Math.floor((Date.now() - sessionStart) / 60000);
+		const secs = Math.floor(((Date.now() - sessionStart) % 60000) / 1000);
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
+	}
+
+	function updateWidget(ctx: any) {
+		ctx.ui.setWidget("interview-tasks", () => ({
+			render(width: number): string[] {
+				const done = tasks.filter((t) => t.status === "done").length;
+				const total = tasks.length;
+				const active = tasks.find((t) => t.status === "active");
+				const elapsed = formatElapsed();
+
+				const lines: string[] = [];
+				const pad = bgBar(" ".repeat(width));
+				lines.push(pad);
+
+				// Header: progress bar + timer
+				const progressFilled = Math.round((done / total) * 12);
+				const progressBar =
+					green("█".repeat(progressFilled)) + dimGray("░".repeat(12 - progressFilled));
+				const header = bgBar(
+					truncateToWidth(
+						white(bold("  📋 TASKS ")) +
+							progressBar +
+							dimGray(` ${done}/${total}`) +
+							" ".repeat(Math.max(1, width - 35 - elapsed.length)) +
+							yellow(`⏱ ${elapsed} `) ,
+						width,
+						""
+					)
+				);
+				lines.push(header);
+
+				// Task list
+				for (const task of tasks) {
+					const icon =
+						task.status === "done" ? green("✓") : task.status === "active" ? yellow("▶") : dimGray("○");
+					const text =
+						task.status === "done"
+							? dimGray(task.text)
+							: task.status === "active"
+								? yellow(bold(task.text))
+								: white(task.text);
+					lines.push(
+						bgBar(truncateToWidth(`  ${icon} ${task.id}. ${text}` + " ".repeat(width), width, ""))
+					);
+				}
+
+				lines.push(pad);
+				return lines;
+			},
+			invalidate() {},
+		}));
+	}
+
+	// /next command — start the next pending task
+	pi.registerCommand("next", {
+		description: "Start the next interview task",
+		handler: async (_args, ctx) => {
+			// Mark current active as done
+			const active = tasks.find((t) => t.status === "active");
+			if (active) {
+				active.status = "done";
+				active.doneAt = Date.now();
+			}
+
+			// Find next pending
+			const next = tasks.find((t) => t.status === "pending");
+			if (next) {
+				next.status = "active";
+				next.startedAt = Date.now();
+				updateWidget(ctx);
+				ctx.ui.notify(`Started: ${next.text}`, "success");
+			} else {
+				updateWidget(ctx);
+				ctx.ui.notify("🎉 All tasks complete!", "success");
+			}
+		},
+	});
+
+	// /done command — mark a specific task as done
+	pi.registerCommand("done", {
+		description: "Mark a task as done by number (e.g. /done 3)",
+		handler: async (args, ctx) => {
+			const id = parseInt(args.trim());
+			const task = tasks.find((t) => t.id === id);
+			if (task) {
+				task.status = "done";
+				task.doneAt = Date.now();
+				updateWidget(ctx);
+				ctx.ui.notify(`✓ Done: ${task.text}`, "success");
+			} else {
+				ctx.ui.notify(`Task #${id} not found. Use /tasks to see list.`, "warning");
+			}
+		},
+	});
+
+	// /tasks command — show full task list
+	pi.registerCommand("tasks", {
+		description: "Show interview task list",
+		handler: async (_args, ctx) => {
+			const lines = tasks.map((t) => {
+				const icon = t.status === "done" ? "✓" : t.status === "active" ? "▶" : "○";
+				return `${icon} ${t.id}. ${t.text}`;
+			});
+			ctx.ui.notify(lines.join("\n"), "info");
+		},
+	});
+
+	// /reset-tasks command — restart with fresh tasks
+	pi.registerCommand("reset-tasks", {
+		description: "Reset all interview tasks and timer",
+		handler: async (_args, ctx) => {
+			const ok = await ctx.ui.confirm("Reset Tasks", "Reset all tasks and restart the timer?");
+			if (ok) {
+				initTasks();
+				updateWidget(ctx);
+				ctx.ui.notify("Tasks and timer reset!", "success");
+			}
+		},
+	});
+
+	// Register tool so the AI can also mark tasks done
+	pi.registerTool({
+		name: "interview_task",
+		label: "Interview Task",
+		description: "Mark interview tasks as done or get current status. Use after completing each interview phase.",
+		parameters: Type.Object({
+			action: Type.Union([Type.Literal("next"), Type.Literal("done"), Type.Literal("status")], {
+				description: "next = start next task, done = complete current task, status = show progress",
+			}),
+			task_id: Type.Optional(Type.Number({ description: "Task ID to mark done (for action=done)" })),
+		}),
+		handler: async (params, ctx) => {
+			if (params.action === "next") {
+				const active = tasks.find((t) => t.status === "active");
+				if (active) {
+					active.status = "done";
+					active.doneAt = Date.now();
+				}
+				const next = tasks.find((t) => t.status === "pending");
+				if (next) {
+					next.status = "active";
+					next.startedAt = Date.now();
+					updateWidget(ctx);
+					return `Started task ${next.id}: ${next.text}`;
+				}
+				updateWidget(ctx);
+				return "All tasks complete!";
+			}
+
+			if (params.action === "done" && params.task_id) {
+				const task = tasks.find((t) => t.id === params.task_id);
+				if (task) {
+					task.status = "done";
+					task.doneAt = Date.now();
+					updateWidget(ctx);
+					return `Completed: ${task.text}`;
+				}
+				return `Task #${params.task_id} not found`;
+			}
+
+			// status
+			const done = tasks.filter((t) => t.status === "done").length;
+			const active = tasks.find((t) => t.status === "active");
+			return `Progress: ${done}/${tasks.length} done. Active: ${active?.text || "none"}. Elapsed: ${formatElapsed()}`;
+		},
+	});
+
+	pi.on("session_start", async (_event, ctx) => {
+		initTasks();
+		updateWidget(ctx);
+		ctx.ui.notify("Interview tasks loaded. Use /next to start, /done <n> to complete.", "info");
+	});
+}

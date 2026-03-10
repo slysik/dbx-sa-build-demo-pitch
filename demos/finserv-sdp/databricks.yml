@@ -1,0 +1,34 @@
+bundle:
+  name: finserv_sdp
+
+variables:
+  catalog:
+    description: Unity Catalog name
+  bronze_schema:
+    description: Raw / append-only layer
+  silver_schema:
+    description: Validated, PII-masked, SCD-2 layer
+  gold_schema:
+    description: Kimball star schema + MV layer
+  schema_location_base:
+    description: Volume path for Auto Loader schema metadata (Python only)
+
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      catalog: dbx_weg
+      bronze_schema: bronze_dev
+      silver_schema: silver_dev
+      gold_schema: gold_dev
+      schema_location_base: /Volumes/dbx_weg/pipeline_metadata/finserv_dev/schemas
+
+  prod:
+    mode: production
+    variables:
+      catalog: dbx_weg
+      bronze_schema: bronze
+      silver_schema: silver
+      gold_schema: gold
+      schema_location_base: /Volumes/dbx_weg/pipeline_metadata/finserv_prod/schemas

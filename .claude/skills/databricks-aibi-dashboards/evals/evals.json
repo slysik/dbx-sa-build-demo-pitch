@@ -1,0 +1,36 @@
+{
+  "skill_name": "databricks-aibi-dashboards",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a dashboard with a counter showing total orders and a bar chart of revenue by region from catalog.schema.fact_orders",
+      "expected_output": "Valid dashboard JSON with pageType PAGE_TYPE_CANVAS, counter widget with disaggregated false, bar chart with encodings",
+      "assertions": [
+        {"text": "Output includes pageType PAGE_TYPE_CANVAS", "type": "contains"},
+        {"text": "Counter widget uses disaggregated: false with aggregation expression", "type": "semantic"},
+        {"text": "Bar chart has x and y encodings defined", "type": "semantic"},
+        {"text": "All SQL queries are tested via execute_sql before dashboard creation", "type": "process"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a dashboard with a date range filter that controls a line chart showing daily revenue trend",
+      "expected_output": "Dashboard with date filter widget linked to line chart via field mapping",
+      "assertions": [
+        {"text": "Filter widget references a date column", "type": "semantic"},
+        {"text": "Line chart uses disaggregated false for filter reactivity", "type": "semantic"},
+        {"text": "frame is inside spec, not on widget", "type": "structural"}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add a text header widget saying 'Sales Overview' and a table showing top 10 customers by spend",
+      "expected_output": "Dashboard with multilineTextboxSpec text widget and table widget",
+      "assertions": [
+        {"text": "Text widget uses multilineTextboxSpec with lines as markdown strings array", "type": "structural"},
+        {"text": "Table widget has column encodings", "type": "semantic"},
+        {"text": "SQL includes ORDER BY and LIMIT 10", "type": "contains"}
+      ]
+    }
+  ]
+}

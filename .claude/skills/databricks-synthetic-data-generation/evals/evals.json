@@ -1,0 +1,26 @@
+{
+  "skill_name": "databricks-synthetic-data-generation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate 50k realistic e-commerce orders with Zipf-distributed product popularity and seasonal revenue patterns",
+      "expected_output": "PySpark script using spark.range, Faker UDFs, Zipf distribution for products, seasonal timestamp generation",
+      "assertions": [
+        {"text": "Uses spark.range not manual row creation", "type": "structural"},
+        {"text": "Product selection uses Zipf or power-law distribution", "type": "semantic"},
+        {"text": "Timestamps show seasonal patterns (not uniform random)", "type": "semantic"},
+        {"text": "Uses DECIMAL for monetary amounts", "type": "structural"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a customer dimension table with 10k rows and realistic demographics",
+      "expected_output": "PySpark with Faker for names, addresses, emails; realistic age/income distributions",
+      "assertions": [
+        {"text": "Uses Faker for name, address, email generation", "type": "structural"},
+        {"text": "Age or income uses non-uniform distribution (log-normal, normal, etc.)", "type": "semantic"},
+        {"text": "Includes referential integrity if related tables exist", "type": "semantic"}
+      ]
+    }
+  ]
+}

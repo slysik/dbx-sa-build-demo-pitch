@@ -1,0 +1,12 @@
+{
+  "session_id": "22e9c254-819c-4de2-9a50-a3d4d5297f33",
+  "prompts": [
+    "what databricks skills are available?",
+    "are they the latest? ",
+    "the /databricks-sa and /databricks-discovery skills can be removed",
+    "1",
+    "I think I got them here: https://github.com/databricks-solutions/ai-dev-kit . do they match and do I have the latest",
+    "yes"
+  ],
+  "agent_name": "Prism"
+}

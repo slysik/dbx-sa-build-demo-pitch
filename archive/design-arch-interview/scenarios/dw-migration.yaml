@@ -1,0 +1,97 @@
+# Global Manufacturing Corp — Databricks Lakehouse Discovery Answers
+# Scenario: 500TB Teradata migration, Snowflake consolidation, global analytics
+
+name: "Global Manufacturing Corp"
+description: "Migrate aging 500TB Teradata EDW to Databricks Lakehouse. Consolidate departmental Snowflake instances. Enable real-time analytics and self-service across 50 countries."
+
+answers:
+  # Section 1: Business Outcomes & Scope
+  customer_name: "Global Manufacturing Corp"
+  biz_problem: "Migrate aging 500TB Teradata EDW to Databricks Lakehouse. Consolidate departmental Snowflake instances. Enable real-time analytics and self-service across 50 countries."
+  biz_kpis: "Decommission Teradata in 18 months; reduce DW TCO by 40%; enable self-service analytics for 500+ users in 90 days"
+  use_cases:
+    - Legacy Migration
+    - Self-service Analytics
+    - Regulatory Reporting
+    - Real-time KPIs
+    - Cost Optimization
+    - Data Democratization
+  consumers:
+    - Analysts
+    - Executives
+    - Regulators
+    - Data Scientists
+    - Apps/APIs
+
+  # Section 2: Data Sources & Ingestion
+  sources: "Teradata EDW (500TB, 15yr), Oracle ERP (OLTP), departmental Snowflake (3 instances), SAP S/4HANA, Salesforce CRM, Kafka (IoT telemetry), market data feeds (Bloomberg)"
+  cloud:
+    - Azure
+  bi_tools: "Power BI (primary), Tableau (some departments), custom Crystal Reports"
+  etl_tools: "Informatica PowerCenter, SSIS (legacy), some dbt (new team), manual stored procedures"
+  latency:
+    - Near-real-time
+    - Hourly
+    - Daily batch
+  formats:
+    - Structured/SQL
+    - Semi-structured/JSON
+    - Streaming/IoT
+  volume: "500 TB existing + 2-3 TB daily growth, ~50 TB/year net new"
+  num_sources: "45"
+
+  # Section 3: Data Warehouse & Modeling
+  dw_approach:
+    - Centralized EDW
+  domains: "Manufacturing, Supply Chain, Finance, Sales, Customer, HR, IoT/Telemetry, Regulatory"
+  subject_areas: "Transaction-atomic, Inventory-by-plant-daily, Customer-account-grain, Financial-ledger-monthly, IoT-sensor-5min-intervals"
+  modeling_pref:
+    - Star/Dimensional
+    - Data Vault
+  query_slas: "200 concurrent analysts, <3s dashboards, <30s ad-hoc, batch reports within 2hr SLA"
+
+  # Section 4: Non-Functional Requirements
+  dr: "RPO 4h, RTO 2h (regulatory), RPO 1h for IoT/operational data"
+  peak_periods: "Month-end close (5-day window), quarterly regulatory submissions, annual audit season"
+  users: "500+ analysts across 50 countries, 20 data engineers, 15 data scientists, 50+ automated reporting jobs"
+  cost_sensitivity:
+    - Balanced
+
+  # Section 5: Governance, Security & Compliance
+  compliance:
+    - GDPR
+    - SOX
+    - Basel III/IV
+  access_model:
+    - RBAC
+    - ABAC/Tags
+    - Geography-based
+  catalog_strategy:
+    - Unity Catalog
+  audit_reqs: "Full audit trail for regulatory reporting, data residency per EU/APAC/Americas, 7-year retention for financial data"
+
+  # Section 6: Operational Model & SDLC
+  deploy_approach:
+    - CI/CD
+    - IaC/Terraform
+  environments:
+    - Dev/Test/Prod
+  ops_model:
+    - Central platform team
+    - Federated / LOB
+  monitoring: "Datadog, PagerDuty, ServiceNow integration"
+
+  # Section 7: Success Metrics & Timeline
+  success_short: "Federate Teradata queries via Lakehouse Federation; migrate top 10 reporting workloads to DBSQL; stand up self-service sandbox for analysts"
+  success_long: "Full Teradata decommission; real-time IoT analytics; ML-powered demand forecasting; global unified data platform"
+  deadlines: "Teradata contract renewal in 18 months; SOX audit Q3; GDPR compliance review Q4"
+  mvp_uses: "Migrate top 10 executive dashboards to DBSQL; Federation for remaining Teradata queries during transition"
+  mandates: "Must use Azure (enterprise agreement); cannot move EU data outside EU; existing Informatica contract (2 years remaining)"
+  skills:
+    - SQL-heavy
+    - Python
+    - Spark
+  pain_points: "Teradata license cost unsustainable ($8M/yr); 3000+ stored procedures (only ~200 actively used); Snowflake sprawl with no governance; cross-region data sharing is manual CSV exports; 48hr SLA for new report requests"
+  notes: "Strong executive sponsorship from CFO. Central platform team of 20 exists but domains want self-service. Previous attempt to migrate to Hadoop failed 3 years ago — team is cautious. Informatica team resistant to change."
+  migration_approach:
+    - Federation-First

@@ -1,0 +1,9 @@
+{
+  "session_id": "a6024f41-7320-49ef-89c6-3d89b7d39813",
+  "prompts": [
+    "after I ran a test nothing happened or I was out of cc and at the command prompt : slysik@Steves-MacBook-Air databricks % just interview test1.md\nclaude --model opus --dangerously-skip-permissions -p \"/dbx-interview-playbook Before generating code, run Step 0: Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3) Time budget? Then generate the full pipeline for: test1.md. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud.\"\nGot the prompt. This is a **streaming payment authorization pipeline** with Zerobus Ingest + Free Edition fallback. Let me run Step 0.\n\n---\n\n## Step 0: Session Setup\n\nI have three questions before we start building:\n\n**Q1: Catalog** \u2014 What catalog should I use?\n- Create a fresh one (e.g., `finserv_zerobus`)?\n- Use existing `dbx_weg`?\n- Something else?\n\n**Q2: Time Budget** \u2014 How much time do we have?\n- 30 min (Bronze + Silver + Gold + harness only)\n- 45 min (+ MV + proof points)\n- 60 min (full pipeline + dashboard + DQ page + proof points)\n\n**Q3: Workspace Constraints** \u2014 The prompt says \"Free Edition\" but your actual workspace is Azure with `dbx_weg` catalog and serverless access. Should I:\n- **Build for your real workspace** (serverless, full features, Zerobus attempt + Auto Loader fallback)?\n- **Simulate Free Edition constraints** (no serverless, no MV, cluster-only)?\n\nOne note from context: Zerobus Ingest may or may not be available on your workspace \u2014 the prompt wisely includes the Auto Loader fallback. I'll attempt Zerobus first and gracefully fall back.\nslysik@Steves-MacBook-Air databricks %",
+    "yes , lets try that ",
+    "actually , what a did was typed \"create a prompt for use case..\" and then used prompt created and put thatinto test.md , like what /plan does "
+  ],
+  "agent_name": "Lumin"
+}

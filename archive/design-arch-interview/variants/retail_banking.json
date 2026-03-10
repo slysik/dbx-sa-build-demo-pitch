@@ -1,0 +1,50 @@
+{
+  "title": "FinServ DW Architecture – Retail Banking",
+  "sources": [
+    "Core Banking (FIS/Temenos)\n(Loans, Deposits, Accounts)",
+    "General Ledger (SAP/Oracle)\n(JE, Balances, Subledger)",
+    "Card Switch (Fiserv/FIS)\n(Auth, Settlement, Disputes)",
+    "CRM / KYC (Salesforce)\n(Customer, Party, Onboarding)",
+    "Credit Bureau Feeds\n(FICO, Experian, TransUnion)",
+    "Vendor / SFTP Feeds\n(Regulatory filings, 3rd party)"
+  ],
+  "ingestion": [
+    "Batch – EOD + Intraday\n(Autoloader from cloud storage)",
+    "CDC via Debezium / Qlik\n(Core Banking → Kafka → Bronze)",
+    "Kafka Streaming\n(Card auths, <5s latency)",
+    "Schema Registry + Contracts\n(validate • version • enforce)"
+  ],
+  "bronze": [
+    "Append-only Raw Delta\n(full replay • partitioned by date)",
+    "7yr Retention + PII Tags\n(Unity Catalog classification)"
+  ],
+  "silver": [
+    "Deduplicate + Conform Keys\n(golden customer/account ID)",
+    "DQ Gates + Quarantine\n(null checks, range, referential)",
+    "GL Reconciliation Controls\n(daily balance tie-out)",
+    "Conformed Entities\n(Customer • Account • Product)"
+  ],
+  "gold": [
+    "Star Schema\n(Fact_Transaction, Dim_Customer)",
+    "Portfolio & Risk Aggregates\n(PD/LGD, VaR, Concentration)",
+    "Regulatory Extracts\n(CCAR, CECL, Call Reports)",
+    "Metrics / Semantic Layer\n(single KPI definitions)"
+  ],
+  "compute": [
+    "Databricks Workflows\n(DAG schedules • SLA alerts)",
+    "Lakeflow / SDP Pipelines\n(Bronze → Silver → Gold)",
+    "DBSQL Pro Warehouse\n(auto-scale • T-shirt sizing)"
+  ],
+  "serve": [
+    "DBSQL + AI/BI Dashboards\n(self-service analytics)",
+    "Power BI / Tableau\n(exec & risk dashboards)",
+    "Analyst Drill Path\n(KPI → txn → source evidence)",
+    "Delta Sharing\n(regulators • downstream apps)"
+  ],
+  "domain_products": [
+    "Credit Risk\n(PD/LGD/EAD, stress testing)",
+    "Finance & Treasury\n(GL, liquidity, ALM, FTP)",
+    "Customer 360\n(segmentation, LTV, churn)",
+    "Payments & Cards\n(fraud scoring, settlement)"
+  ]
+}

@@ -1,0 +1,453 @@
+2026-02-15 17:57:25 | INFO | ==================================================
+2026-02-15 17:57:25 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:25 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:25 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:25 | INFO | Skipping non-Python file
+2026-02-15 17:57:29 | INFO | ==================================================
+2026-02-15 17:57:29 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:29 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:29 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:29 | INFO | Skipping non-Python file
+2026-02-15 17:57:35 | INFO | ==================================================
+2026-02-15 17:57:35 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:35 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:35 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:35 | INFO | Skipping non-Python file
+2026-02-15 17:57:42 | INFO | ==================================================
+2026-02-15 17:57:42 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:42 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:42 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:42 | INFO | Skipping non-Python file
+2026-02-15 17:57:47 | INFO | ==================================================
+2026-02-15 17:57:47 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:47 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:47 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:47 | INFO | Skipping non-Python file
+2026-02-15 17:57:53 | INFO | ==================================================
+2026-02-15 17:57:53 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:53 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:53 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:53 | INFO | Skipping non-Python file
+2026-02-15 17:57:57 | INFO | ==================================================
+2026-02-15 17:57:57 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:57:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:57:57 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:57:57 | INFO | Skipping non-Python file
+2026-02-15 17:58:01 | INFO | ==================================================
+2026-02-15 17:58:01 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:58:01 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:58:01 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:58:01 | INFO | Skipping non-Python file
+2026-02-15 17:58:06 | INFO | ==================================================
+2026-02-15 17:58:06 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:58:06 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:58:06 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:58:06 | INFO | Skipping non-Python file
+2026-02-15 17:58:27 | INFO | ==================================================
+2026-02-15 17:58:27 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:58:27 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:58:27 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:58:27 | INFO | Skipping non-Python file
+2026-02-15 17:59:02 | INFO | ==================================================
+2026-02-15 17:59:02 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:59:02 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:59:02 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:59:02 | INFO | Skipping non-Python file
+2026-02-15 17:59:07 | INFO | ==================================================
+2026-02-15 17:59:07 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:59:07 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:59:07 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:59:07 | INFO | Skipping non-Python file
+2026-02-15 17:59:10 | INFO | ==================================================
+2026-02-15 17:59:10 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:59:10 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:59:10 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:59:10 | INFO | Skipping non-Python file
+2026-02-15 17:59:22 | INFO | ==================================================
+2026-02-15 17:59:22 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 17:59:22 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 17:59:22 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 17:59:22 | INFO | Skipping non-Python file
+2026-02-15 18:02:12 | INFO | ==================================================
+2026-02-15 18:02:12 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:02:12 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:02:12 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:02:12 | INFO | Skipping non-Python file
+2026-02-15 18:03:07 | INFO | ==================================================
+2026-02-15 18:03:07 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:03:07 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:03:07 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:03:07 | INFO | Skipping non-Python file
+2026-02-15 18:03:15 | INFO | ==================================================
+2026-02-15 18:03:15 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:03:15 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:03:15 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:03:15 | INFO | Skipping non-Python file
+2026-02-15 18:03:19 | INFO | ==================================================
+2026-02-15 18:03:19 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:03:19 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:03:19 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:03:19 | INFO | Skipping non-Python file
+2026-02-15 18:03:27 | INFO | ==================================================
+2026-02-15 18:03:27 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:03:27 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:03:27 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:03:27 | INFO | Skipping non-Python file
+2026-02-15 18:08:12 | INFO | ==================================================
+2026-02-15 18:08:12 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:08:12 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:08:12 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:08:12 | INFO | Skipping non-Python file
+2026-02-15 18:08:17 | INFO | ==================================================
+2026-02-15 18:08:17 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:08:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:08:17 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:08:17 | INFO | Skipping non-Python file
+2026-02-15 18:09:38 | INFO | ==================================================
+2026-02-15 18:09:38 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-15 18:09:38 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-15 18:09:38 | INFO | file_path: /Users/slysik/databricks/whiteboard-builder.html
+2026-02-15 18:09:38 | INFO | Skipping non-Python file
+2026-02-16 10:29:24 | INFO | ==================================================
+2026-02-16 10:29:24 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:29:24 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:29:24 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-discovery/SKILL.md
+2026-02-16 10:29:24 | INFO | Skipping non-Python file
+2026-02-16 10:30:08 | INFO | ==================================================
+2026-02-16 10:30:08 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:30:08 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:30:08 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-discovery/questions.md
+2026-02-16 10:30:08 | INFO | Skipping non-Python file
+2026-02-16 10:30:44 | INFO | ==================================================
+2026-02-16 10:30:44 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:30:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:30:44 | INFO | file_path: /Users/slysik/databricks/.claude/skills/excalidraw-architect/SKILL.md
+2026-02-16 10:30:44 | INFO | Skipping non-Python file
+2026-02-16 10:31:10 | INFO | ==================================================
+2026-02-16 10:31:10 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:31:10 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:31:10 | INFO | file_path: /Users/slysik/databricks/.claude/skills/excalidraw-architect/template.md
+2026-02-16 10:31:10 | INFO | Skipping non-Python file
+2026-02-16 10:31:22 | INFO | ==================================================
+2026-02-16 10:31:22 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:31:22 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:31:22 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-discovery/mapping-rules.md
+2026-02-16 10:31:22 | INFO | Skipping non-Python file
+2026-02-16 10:31:41 | INFO | ==================================================
+2026-02-16 10:31:41 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:31:41 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:31:41 | INFO | file_path: /Users/slysik/databricks/.claude/skills/excalidraw-architect/components.md
+2026-02-16 10:31:41 | INFO | Skipping non-Python file
+2026-02-16 10:31:43 | INFO | ==================================================
+2026-02-16 10:31:43 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:31:43 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:31:43 | INFO | file_path: /Users/slysik/databricks/scenarios/finserv.yaml
+2026-02-16 10:31:43 | INFO | Skipping non-Python file
+2026-02-16 10:32:08 | INFO | ==================================================
+2026-02-16 10:32:08 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:32:08 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:32:08 | INFO | file_path: /Users/slysik/databricks/scenarios/wegmans.yaml
+2026-02-16 10:32:08 | INFO | Skipping non-Python file
+2026-02-16 10:32:37 | INFO | ==================================================
+2026-02-16 10:32:37 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:32:37 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:32:37 | INFO | file_path: /Users/slysik/databricks/scenarios/dw-migration.yaml
+2026-02-16 10:32:37 | INFO | Skipping non-Python file
+2026-02-16 10:33:25 | INFO | ==================================================
+2026-02-16 10:33:25 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:33:25 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:33:25 | INFO | file_path: /Users/slysik/databricks/.claude/agents/discovery-agent.md
+2026-02-16 10:33:25 | INFO | Skipping non-Python file
+2026-02-16 10:33:43 | INFO | ==================================================
+2026-02-16 10:33:43 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:33:43 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:33:43 | INFO | file_path: /Users/slysik/databricks/.claude/agents/diagram-agent.md
+2026-02-16 10:33:43 | INFO | Skipping non-Python file
+2026-02-16 10:33:50 | INFO | ==================================================
+2026-02-16 10:33:50 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:33:50 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:33:50 | INFO | file_path: /Users/slysik/databricks/.claude/commands/architect/architect.md
+2026-02-16 10:33:50 | INFO | Skipping non-Python file
+2026-02-16 10:33:53 | INFO | ==================================================
+2026-02-16 10:33:53 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:33:53 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:33:53 | INFO | file_path: /Users/slysik/databricks/.claude/commands/architect/discovery.md
+2026-02-16 10:33:53 | INFO | Skipping non-Python file
+2026-02-16 10:33:56 | INFO | ==================================================
+2026-02-16 10:33:56 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:33:56 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:33:56 | INFO | file_path: /Users/slysik/databricks/.claude/commands/architect/diagram.md
+2026-02-16 10:33:56 | INFO | Skipping non-Python file
+2026-02-16 10:33:59 | INFO | ==================================================
+2026-02-16 10:33:59 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-02-16 10:33:59 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-02-16 10:33:59 | INFO | file_path: /Users/slysik/databricks/justfile
+2026-02-16 10:33:59 | INFO | Skipping non-Python file
+2026-03-05 16:05:52 | INFO | ==================================================
+2026-03-05 16:05:52 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:05:52 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:05:52 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:05:52 | INFO | Skipping non-Python file
+2026-03-05 16:05:57 | INFO | ==================================================
+2026-03-05 16:05:57 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:05:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:05:57 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:05:57 | INFO | Skipping non-Python file
+2026-03-05 16:06:31 | INFO | ==================================================
+2026-03-05 16:06:31 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:06:31 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:06:31 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/6-volumes.md
+2026-03-05 16:06:31 | INFO | Skipping non-Python file
+2026-03-05 16:06:46 | INFO | ==================================================
+2026-03-05 16:06:46 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:06:46 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:06:46 | INFO | file_path: /Users/slysik/databricks/.claude/skills/excalidraw-architect/SKILL.md
+2026-03-05 16:06:46 | INFO | Skipping non-Python file
+2026-03-05 16:06:58 | INFO | ==================================================
+2026-03-05 16:06:58 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:06:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:06:58 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/sql-scripting.md
+2026-03-05 16:06:58 | INFO | Skipping non-Python file
+2026-03-05 16:07:17 | INFO | ==================================================
+2026-03-05 16:07:17 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:07:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:07:17 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/7-data-profiling.md
+2026-03-05 16:07:17 | INFO | Skipping non-Python file
+2026-03-05 16:07:53 | INFO | ==================================================
+2026-03-05 16:07:53 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:07:53 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:07:53 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/materialized-views-pipes.md
+2026-03-05 16:07:53 | INFO | Skipping non-Python file
+2026-03-05 16:08:58 | INFO | ==================================================
+2026-03-05 16:08:58 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:08:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:08:58 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/references/complete-example.md
+2026-03-05 16:08:58 | INFO | Skipping non-Python file
+2026-03-05 16:08:58 | INFO | ==================================================
+2026-03-05 16:08:58 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:08:58 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:08:58 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/references/complete-example.md
+2026-03-05 16:08:58 | INFO | Skipping non-Python file
+2026-03-05 16:09:15 | INFO | ==================================================
+2026-03-05 16:09:15 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:09:15 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:09:15 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/geospatial-collations.md
+2026-03-05 16:09:15 | INFO | Skipping non-Python file
+2026-03-05 16:09:36 | INFO | ==================================================
+2026-03-05 16:09:36 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:09:36 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:09:36 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/references/distributions.md
+2026-03-05 16:09:36 | INFO | Skipping non-Python file
+2026-03-05 16:09:44 | INFO | ==================================================
+2026-03-05 16:09:44 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:09:44 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:09:44 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/references/widget-patterns.md
+2026-03-05 16:09:44 | INFO | Skipping non-Python file
+2026-03-05 16:10:09 | INFO | ==================================================
+2026-03-05 16:10:09 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:10:09 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:10:09 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/references/troubleshooting.md
+2026-03-05 16:10:09 | INFO | Skipping non-Python file
+2026-03-05 16:10:23 | INFO | ==================================================
+2026-03-05 16:10:23 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:10:23 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:10:23 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/references/faker-patterns.md
+2026-03-05 16:10:23 | INFO | Skipping non-Python file
+2026-03-05 16:10:31 | INFO | ==================================================
+2026-03-05 16:10:31 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:10:31 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:10:31 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/ai-functions.md
+2026-03-05 16:10:31 | INFO | Skipping non-Python file
+2026-03-05 16:11:17 | INFO | ==================================================
+2026-03-05 16:11:17 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:11:17 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:11:17 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/SKILL.md
+2026-03-05 16:11:17 | INFO | Skipping non-Python file
+2026-03-05 16:11:41 | INFO | ==================================================
+2026-03-05 16:11:41 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:11:41 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:11:41 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/SKILL.md
+2026-03-05 16:11:41 | INFO | Skipping non-Python file
+2026-03-05 16:11:48 | INFO | ==================================================
+2026-03-05 16:11:48 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:11:48 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:11:48 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-dbsql/best-practices.md
+2026-03-05 16:11:48 | INFO | Skipping non-Python file
+2026-03-05 16:20:05 | INFO | ==================================================
+2026-03-05 16:20:05 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:20:05 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:05 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-genie/evals/trigger-eval.json
+2026-03-05 16:20:05 | INFO | Skipping non-Python file
+2026-03-05 16:20:14 | INFO | ==================================================
+2026-03-05 16:20:14 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:20:14 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:14 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/evals/trigger-eval.json
+2026-03-05 16:20:14 | INFO | Skipping non-Python file
+2026-03-05 16:20:21 | INFO | ==================================================
+2026-03-05 16:20:21 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:20:21 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:21 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-aibi-dashboards/evals/evals.json
+2026-03-05 16:20:21 | INFO | Skipping non-Python file
+2026-03-05 16:20:29 | INFO | ==================================================
+2026-03-05 16:20:29 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:20:29 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:29 | INFO | file_path: /Users/slysik/databricks/.claude/skills/dbx-interview-playbook/evals/evals.json
+2026-03-05 16:20:29 | INFO | Skipping non-Python file
+2026-03-05 16:20:35 | INFO | ==================================================
+2026-03-05 16:20:35 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:20:35 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:20:35 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-synthetic-data-generation/evals/evals.json
+2026-03-05 16:20:35 | INFO | Skipping non-Python file
+2026-03-05 16:23:13 | INFO | ==================================================
+2026-03-05 16:23:13 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:23:13 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:23:13 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data.py
+2026-03-05 16:23:13 | INFO | Running: uvx ty check /Users/slysik/databricks/scripts/01_generate_retail_data.py
+2026-03-05 16:23:16 | INFO |   error[unresolved-import]: Cannot resolve imported module `numpy`
+2026-03-05 16:23:16 | INFO |    --> scripts/01_generate_retail_data.py:7:8
+2026-03-05 16:23:16 | INFO |     |
+2026-03-05 16:23:16 | INFO |   5 | """
+2026-03-05 16:23:16 | INFO |   6 | import json
+2026-03-05 16:23:16 | INFO |   7 | import numpy as np
+2026-03-05 16:23:16 | INFO |     |        ^^^^^^^^^^^
+2026-03-05 16:23:16 | INFO |   8 | from datetime import datetime, timedelta
+2026-03-05 16:23:16 | INFO |   9 | from pyspark.sql import SparkSession
+2026-03-05 16:23:16 | INFO |     |
+2026-03-05 16:23:16 | INFO |   info: Searched in the following paths during module resolution:
+2026-03-05 16:23:16 | INFO |   info:   1. /Users/slysik/databricks (first-party code)
+2026-03-05 16:23:16 | INFO |   info:   2. vendored://stdlib (stdlib typeshed stubs vendored by ty)
+2026-03-05 16:23:16 | INFO |   info:   3. /Users/slysik/.cache/uv/environments-v2/ty-validator-2d33dbb0cf2b266f/lib/python3.13/site-packages (site-packages)
+2026-03-05 16:23:16 | INFO |   info: make sure your Python environment is properly configured: https://docs.astral.sh/ty/modules/#python-environment
+2026-03-05 16:23:16 | INFO |   info: rule `unresolved-import` is enabled by default
+2026-03-05 16:23:16 | INFO |   
+2026-03-05 16:23:16 | INFO |   error[unresolved-import]: Cannot resolve imported module `pyspark.sql`
+2026-03-05 16:23:16 | INFO |     --> scripts/01_generate_retail_data.py:9:6
+2026-03-05 16:23:16 | INFO |      |
+2026-03-05 16:23:16 | INFO | RESULT: BLOCK (exit code 1)
+2026-03-05 16:23:16 | INFO |   ERROR: Downloading ty (9.2MiB)
+2026-03-05 16:23:16 | INFO |   ERROR:  Downloading ty
+2026-03-05 16:23:16 | INFO |   ERROR: Installed 1 package in 63ms
+2026-03-05 16:23:39 | INFO | ==================================================
+2026-03-05 16:23:39 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:23:39 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:23:39 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data.py
+2026-03-05 16:23:39 | INFO | Running: uvx ty check /Users/slysik/databricks/scripts/01_generate_retail_data.py
+2026-03-05 16:23:40 | INFO |   error[unresolved-import]: Cannot resolve imported module `numpy`
+2026-03-05 16:23:40 | INFO |    --> scripts/01_generate_retail_data.py:7:8
+2026-03-05 16:23:40 | INFO |     |
+2026-03-05 16:23:40 | INFO |   5 | """
+2026-03-05 16:23:40 | INFO |   6 | import json
+2026-03-05 16:23:40 | INFO |   7 | import numpy as np
+2026-03-05 16:23:40 | INFO |     |        ^^^^^^^^^^^
+2026-03-05 16:23:40 | INFO |   8 | from datetime import datetime, timedelta
+2026-03-05 16:23:40 | INFO |   9 | from pyspark.sql import SparkSession
+2026-03-05 16:23:40 | INFO |     |
+2026-03-05 16:23:40 | INFO |   info: Searched in the following paths during module resolution:
+2026-03-05 16:23:40 | INFO |   info:   1. /Users/slysik/databricks (first-party code)
+2026-03-05 16:23:40 | INFO |   info:   2. vendored://stdlib (stdlib typeshed stubs vendored by ty)
+2026-03-05 16:23:40 | INFO |   info:   3. /Users/slysik/.cache/uv/environments-v2/ty-validator-2d33dbb0cf2b266f/lib/python3.13/site-packages (site-packages)
+2026-03-05 16:23:40 | INFO |   info: make sure your Python environment is properly configured: https://docs.astral.sh/ty/modules/#python-environment
+2026-03-05 16:23:40 | INFO |   info: rule `unresolved-import` is enabled by default
+2026-03-05 16:23:40 | INFO |   
+2026-03-05 16:23:40 | INFO |   error[unresolved-import]: Cannot resolve imported module `pyspark.sql`
+2026-03-05 16:23:40 | INFO |     --> scripts/01_generate_retail_data.py:9:6
+2026-03-05 16:23:40 | INFO |      |
+2026-03-05 16:23:40 | INFO | RESULT: BLOCK (exit code 1)
+2026-03-05 16:24:21 | INFO | ==================================================
+2026-03-05 16:24:21 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:24:21 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:24:21 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-genie/SKILL.md
+2026-03-05 16:24:21 | INFO | Skipping non-Python file
+2026-03-05 16:24:26 | INFO | ==================================================
+2026-03-05 16:24:26 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:24:26 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:24:26 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:24:26 | INFO | Skipping non-Python file
+2026-03-05 16:24:57 | INFO | ==================================================
+2026-03-05 16:24:57 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:24:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:24:57 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-genie/SKILL.md
+2026-03-05 16:24:57 | INFO | Skipping non-Python file
+2026-03-05 16:25:05 | INFO | ==================================================
+2026-03-05 16:25:05 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:25:05 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:25:05 | INFO | file_path: /Users/slysik/databricks/.claude/skills/databricks-unity-catalog/SKILL.md
+2026-03-05 16:25:05 | INFO | Skipping non-Python file
+2026-03-05 16:36:13 | INFO | ==================================================
+2026-03-05 16:36:13 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:36:13 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:36:13 | INFO | file_path: /Users/slysik/databricks/scripts/02_zerobus_trickle_ingest.py
+2026-03-05 16:36:13 | INFO | Running: uvx ty check /Users/slysik/databricks/scripts/02_zerobus_trickle_ingest.py
+2026-03-05 16:36:13 | INFO |   error[unresolved-import]: Cannot resolve imported module `zerobus.sdk.sync`
+2026-03-05 16:36:13 | INFO |     --> scripts/02_zerobus_trickle_ingest.py:19:6
+2026-03-05 16:36:13 | INFO |      |
+2026-03-05 16:36:13 | INFO |   17 | import time
+2026-03-05 16:36:13 | INFO |   18 | from datetime import datetime
+2026-03-05 16:36:13 | INFO |   19 | from zerobus.sdk.sync import ZerobusSdk
+2026-03-05 16:36:13 | INFO |      |      ^^^^^^^^^^^^^^^^
+2026-03-05 16:36:13 | INFO |   20 | from zerobus.sdk.shared import RecordType, StreamConfigurationOptions, TableProperties
+2026-03-05 16:36:13 | INFO |      |
+2026-03-05 16:36:13 | INFO |   info: Searched in the following paths during module resolution:
+2026-03-05 16:36:13 | INFO |   info:   1. /Users/slysik/databricks (first-party code)
+2026-03-05 16:36:13 | INFO |   info:   2. vendored://stdlib (stdlib typeshed stubs vendored by ty)
+2026-03-05 16:36:13 | INFO |   info:   3. /Users/slysik/.cache/uv/environments-v2/ty-validator-2d33dbb0cf2b266f/lib/python3.13/site-packages (site-packages)
+2026-03-05 16:36:13 | INFO |   info: make sure your Python environment is properly configured: https://docs.astral.sh/ty/modules/#python-environment
+2026-03-05 16:36:13 | INFO |   info: rule `unresolved-import` is enabled by default
+2026-03-05 16:36:13 | INFO |   
+2026-03-05 16:36:13 | INFO |   error[unresolved-import]: Cannot resolve imported module `zerobus.sdk.shared`
+2026-03-05 16:36:13 | INFO |     --> scripts/02_zerobus_trickle_ingest.py:20:6
+2026-03-05 16:36:13 | INFO |      |
+2026-03-05 16:36:13 | INFO |   18 | from datetime import datetime
+2026-03-05 16:36:13 | INFO | RESULT: BLOCK (exit code 1)
+2026-03-05 16:39:49 | INFO | ==================================================
+2026-03-05 16:39:49 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:39:49 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:39:49 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data_v2.py
+2026-03-05 16:39:49 | INFO | Running: uvx ty check /Users/slysik/databricks/scripts/01_generate_retail_data_v2.py
+2026-03-05 16:39:49 | INFO |   error[unresolved-import]: Cannot resolve imported module `numpy`
+2026-03-05 16:39:49 | INFO |     --> scripts/01_generate_retail_data_v2.py:17:8
+2026-03-05 16:39:49 | INFO |      |
+2026-03-05 16:39:49 | INFO |   16 | import json
+2026-03-05 16:39:49 | INFO |   17 | import numpy as np
+2026-03-05 16:39:49 | INFO |      |        ^^^^^^^^^^^
+2026-03-05 16:39:49 | INFO |   18 | from datetime import datetime, timedelta
+2026-03-05 16:39:49 | INFO |   19 | from faker import Faker
+2026-03-05 16:39:49 | INFO |      |
+2026-03-05 16:39:49 | INFO |   info: Searched in the following paths during module resolution:
+2026-03-05 16:39:49 | INFO |   info:   1. /Users/slysik/databricks (first-party code)
+2026-03-05 16:39:49 | INFO |   info:   2. vendored://stdlib (stdlib typeshed stubs vendored by ty)
+2026-03-05 16:39:49 | INFO |   info:   3. /Users/slysik/.cache/uv/environments-v2/ty-validator-2d33dbb0cf2b266f/lib/python3.13/site-packages (site-packages)
+2026-03-05 16:39:49 | INFO |   info: make sure your Python environment is properly configured: https://docs.astral.sh/ty/modules/#python-environment
+2026-03-05 16:39:49 | INFO |   info: rule `unresolved-import` is enabled by default
+2026-03-05 16:39:49 | INFO |   
+2026-03-05 16:39:49 | INFO |   error[unresolved-import]: Cannot resolve imported module `faker`
+2026-03-05 16:39:49 | INFO |     --> scripts/01_generate_retail_data_v2.py:19:6
+2026-03-05 16:39:49 | INFO |      |
+2026-03-05 16:39:49 | INFO |   17 | import numpy as np
+2026-03-05 16:39:49 | INFO | RESULT: BLOCK (exit code 1)
+2026-03-05 16:39:57 | INFO | ==================================================
+2026-03-05 16:39:57 | INFO | TY VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-05 16:39:57 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'agent_id', 'agent_type', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-05 16:39:57 | INFO | file_path: /Users/slysik/databricks/scripts/01_generate_retail_data_v2.py
+2026-03-05 16:39:57 | INFO | Running: uvx ty check /Users/slysik/databricks/scripts/01_generate_retail_data_v2.py
+2026-03-05 16:39:57 | INFO |   error[unresolved-import]: Cannot resolve imported module `numpy`
+2026-03-05 16:39:57 | INFO |     --> scripts/01_generate_retail_data_v2.py:17:8
+2026-03-05 16:39:57 | INFO |      |
+2026-03-05 16:39:57 | INFO |   16 | import json
+2026-03-05 16:39:57 | INFO |   17 | import numpy as np  # noqa: F821
+2026-03-05 16:39:57 | INFO |      |        ^^^^^^^^^^^
+2026-03-05 16:39:57 | INFO |   18 | from datetime import datetime, timedelta
+2026-03-05 16:39:57 | INFO |   19 | from faker import Faker  # noqa: F821
+2026-03-05 16:39:57 | INFO |      |
+2026-03-05 16:39:57 | INFO |   info: Searched in the following paths during module resolution:
+2026-03-05 16:39:57 | INFO |   info:   1. /Users/slysik/databricks (first-party code)
+2026-03-05 16:39:57 | INFO |   info:   2. vendored://stdlib (stdlib typeshed stubs vendored by ty)
+2026-03-05 16:39:57 | INFO |   info:   3. /Users/slysik/.cache/uv/environments-v2/ty-validator-2d33dbb0cf2b266f/lib/python3.13/site-packages (site-packages)
+2026-03-05 16:39:57 | INFO |   info: make sure your Python environment is properly configured: https://docs.astral.sh/ty/modules/#python-environment
+2026-03-05 16:39:57 | INFO |   info: rule `unresolved-import` is enabled by default
+2026-03-05 16:39:57 | INFO |   
+2026-03-05 16:39:57 | INFO |   error[unresolved-import]: Cannot resolve imported module `faker`
+2026-03-05 16:39:57 | INFO |     --> scripts/01_generate_retail_data_v2.py:19:6
+2026-03-05 16:39:57 | INFO |      |
+2026-03-05 16:39:57 | INFO |   17 | import numpy as np  # noqa: F821
+2026-03-05 16:39:57 | INFO | RESULT: BLOCK (exit code 1)

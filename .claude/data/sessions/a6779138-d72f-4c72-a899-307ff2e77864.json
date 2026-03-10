@@ -1,0 +1,27 @@
+{
+  "session_id": "a6779138-d72f-4c72-a899-307ff2e77864",
+  "prompts": [
+    "use Claude Code Chrome extension to see error here: https://adb-7405613453749188.8.azuredatabricks.net/editor/notebooks/2111916848267535?o=7405613453749188#command/6848370601193506",
+    "yes",
+    "make sure the fix is kept in memory so we don't get that errors next time.",
+    "how can I run the dbx_ commands",
+    "how can I check data skew?",
+    "scale to 10000",
+    "did we use my database skills for this session?",
+    "always should use databricks skills to ensure best coding practices",
+    "what was the reasone the code generated for line 12 was incorrect?",
+    "I thought datasets created using pyspark needed all purpose compute cluster",
+    "why can't I select \" All-purpose cluster (classic)\" in my notebook?",
+    "I will make sure to start my \"Steve's Personal Compute Cluster\" before doing discovery and creating dataset's using pyspark",
+    "yes",
+    "I reran using \"Steve's Personal Compute Cluster\". interesting that I see 4 partitions using \"Steve's Personal Compute Cluster\" yet 8 partitons when running same notebook using serverless?",
+    "Last execution failed\n5\n5\n12\n  print(spark.conf.get(\"spark.default.parallelism\"))\n  print(spark.conf.get(\"spark.sql.shuffle.partitions\"))\n[SQL_CONF_NOT_FOUND] The SQL config \"spark.default.parallelism\" cannot be found. Please verify that the config exists. SQLSTATE: 42K0I",
+    "for personal compute : 4\n200",
+    "how do I check if AQE (spark.sql.adaptive.enabled = true)?",
+    "all set to true",
+    "so if I write to a bronze delta table should reduce to 4 parts?",
+    "create code in my notebook to write to bronxe delta table overwrite and optize write and us all best practices",
+    "stop . taking to long ? I did it myself"
+  ],
+  "agent_name": "Meridian"
+}

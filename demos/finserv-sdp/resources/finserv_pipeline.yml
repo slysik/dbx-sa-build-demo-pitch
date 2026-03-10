@@ -1,0 +1,54 @@
+resources:
+  pipelines:
+    finserv_medallion:
+      name: "FinServ Medallion Pipeline — ${bundle.target}"
+      description: >
+        Bronze → Silver → Gold for FinServ Bank Corp.
+        Covers regulatory transactions, customer SCD-2, PCI-DSS masking,
+        and Basel IV reporting aggregations.
+
+      # ── Serverless compute (default — no cluster config needed) ────────────
+      serverless: true
+
+      # ── Unity Catalog target ───────────────────────────────────────────────
+      catalog: ${var.catalog}
+      schema:  ${var.bronze_schema}          # pipeline default schema = bronze
+
+      # ── Source files glob ─────────────────────────────────────────────────
+      libraries:
+        - file:
+            path: src/transformations/bronze/bronze_transactions.sql
+        - file:
+            path: src/transformations/bronze/bronze_customers.sql
+        - file:
+            path: src/transformations/bronze/bronze_market_data.sql
+        - file:
+            path: src/transformations/silver/silver_transactions.sql
+        - file:
+            path: src/transformations/silver/silver_customers.sql
+        - file:
+            path: src/transformations/gold/gold_dim_customer.sql
+        - file:
+            path: src/transformations/gold/gold_fact_transactions.sql
+        - file:
+            path: src/transformations/gold/gold_mv_regulatory.sql
+
+      # ── Pipeline-level configuration parameters ───────────────────────────
+      configuration:
+        silver_schema:            ${var.silver_schema}
+        gold_schema:              ${var.gold_schema}
+        bronze_schema:            ${var.bronze_schema}
+        # ADLS landing zones
+        transactions_landing:     abfss://raw@finservadls.dfs.core.windows.net/transactions/
+        customers_landing:        abfss://raw@finservadls.dfs.core.windows.net/customers/
+        # Event Hub for market data streaming
+        eventhub_conn_str:        "{{secrets/finserv/eventhub-conn-string}}"
+        eventhub_consumer_group:  finserv-sdp
+
+      # ── Notifications ─────────────────────────────────────────────────────
+      notifications:
+        - email_recipients:
+            - slysik@gmail.com
+          alerts:
+            - on-update-failure
+            - on-flow-failure

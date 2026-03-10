@@ -1,0 +1,11 @@
+{
+  "session_id": "25dcc863-e036-4bbc-82ae-1fc15df11183",
+  "prompts": [
+    "how do I create a databricks cluster as  PySpark data gen requires a cluster. use Chrome Ext",
+    "I adjusted termination timeout to 5 mins",
+    "I unchecked ML : which  Enables Databricks Runtime for Machine Learning with preinstalled libraries like PyTorch, TensorFlow, XGBoost, and MLflow.\n\nhow can Photon can optionally be enabled for this runtime. Photon boosts Spark workloads. Not all ML workloads will see an improvement. ",
+    "check the Advanced performance section",
+    "I created. "
+  ],
+  "agent_name": "Lumina"
+}

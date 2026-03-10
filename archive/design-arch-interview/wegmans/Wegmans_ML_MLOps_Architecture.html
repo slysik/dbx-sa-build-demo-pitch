@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML/MLOps Architecture — Interview Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1419; color: #e0e0e0; padding: 24px; }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  .back-link { display: inline-block; margin-bottom: 16px; font-size: 13px; color: #E8763A; text-decoration: none; padding: 6px 14px; border: 1px solid #E8763A; border-radius: 6px; transition: all 0.2s; }
+  .back-link:hover { background: #E8763A; color: #fff; }
+
+  .header { margin-bottom: 36px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; margin-bottom: 12px; }
+  .tag-technical { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .tag-ml { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .tag-retail { background: rgba(232,118,58,0.15); color: #fb923c; }
+  h1 { color: #fff; font-size: 21px; line-height: 1.4; margin-bottom: 8px; }
+  .meta { color: #6b7b8d; font-size: 13px; }
+
+  /* Pocket Answer */
+  .pocket { background: linear-gradient(135deg, #1a2a3a 0%, #1e3348 100%); border: 1px solid #2a4a6a; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+  .pocket::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: rgba(232,118,58,0.04); border-radius: 50%; transform: translate(60px, -60px); }
+  .pocket-label { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; background: rgba(232,118,58,0.9); color: #fff; margin-bottom: 14px; }
+  .pocket-timer { display: inline-block; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.08); color: #8899aa; margin-left: 8px; }
+  .pocket-script { font-size: 15px; line-height: 1.9; color: #c8d8e8; font-style: italic; }
+  .pocket-script .pk { color: #fbbf24; font-style: normal; font-weight: 700; }
+  .pocket-script .pk-green { color: #4ade80; font-style: normal; font-weight: 600; }
+  .pocket-script .pk-blue { color: #60a5fa; font-style: normal; font-weight: 600; }
+  .pocket-script .pk-purple { color: #c084fc; font-style: normal; font-weight: 600; }
+  .pocket-note { margin-top: 16px; font-size: 12px; color: #556677; border-top: 1px solid #2a3a4a; padding-top: 12px; }
+
+  /* Why Card */
+  .why-card { background: linear-gradient(135deg, #1a1f2e 0%, #1e2a3a 100%); border: 1px solid #2a3a4a; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .why-card h2 { color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .why-card p { color: #a0b0c0; font-size: 14px; line-height: 1.7; }
+  .signals { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .signal { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #3a4a5a; color: #8899aa; }
+
+  .section-header { color: #E8763A; font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid rgba(232,118,58,0.3); }
+
+  /* Architecture Diagram */
+  .diagram { background: #141820; border: 1px solid #2a3040; border-radius: 12px; padding: 28px; margin-bottom: 32px; }
+  .diagram-title { color: #fff; font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 20px; }
+  .diagram-subtitle { color: #6b7b8d; font-size: 12px; text-align: center; margin-bottom: 24px; }
+
+  .arch-row { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center; }
+  .arch-box { padding: 10px 16px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: 600; border: 1px solid; min-width: 130px; }
+  .arch-box small { display: block; font-weight: 400; font-size: 10px; margin-top: 3px; opacity: 0.8; }
+  .box-gold { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: #fbbf24; }
+  .box-feature { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3); color: #c084fc; }
+  .box-train { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #60a5fa; }
+  .box-registry { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #4ade80; }
+  .box-serve { background: rgba(232,118,58,0.1); border-color: rgba(232,118,58,0.3); color: #fb923c; }
+  .box-monitor { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.3); color: #f87171; }
+  .box-govern { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.25); color: #86efac; }
+
+  .arrow-center { text-align: center; color: #3a4a5a; font-size: 14px; padding: 6px 0; }
+
+  .gov-bar { background: linear-gradient(90deg, rgba(34,197,94,0.08), rgba(59,130,246,0.08)); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px 20px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+  .gov-bar-item { font-size: 11px; color: #86efac; font-weight: 600; }
+
+  /* Script blocks */
+  .script { background: #141820; border-radius: 8px; padding: 16px 18px; margin: 12px 0; border-left: 3px solid #3b82f6; font-size: 14px; line-height: 1.8; color: #c8d8e8; }
+  .script .hl { color: #fbbf24; font-weight: 600; }
+  .script .hl-green { color: #4ade80; font-weight: 600; }
+  .script .hl-orange { color: #fb923c; font-weight: 600; }
+  .script .hl-blue { color: #60a5fa; font-weight: 600; }
+  .script .hl-purple { color: #c084fc; font-weight: 600; }
+  .script .hl-red { color: #f87171; font-weight: 600; }
+
+  .part { display: inline-block; background: #E8763A; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 4px; margin: 20px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Use case cards */
+  .usecase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0 32px; }
+  .usecase { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; padding: 18px; }
+  .usecase-icon { font-size: 28px; margin-bottom: 10px; }
+  .usecase-title { color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .usecase-desc { color: #8899aa; font-size: 12px; line-height: 1.5; }
+  .usecase-data { margin-top: 8px; font-size: 11px; color: #556; }
+  .usecase-data span { color: #60a5fa; }
+
+  /* Bridge */
+  .bridge { background: linear-gradient(135deg, #1a2332 0%, #1a1f2e 100%); border: 1px solid #2a3a4a; border-radius: 10px; padding: 18px 20px; margin-top: 14px; }
+  .bridge-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #E8763A; margin-bottom: 8px; }
+  .bridge p { font-size: 13px; color: #8899aa; line-height: 1.6; }
+  .bridge .exp { color: #60a5fa; font-weight: 600; }
+
+  /* MLOps Pipeline Visual */
+  .pipeline { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: center; margin: 20px 0; padding: 16px; background: #141820; border-radius: 8px; }
+  .pipe-step { padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: center; }
+  .pipe-arrow { color: #3a4a5a; font-size: 14px; }
+
+  /* Follow-up cards */
+  .fq-card { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; margin-bottom: 16px; overflow: hidden; cursor: pointer; }
+  .fq-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .fq-header:hover { background: #1e2536; }
+  .fq-q { font-size: 14px; color: #e0e0e0; font-weight: 600; flex: 1; }
+  .fq-chevron { color: #6b7b8d; font-size: 18px; transition: transform 0.2s; flex-shrink: 0; margin-left: 12px; }
+  .fq-card.open .fq-chevron { transform: rotate(180deg); }
+  .fq-body { display: none; padding: 0 20px 20px; }
+  .fq-card.open .fq-body { display: block; }
+
+  /* Coaching */
+  .coaching { background: linear-gradient(135deg, #2a1a1a 0%, #1a1f2e 100%); border: 1px solid #E8763A; border-radius: 10px; padding: 20px 24px; margin-bottom: 32px; }
+  .coaching h3 { color: #E8763A; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .coaching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .do-col h4 { color: #4ade80; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .dont-col h4 { color: #f87171; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .coaching-item { font-size: 13px; color: #a0b0c0; margin-bottom: 8px; padding-left: 16px; position: relative; line-height: 1.5; }
+  .coaching-item::before { content: ''; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; }
+  .do-col .coaching-item::before { background: #4ade80; }
+  .dont-col .coaching-item::before { background: #f87171; }
+
+  .closing { background: linear-gradient(135deg, #1a2520 0%, #1a1f2e 100%); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .closing h2 { color: #4ade80; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+  @media (max-width: 700px) {
+    .coaching-grid { grid-template-columns: 1fr; }
+    .arch-row { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back-link" href="file:///Users/slysik/databricks/Wegmans_Interview_Study_Guide.html">← Back to Study Guide</a>
+
+  <div class="header">
+    <span class="tag tag-technical">Technical</span>
+    <span class="tag tag-ml">ML / MLOps</span>
+    <span class="tag tag-retail">Retail AI</span>
+    <h1>"Wegmans wants to use AI/ML — demand forecasting, supply chain optimization, personalized promotions. How would you architect Databricks to support ML workloads alongside analytics? And how do you think about MLOps governance?"</h1>
+    <div class="meta">Wegmans Solutions Architect Prep &nbsp;·&nbsp; Steve Lysik &nbsp;·&nbsp; ~4 min answer</div>
+  </div>
+
+  <!-- POCKET ANSWER -->
+  <div class="pocket">
+    <span class="pocket-label">Pocket Answer</span>
+    <span class="pocket-timer">30–45 sec</span>
+    <div class="pocket-script">
+      "The key insight is that ML doesn't need a separate platform — it's a <span class="pk">consumer of the same lakehouse</span> we already built for analytics. Gold-layer tables become <span class="pk-purple">Feature Store tables</span> in Unity Catalog — daily sales by SKU by store, inventory velocity, promotional lift. Data scientists train models using those governed feature tables in Databricks notebooks, track experiments in <span class="pk-blue">MLflow</span>, and register production-ready models in the <span class="pk-green">Unity Catalog Model Registry</span>. That gives us full lineage — which data trained which model, which model serves which predictions. For serving, <span class="pk">Model Serving endpoints</span> handle real-time inference — a demand forecast API that store replenishment systems call directly. MLOps governance mirrors data governance: models have the same classification tiers, A/B testing via champion-challenger in the registry, and automated monitoring for <span class="pk-green">drift detection</span>. I built similar patterns at Microsoft for Fortune 500 accounts, and my <span class="pk-blue">Agentic AI certification</span> covers exactly this lifecycle."
+    </div>
+    <div class="pocket-note">This is the quick version. Scroll down for the full 4-minute scripted answer with architecture diagram, retail use cases, and follow-up Q&A.</div>
+  </div>
+
+  <!-- Why They're Asking -->
+  <div class="why-card">
+    <h2>Why They're Asking This</h2>
+    <p>Wegmans' JD calls out AI/ML, MCP Servers, and MLOps. They're not just running dashboards — they want predictive capabilities. This question tests whether you can design an ML platform that's integrated with the existing lakehouse (not a silo), whether you understand the full ML lifecycle beyond just training models, and whether you can connect ML to retail-specific use cases that drive actual business value. They especially want to know that models will be governed with the same rigor as data.</p>
+    <div class="signals">
+      <span class="signal">Feature engineering</span>
+      <span class="signal">MLflow</span>
+      <span class="signal">Model registry</span>
+      <span class="signal">Model serving</span>
+      <span class="signal">Drift monitoring</span>
+      <span class="signal">Retail ML use cases</span>
+      <span class="signal">MLOps lifecycle</span>
+    </div>
+  </div>
+
+  <!-- Retail ML Use Cases -->
+  <div class="section-header">Wegmans ML Use Cases — Lead With These</div>
+  <div class="usecase-grid">
+    <div class="usecase">
+      <div class="usecase-icon">📈</div>
+      <div class="usecase-title">Demand Forecasting</div>
+      <div class="usecase-desc">Predict daily demand by SKU by store. Reduce overstock waste (perishables ~12% loss) and prevent stock-outs.</div>
+      <div class="usecase-data">Features: <span>historical sales, weather, promotions, holidays, local events</span></div>
+    </div>
+    <div class="usecase">
+      <div class="usecase-icon">🚛</div>
+      <div class="usecase-title">Supply Chain Optimization</div>
+      <div class="usecase-desc">Optimize distribution center → store routing. Predict supplier lead times. Score supplier reliability.</div>
+      <div class="usecase-data">Features: <span>delivery history, SAP MM data, traffic patterns, order volumes</span></div>
+    </div>
+    <div class="usecase">
+      <div class="usecase-icon">🎯</div>
+      <div class="usecase-title">Personalized Promotions</div>
+      <div class="usecase-desc">Target loyalty members with relevant offers based on purchase patterns. Measure promotional lift.</div>
+      <div class="usecase-data">Features: <span>loyalty purchase history, category affinity, price sensitivity, redemption rates</span></div>
+    </div>
+    <div class="usecase">
+      <div class="usecase-icon">🥬</div>
+      <div class="usecase-title">Perishable Waste Reduction</div>
+      <div class="usecase-desc">Predict shelf life by product and recommend dynamic markdowns before spoilage. ~$15B industry problem.</div>
+      <div class="usecase-data">Features: <span>sell-by dates, velocity, temperature logs, seasonal patterns</span></div>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <div class="section-header">ML Platform Architecture</div>
+  <div class="diagram">
+    <div class="diagram-title">One Platform: Analytics + ML on the Same Lakehouse</div>
+    <div class="diagram-subtitle">Not a separate ML stack — an extension of the medallion architecture</div>
+
+    <div class="arch-row">
+      <div class="arch-box box-gold">Gold Tables<small>Daily sales, inventory, loyalty</small></div>
+      <div class="arch-box box-gold">SAP Aggregations<small>MM, SD, FI summaries</small></div>
+      <div class="arch-box box-gold">Streaming Metrics<small>Real-time POS, smart carts</small></div>
+    </div>
+    <div class="arrow-center">▼ Same governed data, two consumption paths ▼</div>
+    <div class="arch-row">
+      <div class="arch-box box-feature">Feature Store<small>Unity Catalog tables<br>Point-in-time lookups</small></div>
+      <div class="arch-box box-train">Experiment Tracking<small>MLflow<br>Hyperparameters, metrics</small></div>
+    </div>
+    <div class="arrow-center">▼ Train → Validate → Register ▼</div>
+    <div class="arch-row">
+      <div class="arch-box box-registry">Model Registry<small>Unity Catalog<br>Champion / Challenger</small></div>
+    </div>
+    <div class="arrow-center">▼ Promote to production ▼</div>
+    <div class="arch-row">
+      <div class="arch-box box-serve">Model Serving<small>Real-time endpoints<br>REST API for forecasts</small></div>
+      <div class="arch-box box-serve">Batch Inference<small>Scheduled jobs<br>Nightly predictions to Gold</small></div>
+    </div>
+    <div class="arrow-center">▼ Continuous monitoring ▼</div>
+    <div class="arch-row">
+      <div class="arch-box box-monitor">Drift Detection<small>Lakehouse Monitoring<br>Data + prediction drift</small></div>
+      <div class="arch-box box-monitor">A/B Comparison<small>Champion vs Challenger<br>Automated rollback</small></div>
+    </div>
+
+    <div class="gov-bar">
+      <div class="gov-bar-item">🛡️ Unity Catalog — model lineage + access control</div>
+      <div class="gov-bar-item">📊 Full lineage: data → features → model → predictions</div>
+      <div class="gov-bar-item">🔐 Same governance tiers as data</div>
+    </div>
+  </div>
+
+  <!-- MLOps Pipeline -->
+  <div class="section-header">MLOps Lifecycle — Visual</div>
+  <div class="pipeline">
+    <div class="pipe-step box-gold">Feature<br>Engineering</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step box-train">Train +<br>Experiment</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step box-registry">Register +<br>Review</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step box-serve">Deploy +<br>Serve</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step box-monitor">Monitor +<br>Retrain</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); color: #c084fc;">Feedback<br>Loop</div>
+  </div>
+
+  <!-- Scripted Answer -->
+  <div class="section-header">Scripted Answer — Four Parts</div>
+
+  <span class="part">Part 1 — One Platform, Not Two (30s)</span>
+  <div class="script">
+    "The most important architectural decision is: <span class="hl">ML is not a separate platform</span>. It's a consumer of the same lakehouse that serves analytics. The Gold-layer tables we built for BI — daily sales, inventory positions, loyalty segments — those <span class="hl-green">become the Feature Store</span>. A data scientist building a demand forecast model uses the same governed dataset that a merchandising analyst uses in Power BI.<br><br>
+
+    This eliminates the biggest anti-pattern I've seen in enterprise ML: <span class="hl-red">data scientists copying data into their own environment</span>, creating ungoverned shadow copies, and training models on stale or inconsistent data. <span class="hl-blue">One source of truth, two consumption patterns.</span>"
+  </div>
+
+  <span class="part">Part 2 — Feature Engineering + Training (90s)</span>
+  <div class="script">
+    "For Wegmans specifically, let me walk through a <span class="hl-orange">demand forecasting</span> use case.<br><br>
+
+    <span class="hl-purple">Feature engineering</span> happens in the lakehouse. I'd create Feature Store tables in Unity Catalog — <code>wegmans_ml.features.daily_sku_store_sales</code> — that combine SAP sales data with weather data, promotional calendars, local events, and holiday schedules. These are managed as <span class="hl-green">point-in-time correct</span> features, which is critical — you can't leak future data into a forecast model. Databricks Feature Store handles this natively with time-series–aware lookups.<br><br>
+
+    Training uses <span class="hl-blue">MLflow on Databricks</span>. Data scientists run experiments in notebooks, MLflow automatically logs hyperparameters, metrics, and the exact dataset version. Every experiment is reproducible — you can answer 'which data trained this model?' years later because <span class="hl">Unity Catalog tracks the full lineage</span>: data → features → experiment → model.<br><br>
+
+    For the compute side, training jobs use <span class="hl">dedicated ML clusters</span> with GPU support, separate from the SQL Warehouses serving analytics. This is important — a long-running training job shouldn't impact dashboard refresh times. Auto-scaling clusters spin down when not training."
+  </div>
+
+  <div class="bridge">
+    <div class="bridge-label">Your Experience Bridge</div>
+    <p>"At <span class="exp">Microsoft, I designed ML-ready data platforms for ExxonMobil and FedEx</span> — feature engineering on top of the same medallion architecture. The pattern is identical: Gold tables serve both BI and ML. And my <span class="exp">Agentic AI certification</span> covers exactly this model lifecycle, including the governance layer that connects to MCP Servers."</p>
+  </div>
+
+  <span class="part">Part 3 — Model Registry + Serving (60s)</span>
+  <div class="script">
+    "Once a model performs well in experiments, it gets registered in the <span class="hl-green">Unity Catalog Model Registry</span>. This is the central point of control.<br><br>
+
+    Models go through stages: <span class="hl">None → Staging → Champion</span>. A new demand forecast model starts as a Challenger — it runs in parallel against the current Champion model, and we compare predictions against actuals. Only when the Challenger consistently outperforms does it get promoted. This is <span class="hl-blue">automated A/B testing for models</span>.<br><br>
+
+    For serving, Databricks has two paths. <span class="hl-orange">Batch inference</span> — a nightly job scores the demand forecast for every SKU at every store for the next 7 days, writes predictions back to a Gold table that store replenishment systems consume. <span class="hl-purple">Real-time serving</span> — Model Serving endpoints expose a REST API. A smart cart app or a promotional engine can call the endpoint with a customer's loyalty segment and get personalized recommendations in milliseconds.<br><br>
+
+    Both paths are governed — the model's service principal has specific Unity Catalog grants, every inference is logged."
+  </div>
+
+  <span class="part">Part 4 — MLOps Governance: Why It Matters for Retail (60s)</span>
+  <div class="script">
+    "MLOps governance is the part most organizations skip, and it's the part that breaks things in production. Three pillars.<br><br>
+
+    <span class="hl-green">Lineage and reproducibility</span> — Unity Catalog tracks which data version trained which model. If a demand forecast starts performing poorly, I can trace back to the exact feature set, training data, and hyperparameters. Was there a data quality issue in the SAP feed? Did a feature definition change? Lineage answers that in minutes instead of days.<br><br>
+
+    <span class="hl-blue">Drift monitoring</span> — Lakehouse Monitoring watches for both <span class="hl">data drift</span> (input distributions shifting — say, a new product category launches) and <span class="hl">prediction drift</span> (model accuracy degrading over time). When drift exceeds a threshold, it triggers an automated retraining pipeline. Grocery retail is seasonal and volatile — a model trained on summer data won't predict holiday demand accurately. Continuous monitoring catches this before it impacts replenishment decisions.<br><br>
+
+    <span class="hl-purple">Access control on models</span> — models get the same governance tiers as data. A demand forecast model that uses only Internal-tier aggregated data can be deployed broadly. A personalization model that uses Confidential-tier loyalty data has restricted deployment and stricter audit requirements. <span class="hl-green">The governance framework I described for data extends naturally to models.</span>"
+  </div>
+
+  <div class="bridge">
+    <div class="bridge-label">Your Experience Bridge</div>
+    <p>"At <span class="exp">Hopewell, I'm building NL2SQL prototypes with vector indexes</span> — which is the AI consumption layer. The pattern is the same: governed data, governed models, governed access. MCP Servers in Wegmans' JD are the interface between AI agents and the governed platform. <span class="exp">The ML platform and the AI agent platform converge on Unity Catalog as the single governance layer.</span>"</p>
+  </div>
+
+  <!-- Coaching -->
+  <div class="coaching">
+    <h3>Coaching Notes</h3>
+    <div class="coaching-grid">
+      <div class="do-col">
+        <h4>Do This</h4>
+        <div class="coaching-item">Lead with "one platform, not two" — shows you won't create a siloed ML environment</div>
+        <div class="coaching-item">Ground every concept in a Wegmans use case (demand forecast, waste reduction) — not abstract ML theory</div>
+        <div class="coaching-item">Emphasize lineage as the thread connecting data → features → model → predictions</div>
+        <div class="coaching-item">Connect to the governance deep dive: "models get the same classification tiers as data"</div>
+        <div class="coaching-item">Mention your Agentic AI cert and Hopewell work — shows this isn't theoretical for you</div>
+        <div class="coaching-item">Talk about drift monitoring proactively — it's what separates a demo from production ML</div>
+      </div>
+      <div class="dont-col">
+        <h4>Avoid This</h4>
+        <div class="coaching-item">Don't go deep on algorithms (XGBoost vs LSTM for demand forecasting) — they're hiring an architect, not a data scientist</div>
+        <div class="coaching-item">Don't skip MLOps for the "cool" ML parts — the question explicitly asks about governance</div>
+        <div class="coaching-item">Don't propose a separate ML platform (SageMaker, Vertex) — Databricks is their choice, extend it</div>
+        <div class="coaching-item">Don't forget to connect back to existing architecture — Feature Store is Gold tables, governance is Unity Catalog</div>
+        <div class="coaching-item">Don't say "AI will solve everything" — be specific about which problems ML actually helps with in grocery</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Follow-up Questions -->
+  <div class="section-header">Likely Follow-Ups</div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"How do you handle the cold start problem? We don't have historical ML features yet."</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "You actually have <span class="hl-green">more features than you think</span> — they're just in your analytics tables, not labeled as features yet. Daily sales by SKU by store? That's your primary demand signal. SAP inventory levels? That's your stock feature. Weather data you're already ingesting for operations? That's your external signal.<br><br>
+
+        The cold start isn't about <em>collecting</em> data — it's about <span class="hl">restructuring existing Gold tables as point-in-time correct features</span>. I'd start with the demand forecasting use case because you have the most historical data there (years of POS transactions), and it has the clearest ROI — reducing perishable waste directly impacts margins.<br><br>
+
+        You can have a production demand forecast model within <span class="hl-blue">8-12 weeks</span> of starting, because the data is already there. The Feature Store just formalizes the pipeline."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"How does this relate to the MCP Servers mentioned in the job description?"</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "MCP Servers are the <span class="hl-blue">interface layer between AI agents and the governed platform</span>. Think of it this way: a Databricks SQL-managed MCP Server exposes your Gold catalog and model predictions to AI agents — a conversational agent that a store manager asks 'what should I reorder this week?' queries both the demand forecast predictions and the current inventory table, <span class="hl">all governed through Unity Catalog</span>.<br><br>
+
+        The ML platform produces the predictions. MCP Servers make those predictions <span class="hl-green">consumable by AI agents</span>. Unity Catalog governs both. It's three layers working together: data platform → ML platform → AI agent layer, all on the same Databricks infrastructure."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"How do you ensure the personalization models don't create privacy issues with loyalty data?"</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "This connects directly to the <span class="hl">data governance framework</span>. Personalization models train on Confidential-tier loyalty data, so they get Confidential-tier governance.<br><br>
+
+        Practically: the Feature Store tables for loyalty features use <span class="hl-purple">hashed customer IDs</span> — the model never sees names or emails, just pseudonymous behavioral signals. Column masking ensures that even the data scientists building the model can't join back to PII. The model outputs (recommended products, promotional offers) are predictions, not personal data, so they can flow to the promotional engine at Internal tier.<br><br>
+
+        For compliance: Unity Catalog audit logs track every access to loyalty feature tables. If a customer exercises data rights, you can trace exactly which models used their data through lineage. <span class="hl-green">Privacy by design, not privacy as an afterthought.</span>"
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <span class="fq-q">"What's your approach to compute cost management for ML workloads?"</span>
+      <span class="fq-chevron">▼</span>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "ML compute is the most expensive part if not managed carefully. Three strategies.<br><br>
+
+        <span class="hl-blue">Separate compute pools</span> — ML training clusters are isolated from SQL Warehouses. Training jobs use auto-terminating clusters that spin down after idle periods. No GPU clusters running 24/7 waiting for the next experiment.<br><br>
+
+        <span class="hl-orange">Batch over real-time</span> — most retail ML use cases are batch. Demand forecasts run nightly, not per-request. Personalization scores refresh daily. Real-time serving is reserved for the few use cases that genuinely need millisecond latency (smart cart recommendations). This saves significant compute cost.<br><br>
+
+        <span class="hl-green">Feature Store as cost saver</span> — computed features are stored, not recomputed. If five different models use 'trailing 30-day sales by SKU,' it's computed once and shared. Without a Feature Store, every data scientist computes it independently, wasting cluster hours."
+      </div>
+    </div>
+  </div>
+
+  <!-- Closing -->
+  <div class="closing">
+    <h2>Strong Closing Line</h2>
+    <div class="script" style="border-left-color: #22c55e; margin-bottom: 0;">
+      "The architecture I've described isn't just a tech stack — it's a <span class="hl-green">flywheel</span>. Better data in the lakehouse feeds better features, better features train better models, better models produce better predictions, better predictions drive better business decisions, and better decisions generate better data. For Wegmans, that flywheel turns waste reduction, demand accuracy, and personalized customer experiences into <span class="hl-green">compounding competitive advantages</span>. And it all runs on the same governed Databricks platform."
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "session_id": "37e9e787-351f-4e68-bfbc-b88347add53c",
+  "prompts": [
+    "/discovery create a 10 row retail dataset",
+    "/plan specs/discovery-brief.md",
+    "ready",
+    "yes",
+    "how many partitions?",
+    "scale to 1000 and where is notebook. always provide worskpace link",
+    "comment df_sclaed to show how sclaed to 1000",
+    "use chrome ext to see error when print line 12",
+    "can you take a look",
+    "why can't you use chrome extension?",
+    "I want to use the chrome extension",
+    "I want to use the chrome extension",
+    "I want to use the chrome extension",
+    "I want to use the chrome extension",
+    "Claude Code Chrome extension to see error here: https://adb-7405613453749188.8.azuredatabricks.net/editor/notebooks/2111916848267535?o=7405613453749188#command/6848370601193506"
+  ],
+  "agent_name": "Prism"
+}

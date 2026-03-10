@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technical Communication — Interview Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1419; color: #e0e0e0; padding: 24px; }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  .back-link { display: inline-block; margin-bottom: 16px; font-size: 13px; color: #E8763A; text-decoration: none; padding: 6px 14px; border: 1px solid #E8763A; border-radius: 6px; transition: all 0.2s; }
+  .back-link:hover { background: #E8763A; color: #fff; }
+
+  .header { margin-bottom: 36px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; margin-bottom: 12px; }
+  .tag-behavioral { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .tag-comm { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .tag-retail { background: rgba(232,118,58,0.15); color: #fb923c; }
+  h1 { color: #fff; font-size: 21px; line-height: 1.4; margin-bottom: 8px; }
+  .meta { color: #6b7b8d; font-size: 13px; }
+
+  /* Pocket Answer */
+  .pocket { background: linear-gradient(135deg, #1a2a3a 0%, #1e3348 100%); border: 1px solid #2a4a6a; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+  .pocket::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: rgba(232,118,58,0.04); border-radius: 50%; transform: translate(60px, -60px); }
+  .pocket-label { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; background: rgba(232,118,58,0.9); color: #fff; margin-bottom: 14px; }
+  .pocket-timer { display: inline-block; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.08); color: #8899aa; margin-left: 8px; }
+  .pocket-script { font-size: 15px; line-height: 1.9; color: #c8d8e8; font-style: italic; }
+  .pocket-script .pk { color: #fbbf24; font-style: normal; font-weight: 700; }
+  .pocket-script .pk-green { color: #4ade80; font-style: normal; font-weight: 600; }
+  .pocket-script .pk-blue { color: #60a5fa; font-style: normal; font-weight: 600; }
+  .pocket-script .pk-purple { color: #c084fc; font-style: normal; font-weight: 600; }
+  .pocket-note { margin-top: 16px; font-size: 12px; color: #556677; border-top: 1px solid #2a3a4a; padding-top: 12px; }
+
+  /* Why Card */
+  .why-card { background: linear-gradient(135deg, #1a1f2e 0%, #1e2a3a 100%); border: 1px solid #2a3a4a; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .why-card h2 { color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .why-card p { color: #a0b0c0; font-size: 14px; line-height: 1.7; }
+  .signals { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .signal { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #3a4a5a; color: #8899aa; }
+
+  .section-header { color: #E8763A; font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid rgba(232,118,58,0.3); }
+
+  /* Analogy Diagram */
+  .diagram { background: #141820; border: 1px solid #2a3040; border-radius: 12px; padding: 28px; margin-bottom: 32px; }
+  .diagram-title { color: #fff; font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+  .diagram-subtitle { color: #6b7b8d; font-size: 12px; text-align: center; margin-bottom: 24px; }
+
+  .analogy-table { width: 100%; border-collapse: collapse; }
+  .analogy-table th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #2a3a4a; }
+  .analogy-table th.tech-col { color: #60a5fa; }
+  .analogy-table th.arrow-col { color: #3a4a5a; width: 40px; text-align: center; }
+  .analogy-table th.grocery-col { color: #4ade80; }
+  .analogy-table th.who-col { color: #fbbf24; }
+  .analogy-table td { padding: 12px 14px; border-bottom: 1px solid #1e2836; font-size: 13px; vertical-align: top; line-height: 1.5; }
+  .analogy-table td.tech-cell { color: #60a5fa; font-weight: 600; }
+  .analogy-table td.arrow-cell { color: #3a4a5a; text-align: center; font-size: 16px; }
+  .analogy-table td.grocery-cell { color: #4ade80; }
+  .analogy-table td.who-cell { color: #fbbf24; font-size: 12px; }
+  .analogy-table tr:hover { background: rgba(255,255,255,0.02); }
+
+  /* Medallion Visual */
+  .medallion-visual { display: flex; gap: 0; margin: 24px 0; flex-wrap: wrap; justify-content: center; }
+  .medal-layer { flex: 1; min-width: 180px; padding: 18px; text-align: center; position: relative; }
+  .medal-layer .layer-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+  .medal-layer .layer-tech { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+  .medal-layer .layer-analogy { font-size: 13px; line-height: 1.5; }
+  .medal-layer .layer-quote { font-style: italic; font-size: 12px; margin-top: 8px; opacity: 0.8; }
+  .bronze { background: rgba(205,127,50,0.1); border: 1px solid rgba(205,127,50,0.3); border-radius: 10px 0 0 10px; }
+  .bronze .layer-label { color: #cd7f32; }
+  .bronze .layer-tech { color: #cd7f32; }
+  .bronze .layer-analogy { color: #c0a080; }
+  .bronze .layer-quote { color: #a08060; }
+  .medal-arrow { display: flex; align-items: center; color: #3a4a5a; font-size: 20px; padding: 0 4px; }
+  .silver { background: rgba(192,192,192,0.08); border: 1px solid rgba(192,192,192,0.25); }
+  .silver .layer-label { color: #c0c0c0; }
+  .silver .layer-tech { color: #c0c0c0; }
+  .silver .layer-analogy { color: #a0a8b0; }
+  .silver .layer-quote { color: #888; }
+  .gold { background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.25); border-radius: 0 10px 10px 0; }
+  .gold .layer-label { color: #fbbf24; }
+  .gold .layer-tech { color: #fbbf24; }
+  .gold .layer-analogy { color: #c8b870; }
+  .gold .layer-quote { color: #a09840; }
+
+  /* Principles */
+  .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 20px 0 32px; }
+  .principle { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; padding: 18px; }
+  .principle-num { display: inline-block; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+  .p1 .principle-num { background: rgba(232,118,58,0.15); color: #E8763A; }
+  .p2 .principle-num { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .p3 .principle-num { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .p4 .principle-num { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .principle-title { color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .principle-desc { color: #8899aa; font-size: 12px; line-height: 1.5; }
+
+  /* Script blocks */
+  .script { background: #141820; border-radius: 8px; padding: 16px 18px; margin: 12px 0; border-left: 3px solid #3b82f6; font-size: 14px; line-height: 1.8; color: #c8d8e8; }
+  .script .hl { color: #fbbf24; font-weight: 600; }
+  .script .hl-green { color: #4ade80; font-weight: 600; }
+  .script .hl-orange { color: #fb923c; font-weight: 600; }
+  .script .hl-blue { color: #60a5fa; font-weight: 600; }
+  .script .hl-purple { color: #c084fc; font-weight: 600; }
+  .script .hl-red { color: #f87171; font-weight: 600; }
+
+  .part { display: inline-block; background: #E8763A; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 4px; margin: 20px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Scenario cards */
+  .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0 32px; }
+  .scenario { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; padding: 20px; }
+  .scenario-audience { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .aud-merch { color: #fb923c; }
+  .aud-supply { color: #60a5fa; }
+  .scenario-title { color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+  .scenario-wrong { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; }
+  .scenario-wrong-label { color: #f87171; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .scenario-wrong p { font-size: 12px; color: #8899aa; line-height: 1.5; font-style: italic; }
+  .scenario-right { background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); border-radius: 6px; padding: 10px 14px; }
+  .scenario-right-label { color: #4ade80; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .scenario-right p { font-size: 12px; color: #b8c8d8; line-height: 1.5; font-style: italic; }
+
+  /* Bridge */
+  .bridge { background: linear-gradient(135deg, #1a2332 0%, #1a1f2e 100%); border: 1px solid #2a3a4a; border-radius: 10px; padding: 18px 20px; margin-top: 14px; }
+  .bridge-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #E8763A; margin-bottom: 8px; }
+  .bridge p { font-size: 13px; color: #8899aa; line-height: 1.6; }
+  .bridge .exp { color: #60a5fa; font-weight: 600; }
+
+  /* Follow-up cards */
+  .fq-card { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; margin-bottom: 16px; overflow: hidden; cursor: pointer; }
+  .fq-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .fq-header:hover { background: #1e2536; }
+  .fq-q { font-size: 14px; color: #e0e0e0; font-weight: 600; flex: 1; }
+  .fq-chevron { color: #6b7b8d; font-size: 18px; transition: transform 0.2s; flex-shrink: 0; margin-left: 12px; }
+  .fq-card.open .fq-chevron { transform: rotate(180deg); }
+  .fq-body { display: none; padding: 0 20px 20px; }
+  .fq-card.open .fq-body { display: block; }
+
+  /* Coaching */
+  .coaching { background: linear-gradient(135deg, #2a1a1a 0%, #1a1f2e 100%); border: 1px solid #E8763A; border-radius: 10px; padding: 20px 24px; margin-bottom: 32px; }
+  .coaching h3 { color: #E8763A; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .coaching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .do-col h4 { color: #4ade80; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .dont-col h4 { color: #f87171; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .coaching-item { font-size: 13px; color: #a0b0c0; margin-bottom: 8px; padding-left: 16px; position: relative; line-height: 1.5; }
+  .coaching-item::before { content: ''; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; }
+  .do-col .coaching-item::before { background: #4ade80; }
+  .dont-col .coaching-item::before { background: #f87171; }
+
+  .closing { background: linear-gradient(135deg, #1a2520 0%, #1a1f2e 100%); border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .closing h2 { color: #4ade80; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .closing p { color: #a0b8c8; font-size: 14px; line-height: 1.8; }
+  .closing .hl { color: #fbbf24; font-weight: 600; }
+
+  @media (max-width: 700px) {
+    .coaching-grid { grid-template-columns: 1fr; }
+    .medallion-visual { flex-direction: column; }
+    .medal-arrow { justify-content: center; transform: rotate(90deg); }
+    .bronze, .gold { border-radius: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back-link" href="file:///Users/slysik/databricks/Wegmans_Interview_Study_Guide.html">&larr; Back to Study Guide</a>
+
+  <div class="header">
+    <span class="tag tag-behavioral">Behavioral</span>
+    <span class="tag tag-comm">Communication</span>
+    <span class="tag tag-retail">Retail Context</span>
+    <h1>"We're a grocery company, not a tech company. How do you explain something like medallion architecture or Unity Catalog governance to our VP of Merchandising and head of Supply Chain?"</h1>
+    <div class="meta">Wegmans Solutions Architect Prep &nbsp;&middot;&nbsp; Steve Lysik &nbsp;&middot;&nbsp; ~3.5 min answer</div>
+  </div>
+
+  <!-- POCKET ANSWER -->
+  <div class="pocket">
+    <span class="pocket-label">Pocket Answer</span>
+    <span class="pocket-timer">30&ndash;45 sec</span>
+    <div class="pocket-script">
+      "The number one rule I follow is: <span class="pk">never lead with the technology &mdash; lead with the business problem it solves</span>. Nobody in Merchandising needs to know the word 'medallion.' What they need to hear is: 'Right now, your sales data goes through three stages &mdash; <span class="pk-blue">raw receipts</span> come in, we <span class="pk-purple">clean and match them</span> to products and stores, and then you get a <span class="pk-green">ready-to-use report</span> that shows what's selling, where, and why.' That's the medallion architecture &mdash; but I'd never call it that in the room. For governance, I'd say: 'We built one single catalog so every department sees <span class="pk">the same version of truth</span> &mdash; Merchandising sees product performance, Supply Chain sees inventory velocity, and Finance sees margin &mdash; all from the same trusted data, with <span class="pk-green">each team seeing only what's relevant to them</span>.' At Microsoft, I pitched Databricks to C-suite executives across Fortune 500 accounts &mdash; the ones who signed off weren't the engineers, they were the business leaders. I learned that if you can't explain it in grocery terms, you don't understand it well enough yourself."
+    </div>
+    <div class="pocket-note">This is the quick version. Scroll down for the full scripted answer with analogy mapping, scenario walk-throughs, and follow-up Q&A.</div>
+  </div>
+
+  <!-- Why They're Asking -->
+  <div class="why-card">
+    <h2>Why They're Asking This</h2>
+    <p>This is a <strong>culture fit test disguised as a communication question</strong>. Wegmans is telling you who's in the room: business leaders, not engineers. They've probably had past experiences with technical hires who talked over people's heads and lost the room. They want to know: will you be a bridge between the platform team and the business &mdash; or will you be another technologist who alienates non-technical colleagues? The subtext is also: "Our people are smart. Don't condescend to them. Translate for them."</p>
+    <div class="signals">
+      <span class="signal">Can they translate?</span>
+      <span class="signal">Will business leaders trust them?</span>
+      <span class="signal">Respect for non-technical expertise</span>
+      <span class="signal">Culture fit &mdash; humility</span>
+      <span class="signal">Self-aware communicator</span>
+    </div>
+  </div>
+
+  <!-- COMMUNICATION PRINCIPLES -->
+  <div class="section-header">Four Principles of Technical Translation</div>
+  <div class="principles">
+    <div class="principle p1">
+      <div class="principle-num">1</div>
+      <div class="principle-title">Lead with the Business Problem</div>
+      <div class="principle-desc">Never open with the technology name. Start with the pain they feel today: "You're making decisions off stale spreadsheets" or "Three teams have three different sales numbers."</div>
+    </div>
+    <div class="principle p2">
+      <div class="principle-num">2</div>
+      <div class="principle-title">Use Their Vocabulary</div>
+      <div class="principle-desc">Supply Chain says "fill rate" and "lead time." Merchandising says "category performance" and "promotional lift." Map every concept to words they already use daily.</div>
+    </div>
+    <div class="principle p3">
+      <div class="principle-num">3</div>
+      <div class="principle-title">Anchor to Grocery Analogies</div>
+      <div class="principle-desc">The best analogies come from the business itself. A medallion architecture is like produce going from farm &rarr; distribution center &rarr; shelf display. They already live this process.</div>
+    </div>
+    <div class="principle p4">
+      <div class="principle-num">4</div>
+      <div class="principle-title">Show the Outcome, Not the Plumbing</div>
+      <div class="principle-desc">The VP of Merchandising doesn't need to know about Delta tables. They need to know: "You'll see yesterday's sales by 7 AM instead of waiting until Thursday for a report."</div>
+    </div>
+  </div>
+
+  <!-- ANALOGY MAP DIAGRAM -->
+  <div class="diagram">
+    <div class="diagram-title">Analogy Translation Map</div>
+    <div class="diagram-subtitle">"If you can't explain it in grocery terms, you don't understand it well enough."</div>
+    <table class="analogy-table">
+      <tr>
+        <th class="tech-col">Technical Concept</th>
+        <th class="arrow-col">&rarr;</th>
+        <th class="grocery-col">Grocery Translation</th>
+        <th class="who-col">For Who</th>
+      </tr>
+      <tr>
+        <td class="tech-cell">Bronze Layer</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"Raw receipts and scanner data &mdash; everything just as it comes in from every register, truck, and supplier"</td>
+        <td class="who-cell">Supply Chain, IT</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Silver Layer</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"We match everything up &mdash; this receipt goes with this product, this store, this promotion. Clean, connected data."</td>
+        <td class="who-cell">Merchandising, Ops</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Gold Layer</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"The reports and dashboards your team actually uses. Sales by category, weekly performance, promotional ROI."</td>
+        <td class="who-cell">VP Merchandising, Execs</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Unity Catalog</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"One master product book. Everyone looks up the same item, but the buyer sees cost and the cashier sees retail price."</td>
+        <td class="who-cell">All stakeholders</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Column Masking</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"Marketing sees loyalty trends, but never the name or address. The data is there, it's just behind a curtain for people who don't need it."</td>
+        <td class="who-cell">Legal, Compliance</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Data Lineage</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"Like a food recall trace-back. If a number looks wrong, we can trace it all the way back to the register it came from."</td>
+        <td class="who-cell">Finance, QA</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Delta Live Tables</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"An automated production line. Raw data comes in one end, quality checks happen at every step, clean reports come out the other."</td>
+        <td class="who-cell">IT, Operations</td>
+      </tr>
+      <tr>
+        <td class="tech-cell">Feature Store (ML)</td>
+        <td class="arrow-cell">&rarr;</td>
+        <td class="grocery-cell">"A recipe book for our AI. Instead of starting from scratch, the model pulls known ingredients &mdash; last week's sales, weather, holidays."</td>
+        <td class="who-cell">Supply Chain, Analytics</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- MEDALLION VISUAL ANALOGY -->
+  <div class="diagram">
+    <div class="diagram-title">The Grocery Flow = The Data Flow</div>
+    <div class="diagram-subtitle">The medallion architecture mirrors what Wegmans already does with physical goods</div>
+    <div class="medallion-visual">
+      <div class="medal-layer bronze">
+        <div class="layer-label">Bronze</div>
+        <div class="layer-tech">"The Receiving Dock"</div>
+        <div class="layer-analogy">Everything arrives: different trucks, different formats, different suppliers. We store it all exactly as it comes in.</div>
+        <div class="layer-quote">"Think of the back dock at 5 AM &mdash; pallets stacked, invoices clipped to each one."</div>
+      </div>
+      <div class="medal-arrow">&rarr;</div>
+      <div class="medal-layer silver">
+        <div class="layer-label">Silver</div>
+        <div class="layer-tech">"The Distribution Center"</div>
+        <div class="layer-analogy">We sort, label, and organize. Match items to SKUs, check quality, route to the right department.</div>
+        <div class="layer-quote">"This is where we turn a pile of deliveries into organized, store-ready inventory."</div>
+      </div>
+      <div class="medal-arrow">&rarr;</div>
+      <div class="medal-layer gold">
+        <div class="layer-label">Gold</div>
+        <div class="layer-tech">"The Shelf Display"</div>
+        <div class="layer-analogy">Clean, curated, ready for consumption. The customer (or executive) sees exactly what they need, beautifully presented.</div>
+        <div class="layer-quote">"This is the end-cap in aisle 5 &mdash; everything arranged for you to make a quick, confident decision."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL SCRIPTED ANSWER -->
+  <div class="section-header">Full Scripted Answer</div>
+
+  <span class="part">Part 1 &mdash; Establish the Philosophy (30 sec)</span>
+  <div class="script">
+    "Great question, and I actually think this is <span class="hl">the most important skill</span> a Solutions Architect brings. The technology is only valuable if the business understands what it's doing for them and trusts it. My rule is simple: <span class="hl">never lead with the technology name &mdash; lead with the business problem it solves</span>. If I'm in a room with your VP of Merchandising, I'm not going to say 'medallion architecture.' I'm going to talk about what they care about &mdash; getting better data to make better decisions faster."
+  </div>
+
+  <div class="bridge">
+    <div class="bridge-label">Experience Bridge</div>
+    <p>At <span class="exp">Microsoft as a Solutions Architect</span>, I presented Databricks to C-suite executives at Fortune 500 companies. The people who signed the purchase orders weren't the engineers &mdash; they were the CFOs and the VPs of Operations. I learned very quickly that <span class="exp">if you lose the business leader, you lose the deal</span>, no matter how good the tech is.</p>
+  </div>
+
+  <span class="part">Part 2 &mdash; Medallion in Grocery Terms (45 sec)</span>
+  <div class="script">
+    "So let me give you an example. If I'm explaining our data architecture to the head of Supply Chain, I'd say something like: '<span class="hl-green">Think about what happens when a truck pulls up to the Wegmans distribution center</span>. Everything arrives in different formats &mdash; different suppliers, different invoices, different packaging. That's our first stage. Then your team <span class="hl-blue">sorts it, checks quality, labels it, and routes it</span> to the right store and the right department. That's the second stage. And finally, products hit <span class="hl">the shelf display</span> &mdash; curated, organized, ready for the customer to grab and go. That's exactly what we're doing with data. Raw data comes in messy, we clean and organize it, and your team gets a polished report they can act on immediately.' I never used the word 'medallion' &mdash; but I just explained the entire architecture."
+  </div>
+
+  <span class="part">Part 3 &mdash; Unity Catalog Governance (45 sec)</span>
+  <div class="script">
+    "For governance, I'd use an analogy that everyone at a grocery company already understands: the <span class="hl">master product catalog</span>. Every item Wegmans sells has one SKU, one name, one set of attributes. The buyer sees cost and margin. The store manager sees retail price and shelf position. The customer sees the price tag. <span class="hl-green">Same product, different views based on who's looking</span>. That's exactly what Unity Catalog does for data. We have one single source of truth. Merchandising sees product performance. Supply Chain sees inventory velocity. Finance sees margin analysis. <span class="hl-blue">Same underlying data, but each team sees exactly what's relevant to their role</span> &mdash; and sensitive data like individual customer details stays behind a curtain for people who don't need it. When I frame it that way, the VP doesn't just understand governance &mdash; they <span class="hl-purple">become an advocate for it</span>, because they can see it protects their data while making their team faster."
+  </div>
+
+  <span class="part">Part 4 &mdash; The Two-Audience Approach (30 sec)</span>
+  <div class="script">
+    "I also want to acknowledge something: I adjust my communication <span class="hl">based on what each stakeholder actually cares about</span>. The VP of Merchandising? They want to know: 'Will I see promotional ROI faster? Can I compare category performance across stores in real time?' The head of Supply Chain wants to know: '<span class="hl-blue">Will I get demand signals earlier? Can we reduce waste on perishables?</span>' I answer both of those with the same platform &mdash; but I frame it in <span class="hl-green">their KPIs, their vocabulary, their daily pain points</span>. The minute I start talking about Delta tables and partition pruning, I've lost the room."
+  </div>
+
+  <div class="bridge">
+    <div class="bridge-label">Experience Bridge</div>
+    <p>At <span class="exp">IBM as a Data Solutions Architect</span>, I worked with clients across healthcare, manufacturing, and financial services. Every single one had the same challenge: brilliant technical teams who couldn't get executive buy-in because they were presenting architecture diagrams instead of business outcomes. I made it my role to be the <span class="exp">translator in the room</span>. And at <span class="exp">Hopewell</span>, I was the Director of Data &mdash; meaning I sat in both chairs. I was building the pipelines AND presenting to the board. That dual perspective is something I bring to every conversation.</p>
+  </div>
+
+  <span class="part">Part 5 &mdash; Wegmans Culture Tie-in (30 sec)</span>
+  <div class="script">
+    "And I want to add one thing specific to Wegmans. <span class="hl">You're a company where people have been here for decades</span> &mdash; your department managers, your supply chain leads, your merchandising team. They have incredibly deep domain knowledge. My job isn't to come in and tell them what data means. My job is to <span class="hl-green">give them better tools so their expertise reaches further</span>. When I explain a concept, I'm not dumbing it down &mdash; I'm <span class="hl-blue">meeting smart people where they are</span> and connecting what we're building to what they already know. That's how you get real adoption &mdash; not compliance, but genuine buy-in."
+  </div>
+
+  <!-- SCENARIO WALK-THROUGHS -->
+  <div class="section-header">Live Scenario Walk-Throughs</div>
+  <p style="color: #8899aa; font-size: 13px; margin-bottom: 20px;">Two real-world scenarios showing the wrong way and right way to explain the same concept.</p>
+
+  <div class="scenario-grid">
+    <div class="scenario">
+      <div class="scenario-audience aud-merch">VP of Merchandising &mdash; Category Review Meeting</div>
+      <div class="scenario-title">Explaining: Why data might look different than their old reports</div>
+      <div class="scenario-wrong">
+        <div class="scenario-wrong-label">Wrong Approach</div>
+        <p>"We re-ingested the source tables into Bronze and re-ran the Silver transformations with updated dedup logic and SCD Type 2 merge, so some historical category totals shifted by 2-3% from the legacy Teradata output."</p>
+      </div>
+      <div class="scenario-right">
+        <div class="scenario-right-label">Right Approach</div>
+        <p>"You may notice some of last quarter's category numbers shifted slightly. That's because we found duplicate transactions in the old system that were inflating totals. We cleaned that up, so what you're seeing now is actually more accurate. Bottom line: your category rankings didn't change, but the numbers are now trustworthy enough to build forecasts on."</p>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-audience aud-supply">Head of Supply Chain &mdash; Demand Planning Session</div>
+      <div class="scenario-title">Explaining: Why they should trust the new demand forecast</div>
+      <div class="scenario-wrong">
+        <div class="scenario-wrong-label">Wrong Approach</div>
+        <p>"The model uses an XGBoost ensemble trained on 18 months of Silver-layer POS data joined with Feature Store tables for weather, holidays, and promotional flags, validated against a 20% holdout with a MAPE of 4.2%."</p>
+      </div>
+      <div class="scenario-right">
+        <div class="scenario-right-label">Right Approach</div>
+        <p>"The new forecast looks at the same things your best planners look at &mdash; last year's sales, upcoming holidays, weather patterns, and what promotions are running &mdash; but it does it for every SKU in every store, every day. In testing, it was within 4% of actual demand. That should mean fewer empty shelves on the things that matter and less waste on perishables."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- COACHING -->
+  <div class="coaching">
+    <h3>Coaching Notes</h3>
+    <div class="coaching-grid">
+      <div class="do-col">
+        <h4>Do This</h4>
+        <div class="coaching-item">Use a real analogy in your answer &mdash; the grocery flow one is gold. Show them you can actually do it, not just talk about doing it.</div>
+        <div class="coaching-item">Reference specific Wegmans stakeholders by title: "If I'm with your VP of Merchandising..." makes it tangible.</div>
+        <div class="coaching-item">Mention that you've been on both sides &mdash; building AND presenting. The Hopewell board experience is powerful here.</div>
+        <div class="coaching-item">Show respect for tenure and institutional knowledge. Wegmans people have been there for years. Acknowledge that.</div>
+        <div class="coaching-item">End with "adoption, not compliance" &mdash; that's a phrase that will resonate with a people-first company.</div>
+      </div>
+      <div class="dont-col">
+        <h4>Avoid This</h4>
+        <div class="coaching-item">Don't just SAY "I use simple language" &mdash; SHOW IT by actually translating a concept in real time during your answer.</div>
+        <div class="coaching-item">Don't be condescending. "I dumb it down" is the wrong framing. It's "I translate" or "I meet people where they are."</div>
+        <div class="coaching-item">Don't use the word "stakeholder" more than once. It's corporate-speak. Say "your Supply Chain team" or "the Merchandising VP."</div>
+        <div class="coaching-item">Don't forget the governance piece. They asked about Unity Catalog specifically &mdash; the product catalog analogy is your strongest play.</div>
+        <div class="coaching-item">Don't rush. This is a question where pacing and tone matter as much as content. Slow down for the analogy parts.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOLLOW-UP Q&A -->
+  <div class="section-header">Likely Follow-Up Questions</div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <div class="fq-q">"What if they push back and say the old reports were fine?"</div>
+      <div class="fq-chevron">&#9662;</div>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "That's a completely valid reaction, and honestly, it tells me the old reports were <span class="hl-green">serving a real need</span>. I'd never dismiss that. What I'd say is: 'The old reports got you here &mdash; and that's important. What we're doing isn't replacing them, it's <span class="hl">upgrading the engine underneath</span>. You'll see the same numbers you trust, but they'll be fresher, they'll be consistent across departments, and when you have a new question &mdash; like how a promotion performed by store &mdash; you won't have to wait two weeks for IT to build a custom query.' I position it as <span class="hl-blue">evolution, not revolution</span>."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <div class="fq-q">"How do you handle a room where some people get it and some don't?"</div>
+      <div class="fq-chevron">&#9662;</div>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "I <span class="hl">read the room in real time</span>. I watch body language &mdash; if someone leans back and crosses their arms, I've lost them. If someone starts nodding, I know the analogy landed. In practice, I layer my explanation: start with the business outcome for the executives, then offer a 'one level deeper' for anyone who wants the technical detail. Something like: 'For anyone who's curious about the how &mdash; this uses Delta Live Tables under the hood, which is basically an automated quality-check pipeline. Happy to go deeper after the meeting.' That way the technical people feel respected, and the business people aren't dragged into the weeds."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <div class="fq-q">"How do you get business stakeholders to actually use new dashboards instead of their old Excel files?"</div>
+      <div class="fq-chevron">&#9662;</div>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "This is a change management challenge more than a technical one. The answer is: <span class="hl">make the new thing solve a pain they feel today</span>. I don't start by replacing their Excel file. I start by showing them something they <span class="hl-green">can't do in Excel</span> &mdash; like a real-time view of promotional performance across all stores, or an automated daily alert when a product is trending below forecast. Once they see value the old tool can't deliver, <span class="hl-blue">they migrate themselves</span>. I've seen this pattern play out multiple times &mdash; at Microsoft, the biggest adoption wins came when we found the one thing the old system couldn't do, and made the new platform do it beautifully. Pull, not push."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <div class="fq-q">"Can you give an example of when a technical explanation went badly?"</div>
+      <div class="fq-chevron">&#9662;</div>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "Early in my career at IBM, I walked into a client meeting with a <span class="hl-red">20-slide architecture deck</span> &mdash; entity-relationship diagrams, data flow arrows, the works. I was proud of it. The CIO sat through about four slides, then said: 'I appreciate the thoroughness, but tell me &mdash; will my teams get their reports faster?' I spent 20 minutes on architecture and <span class="hl">never answered the only question that mattered</span>. That was the moment I changed my approach. Now I always start with outcomes. The architecture is my backup &mdash; it's there if someone asks for it, but it's never my opening act. That lesson has shaped every presentation I've given since."
+      </div>
+    </div>
+  </div>
+
+  <div class="fq-card" onclick="this.classList.toggle('open')">
+    <div class="fq-header">
+      <div class="fq-q">"How do you handle engineers who think translating for business means you're not technical enough?"</div>
+      <div class="fq-chevron">&#9662;</div>
+    </div>
+    <div class="fq-body">
+      <div class="script">
+        "That's real, and I've experienced it. The way I handle it is by being <span class="hl">undeniably technical in the right rooms</span>. When I'm with the engineering team, I'm reviewing their Delta Live Tables pipeline code, discussing partition strategies, and debating merge vs. overwrite patterns. They see that I can go deep. Then when they see me translate the same work into business language for an executive, <span class="hl-green">they actually start to respect that as its own skill</span> &mdash; because most of them know they struggle with it. Over time, the best engineers start coming to me before presentations saying 'Can you help me frame this?' That's when you know you've earned both sides."
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="closing">
+    <h2>Closing Line</h2>
+    <p>"The best Solutions Architect isn't the one who knows the most about the technology. It's the one who can make everyone in the room &mdash; the VP, the engineer, and the analyst &mdash; feel like the technology was <span class="hl">built for their specific problem</span>. That's what I do."</p>
+  </div>
+
+</div>
+</body>
+</html>

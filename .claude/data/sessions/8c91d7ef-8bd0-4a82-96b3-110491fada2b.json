@@ -1,0 +1,8 @@
+{
+  "session_id": "8c91d7ef-8bd0-4a82-96b3-110491fada2b",
+  "prompts": [
+    "how can I use sLidev ? I want to be able to easily create Databricks arch diagramns during my interview:  \u23fa That's Slidev \u2014 a developer-focused, markdown-based presentation tool built on Vue.js. The giveaways:\n\n  - Top-right toolbar with the dotted navigation controls and keyboard shortcut icons (shift, arrow\n  keys, etc.)\n  - Bottom-right slide indicator dots (yellow = current slide)\n  - The overall dark-themed, code-friendly aesthetic with a background image overlay\n\n  Slidev is popular for technical talks since you write slides in Markdown and can embed live code, use\n  Vue components, and style with UnoCSS/Tailwind.",
+    "yes"
+  ],
+  "agent_name": "Meridian"
+}

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First 90 Days: Introducing Standards — Interview Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1419; color: #e0e0e0; padding: 24px; }
+
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* Header */
+  .header { margin-bottom: 36px; }
+  .header .tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; margin-bottom: 12px; }
+  .tag-behavioral { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .tag-strategic { background: rgba(234,179,8,0.15); color: #fbbf24; }
+  h1 { color: #fff; font-size: 22px; line-height: 1.4; margin-bottom: 8px; }
+  .header .meta { color: #6b7b8d; font-size: 13px; }
+
+  /* Why Card */
+  .why-card { background: linear-gradient(135deg, #1a1f2e 0%, #1e2a3a 100%); border: 1px solid #2a3a4a; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .why-card h2 { color: #fbbf24; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .why-card p { color: #a0b0c0; font-size: 14px; line-height: 1.7; }
+  .why-card .signals { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .why-card .signal { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid #3a4a5a; color: #8899aa; }
+
+  /* Phase Timeline */
+  .timeline { position: relative; margin-bottom: 40px; }
+  .timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #c084fc, #E8763A, #22c55e); border-radius: 2px; }
+
+  .phase { position: relative; padding-left: 56px; margin-bottom: 32px; }
+  .phase-dot { position: absolute; left: 12px; top: 4px; width: 18px; height: 18px; border-radius: 50%; border: 3px solid; }
+  .phase-dot.p1 { border-color: #c084fc; background: rgba(168,85,247,0.2); }
+  .phase-dot.p2 { border-color: #E8763A; background: rgba(232,118,58,0.2); }
+  .phase-dot.p3 { border-color: #22c55e; background: rgba(34,197,94,0.2); }
+
+  .phase-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .phase-label.p1 { color: #c084fc; }
+  .phase-label.p2 { color: #E8763A; }
+  .phase-label.p3 { color: #22c55e; }
+
+  .phase h3 { color: #fff; font-size: 17px; margin-bottom: 12px; }
+
+  .phase-card { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; padding: 20px; }
+
+  /* Script blocks */
+  .script { background: #141820; border-radius: 8px; padding: 16px 18px; margin: 12px 0; border-left: 3px solid #3b82f6; font-size: 14px; line-height: 1.8; color: #c8d8e8; }
+  .script .hl { color: #fbbf24; font-weight: 600; }
+  .script .hl-green { color: #4ade80; font-weight: 600; }
+  .script .hl-orange { color: #fb923c; font-weight: 600; }
+  .script .hl-blue { color: #60a5fa; font-weight: 600; }
+  .script .hl-purple { color: #c084fc; font-weight: 600; }
+
+  /* Action items inside phases */
+  .actions { margin-top: 14px; }
+  .action-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .action-icon { flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; margin-top: 1px; }
+  .action-icon.listen { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .action-icon.do { background: rgba(232,118,58,0.15); color: #E8763A; }
+  .action-icon.build { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .action-text { font-size: 13px; color: #a0b0c0; line-height: 1.6; }
+  .action-text strong { color: #e0e0e0; }
+
+  /* Experience Bridge */
+  .bridge { background: linear-gradient(135deg, #1a2332 0%, #1a1f2e 100%); border: 1px solid #2a3a4a; border-radius: 10px; padding: 18px 20px; margin-top: 14px; }
+  .bridge-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #E8763A; margin-bottom: 8px; }
+  .bridge p { font-size: 13px; color: #8899aa; line-height: 1.6; }
+  .bridge .exp { color: #60a5fa; font-weight: 600; }
+
+  /* Principles Row */
+  .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .principle { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; padding: 20px; text-align: center; }
+  .principle .p-icon { font-size: 28px; margin-bottom: 10px; }
+  .principle .p-title { color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .principle .p-desc { color: #8899aa; font-size: 12px; line-height: 1.5; }
+
+  /* Section headers */
+  .section-header { color: #E8763A; font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid rgba(232,118,58,0.3); }
+
+  /* Follow-up cards */
+  .followup { margin-bottom: 40px; }
+  .fq-card { background: #1a1f2e; border: 1px solid #2a3040; border-radius: 10px; margin-bottom: 16px; overflow: hidden; cursor: pointer; }
+  .fq-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .fq-header:hover { background: #1e2536; }
+  .fq-q { font-size: 14px; color: #e0e0e0; font-weight: 600; }
+  .fq-chevron { color: #6b7b8d; font-size: 18px; transition: transform 0.2s; }
+  .fq-card.open .fq-chevron { transform: rotate(180deg); }
+  .fq-body { display: none; padding: 0 20px 20px; }
+  .fq-card.open .fq-body { display: block; }
+  .fq-body .script { margin-top: 0; }
+
+  /* Coaching box */
+  .coaching { background: linear-gradient(135deg, #2a1a1a 0%, #1a1f2e 100%); border: 1px solid #E8763A; border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
+  .coaching h3 { color: #E8763A; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .coaching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .do-col h4 { color: #4ade80; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .dont-col h4 { color: #f87171; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .coaching-item { font-size: 13px; color: #a0b0c0; margin-bottom: 8px; padding-left: 16px; position: relative; line-height: 1.5; }
+  .coaching-item::before { content: ''; position: absolute; left: 0; top: 7px; width: 6px; height: 6px; border-radius: 50%; }
+  .do-col .coaching-item::before { background: #4ade80; }
+  .dont-col .coaching-item::before { background: #f87171; }
+
+  /* Anti-pattern callout */
+  .antipattern { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); border-radius: 10px; padding: 18px 20px; margin-bottom: 40px; }
+  .antipattern h3 { color: #f87171; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .ap-item { font-size: 13px; color: #d0a0a0; margin-bottom: 8px; line-height: 1.6; }
+  .ap-item strong { color: #f87171; }
+
+  /* Visual Diagram */
+  .diagram-section { margin-bottom: 40px; }
+  .diagram { background: #141820; border: 1px solid #2a3040; border-radius: 12px; padding: 28px; }
+  .diagram-title { color: #fff; font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 20px; }
+
+  .timeline-visual { display: flex; justify-content: space-between; align-items: flex-start; position: relative; padding: 0 10px; }
+  .timeline-visual::before { content: ''; position: absolute; top: 30px; left: 60px; right: 60px; height: 3px; background: linear-gradient(to right, #c084fc, #E8763A, #22c55e); border-radius: 2px; }
+
+  .tv-phase { text-align: center; position: relative; z-index: 1; flex: 1; }
+  .tv-circle { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid; }
+  .tv-circle.c1 { border-color: #c084fc; background: rgba(168,85,247,0.1); }
+  .tv-circle.c2 { border-color: #E8763A; background: rgba(232,118,58,0.1); }
+  .tv-circle.c3 { border-color: #22c55e; background: rgba(34,197,94,0.1); }
+  .tv-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .tv-label.l1 { color: #c084fc; }
+  .tv-label.l2 { color: #E8763A; }
+  .tv-label.l3 { color: #22c55e; }
+  .tv-name { font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 6px; }
+  .tv-detail { font-size: 11px; color: #6b7b8d; line-height: 1.5; max-width: 180px; margin: 0 auto; }
+
+  /* Equation bar */
+  .equation { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 32px 0; flex-wrap: wrap; }
+  .eq-box { padding: 10px 18px; border-radius: 8px; text-align: center; }
+  .eq-box.trust { background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.3); }
+  .eq-box.value { background: rgba(232,118,58,0.12); border: 1px solid rgba(232,118,58,0.3); }
+  .eq-box.consensus { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); }
+  .eq-box.adoption { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); }
+  .eq-label { font-size: 12px; font-weight: 600; }
+  .eq-box.trust .eq-label { color: #c084fc; }
+  .eq-box.value .eq-label { color: #E8763A; }
+  .eq-box.consensus .eq-label { color: #22c55e; }
+  .eq-box.adoption .eq-label { color: #60a5fa; }
+  .eq-plus { color: #6b7b8d; font-size: 20px; font-weight: 700; }
+
+  /* Pocket Answer */
+  .pocket { background: linear-gradient(135deg, #1a2a3a 0%, #1e3348 100%); border: 1px solid #2a4a6a; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+  .pocket::before { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: rgba(232,118,58,0.04); border-radius: 50%; transform: translate(60px, -60px); }
+  .pocket-label { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 4px 12px; border-radius: 4px; background: rgba(232,118,58,0.9); color: #fff; margin-bottom: 14px; }
+  .pocket-timer { display: inline-block; font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.08); color: #8899aa; margin-left: 8px; }
+  .pocket-script { font-size: 15px; line-height: 1.9; color: #c8d8e8; font-style: italic; }
+  .pocket-script .pk { color: #fbbf24; font-style: normal; font-weight: 700; }
+  .pocket-script .pk-green { color: #4ade80; font-style: normal; font-weight: 600; }
+  .pocket-script .pk-blue { color: #60a5fa; font-style: normal; font-weight: 600; }
+  .pocket-note { margin-top: 16px; font-size: 12px; color: #556677; border-top: 1px solid #2a3a4a; padding-top: 12px; }
+
+  @media (max-width: 700px) {
+    .coaching-grid { grid-template-columns: 1fr; }
+    .timeline-visual { flex-direction: column; gap: 24px; align-items: center; }
+    .timeline-visual::before { display: none; }
+    .equation { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a href="file:///Users/slysik/databricks/Wegmans_Interview_Study_Guide.html" style="display: inline-block; margin-bottom: 16px; font-size: 13px; color: #E8763A; text-decoration: none; padding: 6px 14px; border: 1px solid #E8763A; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='#E8763A';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#E8763A'">← Back to Study Guide</a>
+
+  <!-- Header -->
+  <div class="header">
+    <span class="tag tag-behavioral">Behavioral</span>
+    <span class="tag tag-strategic">Strategic / Change Mgmt</span>
+    <h1>"You're in the first 90 days. Engineering teams have been building pipelines their own way for years. How do you introduce architectural standards without alienating the people who've been keeping the lights on?"</h1>
+    <div class="meta">Wegmans Solutions Architect Prep &nbsp;·&nbsp; Steve Lysik &nbsp;·&nbsp; ~3 min answer</div>
+  </div>
+
+  <!-- POCKET ANSWER (30-45 sec) -->
+  <div class="pocket">
+    <span class="pocket-label">Pocket Answer</span>
+    <span class="pocket-timer">30–45 sec</span>
+    <div class="pocket-script">
+      "The first thing I would <span class="pk">not</span> do is show up with a 50-page standards doc. My approach is three phases. First 30 days — <span class="pk-blue">listen and map</span>. Pair with each team, understand why they built things the way they did, find the bright spots already working well. <span class="pk">Especially at a company like Wegmans</span> where people have deep institutional knowledge and tenure — that context is invaluable. I'm not coming in to replace what they know; I'm coming in to give them <span class="pk-green">better tools so their expertise scales</span>. Days 30 to 60 — pick <span class="pk">one or two shared pain points</span> and solve them with reusable templates. A DLT pipeline pattern, a Unity Catalog naming convention. Make the right way also the easy way. Days 60 to 90 — now I've earned trust, so I form a lightweight <span class="pk-green">architecture working group</span> with respected engineers from each team and we <span class="pk">co-author standards together</span>. New work follows the standards; existing pipelines migrate organically via strangler fig. This is exactly how I operated at <span class="pk-blue">Microsoft coming into Fortune 500 accounts</span>. The principle: <span class="pk-green">standards people feel ownership over stick — standards imposed by the new architect get resented</span>."
+    </div>
+    <div class="pocket-note">This is the quick version. Scroll down for the full 3-minute phased answer with experience bridges, follow-up Q&A, and coaching notes.</div>
+  </div>
+
+  <!-- Why They're Asking -->
+  <div class="why-card">
+    <h2>Why They're Asking This</h2>
+    <p>Wegmans has a team of 5 architects and engineering teams with established workflows. They need someone who can raise the bar on consistency and quality <em>without</em> creating friction. This question reveals whether you're a collaborate-first leader or a top-down mandate person. They've probably been burned by both — architects who never ship standards, and architects who shove standards down people's throats on day one.</p>
+    <div class="signals">
+      <span class="signal">Emotional intelligence</span>
+      <span class="signal">Change management</span>
+      <span class="signal">Stakeholder influence</span>
+      <span class="signal">Pragmatism over perfection</span>
+      <span class="signal">Servant leadership</span>
+    </div>
+  </div>
+
+  <!-- Visual Timeline Diagram -->
+  <div class="diagram-section">
+    <div class="section-header">90-Day Visual Roadmap</div>
+    <div class="diagram">
+      <div class="diagram-title">Earn Trust → Prove Value → Build Consensus</div>
+      <div class="timeline-visual">
+        <div class="tv-phase">
+          <div class="tv-circle c1">👂</div>
+          <div class="tv-label l1">Days 1–30</div>
+          <div class="tv-name">Listen & Map</div>
+          <div class="tv-detail">Shadow teams, catalog patterns, find bright spots, build relationships</div>
+        </div>
+        <div class="tv-phase">
+          <div class="tv-circle c2">🔧</div>
+          <div class="tv-label l2">Days 30–60</div>
+          <div class="tv-name">Quick Wins</div>
+          <div class="tv-detail">Solve real pain, codify what already works, create reusable templates</div>
+        </div>
+        <div class="tv-phase">
+          <div class="tv-circle c3">🤝</div>
+          <div class="tv-label l3">Days 60–90</div>
+          <div class="tv-name">Co-Author Standards</div>
+          <div class="tv-detail">Working group, shared ownership, lightweight guardrails, inner-source model</div>
+        </div>
+      </div>
+
+      <div class="equation">
+        <div class="eq-box trust"><span class="eq-label">Trust</span></div>
+        <span class="eq-plus">+</span>
+        <div class="eq-box value"><span class="eq-label">Proven Value</span></div>
+        <span class="eq-plus">+</span>
+        <div class="eq-box consensus"><span class="eq-label">Shared Ownership</span></div>
+        <span class="eq-plus">=</span>
+        <div class="eq-box adoption"><span class="eq-label">Voluntary Adoption</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripted Answer by Phase -->
+  <div class="section-header">Scripted Answer — Three Phases</div>
+
+  <div class="timeline">
+
+    <!-- Phase 1 -->
+    <div class="phase">
+      <div class="phase-dot p1"></div>
+      <div class="phase-label p1">Phase 1 · Days 1–30</div>
+      <h3>Listen First, Earn the Right to Have an Opinion</h3>
+      <div class="phase-card">
+        <div class="script">
+          "The first thing I <span class="hl-purple">would not do</span> is show up with a 50-page standards document. I've seen that movie before and it doesn't end well.<br><br>
+
+          My first 30 days are about <span class="hl">listening and mapping</span>. I'd sit with each engineering team — not in a formal review setting, but <span class="hl-green">pairing on actual work</span>. 'Show me how you build a pipeline from scratch. Walk me through what happens when something breaks at 2 AM.' That tells me more than any architecture diagram.<br><br>
+
+          What I'm really doing is <span class="hl-blue">cataloging patterns</span> — not looking for what's wrong, but looking for <span class="hl">what's already working well</span>. Every team has practices that are smart. Maybe one team has a great approach to schema evolution. Another team has solid alerting. I want to find those <span class="hl-green">bright spots</span> because those become the seeds of standards that people actually respect — because they came from their peers, not from the new architect."
+        </div>
+
+        <div class="actions">
+          <div class="action-item">
+            <div class="action-icon listen">1</div>
+            <div class="action-text"><strong>Shadow each team</strong> — pair on real work, ask "show me" not "tell me." Understand their constraints and why they built things the way they did.</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon listen">2</div>
+            <div class="action-text"><strong>Catalog the landscape</strong> — tools, patterns, pain points, bright spots. Build a mental (or literal) map of the current state without judgment.</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon listen">3</div>
+            <div class="action-text"><strong>Name the bright spots publicly</strong> — "Team X has a really elegant approach to handling late-arriving data." This builds trust and signals you're not here to tear everything down.</div>
+          </div>
+        </div>
+
+        <div class="bridge">
+          <div class="bridge-label">Your Experience Bridge</div>
+          <p>"At <span class="exp">Microsoft, working with ExxonMobil and FedEx</span>, I was the external architect coming into organizations with decades of established data engineering practice. The first thing I learned was that the people running those pipelines knew things about their data that no architecture review could surface. My job was to understand their context first."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase">
+      <div class="phase-dot p2"></div>
+      <div class="phase-label p2">Phase 2 · Days 30–60</div>
+      <h3>Prove Value Before Asking for Change</h3>
+      <div class="phase-card">
+        <div class="script">
+          "By day 30, I know where the pain is. And there's <span class="hl">always</span> shared pain — pipelines that break in the same way, data quality issues that multiple teams fight independently, onboarding new engineers takes too long because nothing is documented the same way.<br><br>
+
+          So I pick <span class="hl-orange">one or two high-visibility pain points</span> and solve them. Not by rewriting someone's pipeline, but by creating something <span class="hl-green">reusable</span> — maybe it's a DLT template with built-in data quality expectations, or a Unity Catalog namespace convention that makes cross-team data discovery actually work, or a CI/CD pattern for Databricks Workflows that eliminates the 'it worked in my notebook' problem.<br><br>
+
+          The key is: <span class="hl">I'm not mandating anything yet</span>. I'm saying, 'Hey, I built this thing that solves the problem you told me about. Try it. If it works, great. If not, tell me why and we'll improve it together.' When people adopt something because it <span class="hl-green">makes their life easier</span> rather than because they were told to, it sticks."
+        </div>
+
+        <div class="actions">
+          <div class="action-item">
+            <div class="action-icon do">1</div>
+            <div class="action-text"><strong>Solve shared pain first</strong> — pick problems that multiple teams complained about. Solving these builds credibility across the org, not just with one team.</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon do">2</div>
+            <div class="action-text"><strong>Ship reusable assets</strong> — DLT templates, notebook templates, CI/CD patterns, monitoring dashboards. Make the "right way" also the "easy way."</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon do">3</div>
+            <div class="action-text"><strong>Codify existing best practices</strong> — write up the bright spots you found in Phase 1 as the start of your patterns library. Credit the teams who originated them.</div>
+          </div>
+        </div>
+
+        <div class="bridge">
+          <div class="bridge-label">Your Experience Bridge</div>
+          <p>"At <span class="exp">IBM, leading the $25M analytics platform</span>, we had 50TB+ of data across teams that had built independently for years. I didn't start with a governance mandate — I started by building shared ingestion patterns that eliminated duplicate work. When teams saw they could onboard a new data source in days instead of weeks, they <em>asked</em> for more standardization."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase">
+      <div class="phase-dot p3"></div>
+      <div class="phase-label p3">Phase 3 · Days 60–90</div>
+      <h3>Co-Author Standards, Don't Dictate Them</h3>
+      <div class="phase-card">
+        <div class="script">
+          "Now I have trust and proof points. <span class="hl-green">This is when standards actually land.</span><br><br>
+
+          I'd form a lightweight <span class="hl">architecture working group</span> — not a bureaucratic review board, but a group of respected engineers from each team, people whose opinions carry weight with their peers. We co-author the standards together. My role is to <span class="hl-blue">facilitate and synthesize</span>, not dictate.<br><br>
+
+          The standards themselves should be <span class="hl-orange">thin and opinionated</span>: a naming convention for Unity Catalog objects, a pipeline template with built-in observability, a data quality contract pattern, a branching and deployment strategy. Things that <span class="hl-green">reduce cognitive load</span> when someone moves between teams or picks up someone else's work.<br><br>
+
+          And critically — <span class="hl">standards apply to new work</span>. I'm not asking anyone to rewrite pipelines that are running fine in production. We use a <span class="hl-blue">strangler fig approach</span>: as pipelines naturally need updates or new features, they migrate to the new patterns. Over time, the old approaches get replaced organically rather than through a disruptive big-bang migration."
+        </div>
+
+        <div class="actions">
+          <div class="action-item">
+            <div class="action-icon build">1</div>
+            <div class="action-text"><strong>Architecture working group</strong> — include respected ICs from each team. They become ambassadors, not enforcers. Rotate membership so it doesn't become a bottleneck.</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon build">2</div>
+            <div class="action-text"><strong>Inner-source model</strong> — publish standards as a living repo. Anyone can propose changes via PR. Standards evolve with the teams, not apart from them.</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon build">3</div>
+            <div class="action-text"><strong>Strangler fig for legacy</strong> — existing pipelines get migrated only when they need changes. No forced rewrites. This respects the investment teams have already made.</div>
+          </div>
+          <div class="action-item">
+            <div class="action-icon build">4</div>
+            <div class="action-text"><strong>Lightweight guardrails</strong> — Unity Catalog policies, Databricks Asset Bundles for deploy consistency, automated linting. Make compliance automatic, not manual.</div>
+          </div>
+        </div>
+
+        <div class="bridge">
+          <div class="bridge-label">Your Experience Bridge</div>
+          <p>"This mirrors what I'm doing now at <span class="exp">Hopewell</span> — coming into client environments as an outside architect. The pattern is always the same: <span class="exp">earn trust by listening, prove value by solving pain, then formalize what's already working</span>. The standards that stick are the ones the team feels ownership over."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Principles -->
+  <div class="section-header">Core Principles to Communicate</div>
+  <div class="principles">
+    <div class="principle">
+      <div class="p-icon">🌱</div>
+      <div class="p-title">Adopt, Don't Impose</div>
+      <div class="p-desc">Best practices already exist in your teams. Find them, name them, scale them.</div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🛤️</div>
+      <div class="p-title">Pave the Path</div>
+      <div class="p-desc">Make the standard way also the easiest way. Templates &gt; mandates.</div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🤝</div>
+      <div class="p-title">Shared Ownership</div>
+      <div class="p-desc">Standards authored by the team stick. Standards imposed by the architect get resented.</div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🌿</div>
+      <div class="p-title">Strangler Fig</div>
+      <div class="p-desc">Migrate on natural cadence. Never force a rewrite of working production code.</div>
+    </div>
+  </div>
+
+  <!-- Anti-Patterns -->
+  <div class="antipattern">
+    <h3>Anti-Patterns to Avoid Saying</h3>
+    <div class="ap-item"><strong>"We need to standardize everything before we ship anything new."</strong> — Sounds like a bottleneck, not a leader. They'll hear "nothing gets done until the architect approves it."</div>
+    <div class="ap-item"><strong>"The current state is a mess."</strong> — Insults the people who built it. Even if it's true, frame it as "organic evolution that served its purpose."</div>
+    <div class="ap-item"><strong>"At my last company we did X."</strong> — Without context about why it fits here, this sounds like you're trying to transplant someone else's org chart.</div>
+    <div class="ap-item"><strong>"We'll do a full audit first."</strong> — Engineers hear "inspection" and get defensive. Call it "landscape mapping" or "learning the environment."</div>
+  </div>
+
+  <!-- Coaching Box -->
+  <div class="coaching">
+    <h3>Coaching Notes — What Makes This Answer Win</h3>
+    <div class="coaching-grid">
+      <div class="do-col">
+        <h4>Do This</h4>
+        <div class="coaching-item">Lead with empathy — "I would NOT show up with a 50-page standards doc" immediately signals self-awareness</div>
+        <div class="coaching-item">Use the phrase "keeping the lights on" back at them — it shows you heard the question and respect what exists</div>
+        <div class="coaching-item">Mention specific Databricks tools (DLT, Unity Catalog, Asset Bundles) to keep it concrete, not theoretical</div>
+        <div class="coaching-item">Credit teams, not yourself — "they already had a great approach" > "I implemented a new standard"</div>
+        <div class="coaching-item">Reference your actual experience of coming in as an external architect (Microsoft, Hopewell) — this is literally your day job</div>
+      </div>
+      <div class="dont-col">
+        <h4>Avoid This</h4>
+        <div class="coaching-item">Don't be too theoretical — they want to hear a specific 90-day plan, not change management philosophy</div>
+        <div class="coaching-item">Don't skip to Phase 3 — if you jump straight to "I'd form a working group," you sound naive about earning trust</div>
+        <div class="coaching-item">Don't say "it depends" without then committing to a concrete approach</div>
+        <div class="coaching-item">Don't focus only on tools — this question is 70% about people, 30% about technology</div>
+        <div class="coaching-item">Don't promise overnight transformation — "this takes 6-12 months to really mature" shows realistic expectations</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Follow-up Questions -->
+  <div class="section-header">Likely Follow-Ups</div>
+  <div class="followup">
+
+    <div class="fq-card" onclick="this.classList.toggle('open')">
+      <div class="fq-header">
+        <span class="fq-q">"What if a team just refuses to adopt the standards?"</span>
+        <span class="fq-chevron">▼</span>
+      </div>
+      <div class="fq-body">
+        <div class="script">
+          "First, I'd want to understand <span class="hl">why</span>. Usually resistance falls into three buckets: they don't see the value, the standard doesn't fit their use case, or they don't have time to migrate.<br><br>
+
+          If it's a value problem, that's on me — I haven't demonstrated enough benefit. I'd go back to pairing with that team and solving a specific pain point using the standard approach so they see the difference firsthand.<br><br>
+
+          If it's a fit problem, that's <span class="hl-green">good feedback</span> — maybe the standard needs an extension or a documented exception. Not every pipeline is the same.<br><br>
+
+          If it's a time problem, that's a prioritization conversation with leadership, not an architecture conversation. I'd help them make the case for tech debt reduction alongside their feature work.<br><br>
+
+          What I <span class="hl-purple">wouldn't</span> do is escalate to management or make it a compliance issue. The moment standards become a stick instead of a tool, you've lost."
+        </div>
+      </div>
+    </div>
+
+    <div class="fq-card" onclick="this.classList.toggle('open')">
+      <div class="fq-header">
+        <span class="fq-q">"How do you measure whether your standards are actually working?"</span>
+        <span class="fq-chevron">▼</span>
+      </div>
+      <div class="fq-body">
+        <div class="script">
+          "I look at <span class="hl">leading indicators, not lagging ones</span>. The lagging indicator is 'percent of pipelines that follow the standard' — that's a vanity metric that incentivizes checkbox compliance.<br><br>
+
+          The leading indicators I care about:<br>
+          <span class="hl-blue">Time-to-production</span> for a new pipeline — if standards include good templates, this should drop.<br>
+          <span class="hl-orange">Incident frequency</span> — standardized observability and quality checks should reduce production issues.<br>
+          <span class="hl-green">Cross-team PR activity</span> — if engineers from Team A are contributing to Team B's patterns repo, the inner-source model is working.<br>
+          <span class="hl-purple">Onboarding time</span> — can a new engineer understand and contribute to a pipeline they didn't build? That's the ultimate test of whether standards are creating shared understanding."
+        </div>
+      </div>
+    </div>
+
+    <div class="fq-card" onclick="this.classList.toggle('open')">
+      <div class="fq-header">
+        <span class="fq-q">"Where's the line between helpful standards and bureaucracy?"</span>
+        <span class="fq-chevron">▼</span>
+      </div>
+      <div class="fq-body">
+        <div class="script">
+          "My test is simple: <span class="hl">does this standard accelerate teams or slow them down?</span><br><br>
+
+          If an engineer has to file a ticket and wait for an architecture review to deploy a straightforward pipeline, that's bureaucracy. If they can grab a tested template, plug in their logic, and deploy through an automated pipeline with built-in guardrails — that's a standard doing its job.<br><br>
+
+          I think of standards in two tiers. <span class="hl-green">Hard guardrails</span> are the non-negotiables — data classification in Unity Catalog, PII handling, access control patterns. Those get enforced through automation, not process. <span class="hl-blue">Soft guidelines</span> are the conventions — naming, folder structure, documentation patterns. Those are 'you should unless you have a good reason not to, and you document why.'<br><br>
+
+          The moment your standards require more meetings, you've crossed the line."
+        </div>
+      </div>
+    </div>
+
+    <div class="fq-card" onclick="this.classList.toggle('open')">
+      <div class="fq-header">
+        <span class="fq-q">"How does this work at Wegmans specifically — with SAP pipelines alongside Databricks?"</span>
+        <span class="fq-chevron">▼</span>
+      </div>
+      <div class="fq-body">
+        <div class="script">
+          "That's actually a great example of why <span class="hl">listening first</span> matters so much. SAP-sourced pipelines have very different characteristics than web clickstream or IoT data. The extraction patterns, change data capture logic, schema semantics — they're all domain-specific.<br><br>
+
+          I'd want to understand how the SAP integration team is currently operating before suggesting any changes. My approach would be to <span class="hl-orange">standardize the Databricks layer</span> — medallion architecture, Unity Catalog governance, data quality expectations — while <span class="hl-green">respecting that the source-specific ingestion layer</span> may legitimately need different patterns for SAP ODP extraction versus Event Hub streaming versus batch file loads.<br><br>
+
+          The standard isn't 'everyone builds pipelines the same way.' It's '<span class="hl-blue">everyone lands data into a consistent lakehouse structure</span> so downstream consumers don't have to care how it got there.' That's where the real value is for a retail organization — analysts and data scientists shouldn't have to know whether a data point came from SAP S/4 HANA or the POS system."
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Closing -->
+  <div class="why-card" style="border-color: rgba(34,197,94,0.3); background: linear-gradient(135deg, #1a2520 0%, #1a1f2e 100%);">
+    <h2 style="color: #4ade80;">Strong Closing Line</h2>
+    <div class="script" style="border-left-color: #22c55e; margin-bottom: 0;">
+      "At the end of the day, my job as an architect isn't to be the smartest person in the room about how pipelines should work. It's to <span class="hl-green">make it easy for every team to build things the right way</span> — and to make sure we collectively agree on what 'the right way' means. That only happens when people feel ownership, not obligation."
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Cards are toggled via onclick in HTML
+</script>
+</body>
+</html>

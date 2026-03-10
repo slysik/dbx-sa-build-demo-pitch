@@ -1,0 +1,87 @@
+# FinServ Bank Corp — Databricks Lakehouse Discovery Answers
+# Scenario: Regulatory reporting, real-time risk, data democratization
+
+name: "FinServ Bank Corp"
+description: "Regulatory reporting delays, stale real-time KPIs, siloed risk and compliance data"
+
+answers:
+  # Section 1: Business Outcomes & Scope
+  customer_name: "FinServ Bank Corp"
+  biz_problem: "Regulatory reporting delays, stale real-time KPIs, siloed risk and compliance data"
+  biz_kpis: "Reduce report delivery from 5 days to 1 day; enable real-time risk dashboards in 90 days"
+  use_cases:
+    - Regulatory Reporting
+    - Real-time KPIs
+    - Data Democratization
+    - ML/AI Platform
+  consumers:
+    - Regulators
+    - Executives
+    - Analysts
+    - Data Scientists
+
+  # Section 2: Data Sources & Ingestion
+  sources: "Core banking (Temenos), loan origination (Fiserv), market data (Bloomberg), risk systems (custom), HR (Workday)"
+  cloud:
+    - Azure
+  bi_tools: "Power BI, custom VB6 reports"
+  etl_tools: "SSIS, custom scheduled jobs"
+  latency:
+    - Near-real-time
+    - Hourly
+  formats:
+    - Structured/SQL
+    - Semi-structured/JSON
+  volume: "2-3 TB daily, growing 20%/year"
+  num_sources: "28"
+
+  # Section 3: Data Warehouse & Modeling
+  dw_approach:
+    - Centralized EDW
+  domains: "Customers, Accounts, Products, Transactions, Risk, Compliance, HR"
+  subject_areas: "Customer grain, Account-daily, Transaction-atomic, Risk-daily, Compliance-audit-trail"
+  modeling_pref:
+    - Star/Dimensional
+  query_slas: "50 concurrent report users, <2s exec dashboard, <30s ad-hoc"
+
+  # Section 4: Non-Functional Requirements
+  dr: "RPO 4h, RTO 2h (regulatory requirement)"
+  peak_periods: "Month-end close (72h window), regulatory deadline sprints"
+  users: "250 knowledge workers + 5 automated systems"
+  cost_sensitivity:
+    - Balanced
+
+  # Section 5: Governance, Security & Compliance
+  compliance:
+    - GDPR
+    - PCI-DSS
+    - SOX
+    - Basel IV
+  access_model:
+    - RBAC
+  catalog_strategy:
+    - Unity Catalog
+  audit_reqs: "Complete audit trail for all data access, quarterly compliance certification"
+
+  # Section 6: Operational Model & SDLC
+  deploy_approach:
+    - CI/CD
+    - IaC/Terraform
+  environments:
+    - Dev/Test/Prod
+  ops_model:
+    - Central platform team
+  monitoring: "Datadog, Azure Monitor"
+
+  # Section 7: Success Metrics & Timeline
+  success_short: "Regulatory reporting on real-time data by month-end (90 days)"
+  success_long: "Cross-bank ML-powered risk prediction, self-service analytics, real-time compliance monitoring"
+  deadlines: "GDPR audit (Q3), regulatory reporting deadline (Q4)"
+  mvp_uses: "Regulatory report acceleration, real-time KPI dashboard"
+  mandates: "Must use Azure (enterprise standard), cannot move data out of region"
+  skills:
+    - SQL-heavy
+    - Python
+  pain_points: "Legacy SSIS jobs fail silently; data quality issues not caught until report time; cross-system reconciliation is manual"
+  notes: "Risk aversion high; prefer Databricks over open-source Spark. Data governance is top priority."
+  migration_approach: []

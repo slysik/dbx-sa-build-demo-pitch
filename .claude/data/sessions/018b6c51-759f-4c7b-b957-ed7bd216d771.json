@@ -1,0 +1,9 @@
+{
+  "session_id": "018b6c51-759f-4c7b-b957-ed7bd216d771",
+  "prompts": [
+    "/prime ",
+    "  /build specs/create-customer2-delta-table.md",
+    "run a optimize on customer2 table"
+  ],
+  "agent_name": "Pulse"
+}

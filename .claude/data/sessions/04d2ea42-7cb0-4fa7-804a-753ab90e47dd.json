@@ -1,0 +1,7 @@
+{
+  "session_id": "04d2ea42-7cb0-4fa7-804a-753ab90e47dd",
+  "prompts": [
+    "/dbx-interview-playbook Step 0 answers: (1) Catalog: dbx_weg (2) Real Azure workspace with serverless (3) Time budget: 60 min. Skip questions. Generate the full pipeline for: Build a streaming retail orders pipeline: ingest 100k orders, deduplicate, aggregate daily revenue by store and loyalty tier, build a dashboard.. PySpark for data gen (~100k rows via spark.range + Faker UDFs), SQL for all transforms. Include TALK/SCALING/DW-BRIDGE narration comments. Execute SQL via MCP. Create dashboard. Include proof points."
+  ],
+  "agent_name": "Prism"
+}

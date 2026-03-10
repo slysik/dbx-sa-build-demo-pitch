@@ -1,0 +1,22 @@
+[
+  {"query": "grant SELECT on my schema to the data_engineers group", "should_trigger": true},
+  {"query": "upload a CSV to volumes at /Volumes/dbx_weg/bronze/raw_files/data.csv", "should_trigger": true},
+  {"query": "query system.access.audit to see who changed permissions last week", "should_trigger": true},
+  {"query": "check table lineage for dbx_weg.gold.daily_revenue", "should_trigger": true},
+  {"query": "SHOW GRANTS on catalog dbx_weg", "should_trigger": true},
+  {"query": "create a new catalog called retail_analytics with a storage root", "should_trigger": true},
+  {"query": "list all files in my volume /Volumes/dbx_weg/bronze/checkpoints/", "should_trigger": true},
+  {"query": "how much DBU usage did we have last month from system.billing.usage", "should_trigger": true},
+  {"query": "revoke ALL PRIVILEGES on schema gold from the interns group", "should_trigger": true},
+  {"query": "set up data profiling and quality monitoring on my silver tables", "should_trigger": true},
+  {"query": "create a delta table with liquid clustering on order_date", "should_trigger": false},
+  {"query": "set up a streaming pipeline from bronze to silver using SDP", "should_trigger": false},
+  {"query": "build a dashboard showing daily revenue trends", "should_trigger": false},
+  {"query": "create a genie space for my sales team", "should_trigger": false},
+  {"query": "deploy a model serving endpoint for predictions", "should_trigger": false},
+  {"query": "run my ETL job on the cluster", "should_trigger": false},
+  {"query": "generate 100k rows of fake transaction data with pyspark and faker", "should_trigger": false},
+  {"query": "create a notebook that processes JSON files with spark", "should_trigger": false},
+  {"query": "write a SQL query joining orders and customers tables", "should_trigger": false},
+  {"query": "set up an alert when my query fails", "should_trigger": false}
+]

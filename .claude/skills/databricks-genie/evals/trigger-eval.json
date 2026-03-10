@@ -1,0 +1,22 @@
+[
+  {"query": "create a genie space for my sales team so they can explore revenue data", "should_trigger": true},
+  {"query": "let business users ask questions in natural language about our gold tables", "should_trigger": true},
+  {"query": "set up NL-to-SQL for the retail_demo.gold schema", "should_trigger": true},
+  {"query": "I want to build a conversational data interface on top of my catalog.sales.orders table", "should_trigger": true},
+  {"query": "add sample questions to my genie space 01ef8abc", "should_trigger": true},
+  {"query": "how do I use the genie conversation API to ask questions programatically", "should_trigger": true},
+  {"query": "create a natural language query interface for non-technical users on our customer data", "should_trigger": true},
+  {"query": "delete the old genie space and make a new one with updated tables", "should_trigger": true},
+  {"query": "set up a text-to-sql chatbot for our analytics tables in dbx_weg.gold", "should_trigger": true},
+  {"query": "ask_genie to query my space about top customers last quarter", "should_trigger": true},
+  {"query": "create a SQL query to find total revenue by region", "should_trigger": false},
+  {"query": "build a dashboard showing monthly sales trends", "should_trigger": false},
+  {"query": "set up a streaming pipeline for bronze to silver", "should_trigger": false},
+  {"query": "create a notebook that reads from my delta table", "should_trigger": false},
+  {"query": "deploy a model serving endpoint for my fraud detection model", "should_trigger": false},
+  {"query": "grant SELECT on catalog.schema to my team", "should_trigger": false},
+  {"query": "upload a CSV file to my volume at /Volumes/catalog/schema/vol/", "should_trigger": false},
+  {"query": "create a job that runs my ETL notebook every hour", "should_trigger": false},
+  {"query": "generate synthetic transaction data with faker", "should_trigger": false},
+  {"query": "what tables are in the dbx_weg.gold schema", "should_trigger": false}
+]
