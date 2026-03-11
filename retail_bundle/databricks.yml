@@ -1,0 +1,27 @@
+# SA: Asset Bundle — single artifact that deploys Bronze notebook, SDP pipeline,
+#     dashboard, and orchestration job. One `bundle deploy` = entire demo ready.
+#     Variables parameterize catalog/schema/warehouse — same bundle works dev→prod.
+
+bundle:
+  name: retail_medallion_bundle
+
+variables:
+  catalog:
+    default: interview
+  schema:
+    default: retail
+  warehouse_id:
+    default: b89b264d78f9d52e
+
+include:
+  - resources/*.yml
+
+workspace:
+  host: https://adb-7405619449104571.11.azuredatabricks.net
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/Users/slysik@gmail.com/.bundle/${bundle.name}

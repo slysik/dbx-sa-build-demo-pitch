@@ -1,0 +1,17 @@
+# SA: SDP pipeline — serverless compute, Unity Catalog target.
+#     Reads Bronze Delta tables, produces Silver (cleaned) + Gold (aggregated).
+#     Materialized views because Bronze is regular Delta (not streaming tables).
+#     Pipeline provisions in ~3 min, executes Silver+Gold in ~1-2 min.
+
+resources:
+  pipelines:
+    retail_medallion:
+      name: "[${bundle.target}] Retail Medallion Pipeline"
+      catalog: ${var.catalog}
+      target: ${var.schema}
+      development: true
+      libraries:
+        - file:
+            path: ../src/pipeline/02_silver.sql
+        - file:
+            path: ../src/pipeline/03_gold.sql
