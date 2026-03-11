@@ -149,3 +149,33 @@ databricks bundle destroy --auto-approve  # Tear down
 2. **Serverless SDP completes in 1-3 min** — most time is compute provisioning, not execution.
 3. **Serverless notebook tasks** — omit cluster config in job YAML to use serverless.
 4. **DABs pipeline libraries** — use `file:` (not `notebook:`) for raw `.sql` files. `notebook:` expects Databricks notebook format.
+
+## Test Run Learnings (2026-03-11 media_lakehouse run)
+
+### CLI API Call Patterns
+5. **`databricks api get --query` is BROKEN on macOS system Python 3.9** — returns empty response, causes JSON parse errors. **Always use URL query params instead**: `databricks api get "/api/2.1/jobs/runs/get?run_id=$RUN_ID"`.
+6. **`databricks pipelines list` does NOT exist** — use `databricks pipelines list-pipelines`. The CLI subcommand name is different from what you'd expect.
+7. **Pipeline list returns a flat JSON array**, not `{"statuses": [...]}`. Parse accordingly: `data=json.load(sys.stdin); for p in data: ...`.
+8. **Jobs list returns `{"jobs": [...]}` dict**, not a flat array. Parse with `data.get('jobs', data)`.
+9. **`DROP METRIC VIEW` syntax does not exist** — use `DROP VIEW IF EXISTS` to drop metric views.
+10. **Multi-statement SQL via Statements API fails** — submit one statement per API call. Don't chain with semicolons.
+
+### SDP Pipeline Performance
+11. **SDP serverless provisioning + execution for 3 MVs (Silver) + 3 MVs (Gold) against 10M Bronze rows: ~50 seconds total.** Much faster than expected. Provisioning is the bottleneck, not execution.
+12. **Pipeline goes RUNNING → IDLE quickly** — poll every 20 sec, not every 60 sec. Most runs complete in 1-2 poll cycles.
+
+### Dashboard Deployment
+13. **Dashboard creation via POST works on first try when workspace is clean.** No collision issues when old dashboards are deleted first.
+14. **Dashboard publish with `embed_credentials: false` works reliably** — confirmed again on this workspace.
+15. **Upload SDP SQL files as notebooks for interviewer viewing** — use `workspace import --language SQL`. They can't run standalone (SDP-only syntax) but interviewer can read the logic.
+
+### Project Structure (repo-best-practices integration)
+16. **Scaffold + code gen takes ~2 min regardless of data size** — it's all local file writes. This is "free" time.
+17. **Bundle validate + deploy: ~25 sec** — fast. No reason to skip validation.
+18. **The `media_lakehouse/` subdirectory pattern works cleanly** — `databricks.yml` at project root, `bundle validate` and `bundle deploy` run from inside the subdir.
+19. **Workspace folder `/Users/slysik@gmail.com/media_lakehouse/` holds uploaded notebooks for UI viewing** — separate from the `.bundle/` deploy path. Both are needed: `.bundle/` for pipeline/job execution, visible folder for interviewer walkthrough.
+
+### Cleanup Workflow
+20. **Full workspace cleanup order matters**: delete pipelines FIRST (releases table ownership), then drop tables (materialization + bronze), then delete jobs, then delete dashboards, then delete workspace folders. Wrong order causes `TABLE_ALREADY_MANAGED` errors.
+21. **Drop tables one at a time via SQL Statements API** — multi-statement fails. Loop through table names individually.
+22. **Metric views show as `METRIC_VIEW` table_type in information_schema** but are dropped with `DROP VIEW`, not `DROP METRIC VIEW`.

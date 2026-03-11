@@ -148,6 +148,15 @@ N_EVENTS = 1_000_000   # scale test
 
 **Notebook-first, pipeline-in-parallel.** The user walks through Bronze while backend deploys SDP.
 
+**If pi `dbx-tools` extension is loaded, use custom tools instead of raw CLI:**
+- `dbx_auth_check` instead of `databricks auth describe`
+- `dbx_run_notebook` instead of manual runs/submit + polling loop
+- `dbx_poll_pipeline` instead of manual pipeline polling loop
+- `dbx_validate_tables` instead of individual SQL count queries
+- `dbx_deploy_dashboard` instead of manual POST/PATCH + publish
+- `dbx_cleanup` instead of manual delete loops
+- `dbx_sql` instead of raw SQL Statements API calls
+
 ```
 1. Upload notebook → hand URL immediately (user starts walking through on warm cluster)
 2. IN PARALLEL: create/update SDP pipeline, upload Silver/Gold SQL, trigger pipeline
@@ -304,6 +313,75 @@ PHASE 4: HAND TO USER
 ## Supplemental References
 
 - **[sdp-and-dashboard-patterns.md](sdp-and-dashboard-patterns.md)** — SDP gotchas, metric view patterns, dashboard REST API, auth/workspace issues. Read when building Silver/Gold/Dashboard.
+
+## CLI Polling Patterns — MUST USE THESE (tested 2026-03-11)
+
+### ❌ BROKEN: `--query` param with system Python 3.9
+```bash
+# This returns empty response → JSON parse error
+databricks -p slysik api get /api/2.1/jobs/runs/get --query "run_id=$RUN_ID"
+```
+
+### ✅ WORKING: URL query params
+```bash
+# Notebook run polling
+databricks -p slysik api get "/api/2.1/jobs/runs/get?run_id=$RUN_ID" 2>&1 | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+state=d.get('state',{})
+print(f'{state.get(\"life_cycle_state\",\"?\")}|{state.get(\"result_state\",\"\")}')"
+
+# Pipeline state polling
+databricks -p slysik api get "/api/2.0/pipelines/$PIPELINE_ID" 2>&1 | python3 -c "
+import sys,json; d=json.load(sys.stdin); print(d.get('state','?'))"
+```
+
+### Complete polling loop (notebook run)
+```bash
+RUN_ID=<run_id>
+for i in $(seq 1 30); do
+  result=$(databricks -p slysik api get "/api/2.1/jobs/runs/get?run_id=$RUN_ID" 2>&1 | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+s=d.get('state',{})
+print(f'{s.get(\"life_cycle_state\",\"?\")}|{s.get(\"result_state\",\"\")}')" 2>&1)
+  life=$(echo $result | cut -d'|' -f1)
+  res=$(echo $result | cut -d'|' -f2)
+  echo "  $(date '+%H:%M:%S') — $life $res"
+  if [ "$life" = "TERMINATED" ] || [ "$life" = "INTERNAL_ERROR" ]; then break; fi
+  sleep 10
+done
+```
+
+### Complete polling loop (SDP pipeline)
+```bash
+PIPELINE_ID=<pipeline_id>
+for i in $(seq 1 20); do
+  state=$(databricks -p slysik api get "/api/2.0/pipelines/$PIPELINE_ID" 2>&1 | python3 -c "
+import sys,json; d=json.load(sys.stdin); print(d.get('state','?'))" 2>&1)
+  echo "  $(date '+%H:%M:%S') — $state"
+  if [ "$state" = "IDLE" ] || [ "$state" = "FAILED" ]; then break; fi
+  sleep 20
+done
+```
+
+## Test Run Timing Benchmarks (2026-03-11)
+
+| Phase | 100K rows | 10M rows | Notes |
+|-------|-----------|----------|-------|
+| Scaffold + code gen | ~2 min | ~2 min | Constant — no data dependency |
+| Bundle validate + deploy | ~25 sec | ~25 sec | Constant |
+| Upload notebooks | ~10 sec | ~10 sec | Constant |
+| Run Bronze notebook | ~30 sec | ~5.5 min | **Main bottleneck at scale** |
+| SDP pipeline (serverless) | ~50 sec | ~50 sec | Mostly provisioning time |
+| Dashboard deploy + publish | ~30 sec | ~30 sec | Constant |
+| **Total** | **~6-7 min** | **~11-12 min** | At 100K, fits interview easily |
+
+### Speed Rules
+- **Start at 100K** for initial demo — scale to 1M after showing it works
+- **SDP serverless provisioning** is ~40 sec regardless of data size — it's fixed overhead
+- **Bronze notebook** is the only variable-time step — scales linearly with N_EVENTS
+- **4-core single node**: 100K = ~30s, 1M = ~1.5min, 10M = ~5.5min
 
 ## Complete Config Block (Copy-Paste Start)
 
