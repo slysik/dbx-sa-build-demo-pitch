@@ -179,3 +179,38 @@ databricks bundle destroy --auto-approve  # Tear down
 20. **Full workspace cleanup order matters**: delete pipelines FIRST (releases table ownership), then drop tables (materialization + bronze), then delete jobs, then delete dashboards, then delete workspace folders. Wrong order causes `TABLE_ALREADY_MANAGED` errors.
 21. **Drop tables one at a time via SQL Statements API** — multi-statement fails. Loop through table names individually.
 22. **Metric views show as `METRIC_VIEW` table_type in information_schema** but are dropped with `DROP VIEW`, not `DROP METRIC VIEW`.
+
+## Test Run Learnings (2026-03-11 retail_lakehouse run)
+
+### Bronze via Serverless SQL (Auth Workaround)
+23. **When cluster auth fails ("principal inactive"), generate Bronze via serverless SQL warehouse instead.** `CREATE OR REPLACE TABLE ... AS SELECT ... FROM RANGE(N)` works identically to `spark.range(N)`. Same distributed generation, same data quality — just runs on serverless compute instead of the interview cluster. The notebook still exists for walkthrough but data was created via `dbx_sql`.
+24. **SQL RANGE(N) is the serverless equivalent of spark.range(N).** Supports all the same patterns: modulo for FK integrity, rand(seed) for reproducibility, CASE/WHEN for weighted distributions, DATE_ADD for date spread.
+
+### Dashboard — What Made It Work This Time
+25. **Dashboard datasets query ONLY Gold MVs — never Silver or Bronze.** Gold tables are pre-aggregated (72-600 rows), which means dashboard queries are instant. Previous attempts that queried Silver (100K+ rows) were slower and more error-prone.
+26. **Dashboard dataset SQL re-aggregates Gold by dropping time dimensions.** Gold has `category × year × month` (72 rows). Dashboard `ds_category` does `GROUP BY category` to collapse months → 6 rows. This two-stage aggregation (Silver→Gold in SDP, Gold→dashboard in SQL) keeps both layers clean.
+27. **Every dashboard SQL query was tested via `dbx_sql` BEFORE building the dashboard JSON.** All 5 queries returned valid data. Zero broken widgets on first deploy.
+28. **Counter widgets use `disaggregated: true` with a 1-row KPI summary dataset.** The `ds_kpi` dataset pre-aggregates everything into a single row (`COUNT(*), SUM(), AVG()`). Counter widgets just reference the column name directly — no widget-level aggregation needed.
+29. **Dashboard field name matching is exact and case-sensitive.** `name` in `query.fields` MUST equal `fieldName` in `encodings`. For pre-aggregated data with `disaggregated: true`, both use the bare column alias (e.g., `"revenue"`, not `"sum(revenue)"`).
+30. **Widget versions confirmed working: counter=2, table=2, bar=3, line=3, pie=3, filter-multi-select=2.** Text widgets have NO spec block — use `multilineTextboxSpec` directly.
+31. **Separate text widgets for title and subtitle.** Multiple items in `lines` array concatenate on one line. Use separate widgets at different y positions.
+32. **Global filters on `PAGE_TYPE_GLOBAL_FILTERS` page affect all datasets containing the filter column.** Category filter affects `ds_category` (has `category`), region filter affects `ds_region` (has `region`). Datasets without the column are unaffected.
+
+### Dashboard Dataset Design Pattern (Canonical)
+```
+Gold MV (pre-aggregated by SDP):
+  gold_sales_by_category: category × year × month → 72 rows
+  gold_sales_by_store: region × format × city × year × month → 600 rows
+  gold_daily_revenue: date → 365 rows
+
+Dashboard datasets (re-aggregate Gold):
+  ds_kpi: SUM/AVG across all gold_sales_by_category → 1 row
+  ds_category: GROUP BY category → 6 rows
+  ds_region: GROUP BY region, store_format → ~15 rows
+  ds_daily: direct SELECT from gold_daily_revenue → 365 rows
+```
+**Rule: Dashboard SQL should never touch more than ~1000 rows. If it does, add another Gold MV.**
+
+### Pi Footer Extension
+33. **`ctx.ui.setStatus()` is invisible when `ctx.ui.setFooter()` is used.** Custom footers replace the default footer entirely, including all status entries. Pipeline checkmarks must be rendered INSIDE the custom footer's `render()` function, not via `setStatus()`.
+34. **`tool_result` event has `event.content` (array) and `event.toolName` directly on the event.** Match on tool output text (`text.includes("completed")`) for reliable detection regardless of result structure changes.

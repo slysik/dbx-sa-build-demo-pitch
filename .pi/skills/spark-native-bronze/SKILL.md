@@ -231,6 +231,9 @@ The code structure is identical — only column names and categories change.
 5. **Widget versions** — counter=2, table=2, filters=2, bar/line/pie=3. Text widgets have NO spec block.
 6. **Text title + subtitle** — Use SEPARATE text widgets at different y positions. Multiple `lines` array items concatenate on one line.
 7. **Global filters** — Put on a `PAGE_TYPE_GLOBAL_FILTERS` page. Filter only affects datasets containing the filter column.
+8. **Dashboard datasets query ONLY Gold MVs — NEVER Silver or Bronze.** Gold tables are pre-aggregated (tens to hundreds of rows). Dashboard SQL re-aggregates Gold by collapsing time dims → single-digit row counts for charts. This two-stage pattern (SDP aggregates Silver→Gold, dashboard re-aggregates Gold→widget) is the key to dashboards that load instantly and render correctly.
+9. **Counter widgets: use `disaggregated: true` with a 1-row pre-aggregated dataset.** Create a `ds_kpi` dataset that SELECT SUM/AVG/COUNT from Gold into one row. Counter fields reference bare column aliases (`"revenue"` not `"sum(revenue)"`).
+10. **Auth fallback: generate Bronze via `dbx_sql` + `RANGE(N)` on serverless.** When cluster auth fails ("principal inactive"), `CREATE OR REPLACE TABLE ... AS SELECT ... FROM RANGE(N)` is identical to `spark.range(N)`. Same FK integrity via modulo, same distributions, zero code pattern changes.
 
 ## Interview Workflow — Complete Sequence (MUST FOLLOW)
 
