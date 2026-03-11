@@ -386,6 +386,29 @@ done
 - **Bronze notebook** is the only variable-time step — scales linearly with N_EVENTS
 - **4-core single node**: 100K = ~30s, 1M = ~1.5min, 10M = ~5.5min
 
+## CDC Pattern — Bronze with APPLY CHANGES at Silver (2026-03-11 media_lakehouse)
+
+### Bronze CDC Generation
+35. **Three `spark.range()` unions for CDC: INSERT + UPDATE + DELETE.** Cleanest pattern for interview narration. Each block has identical schema. UPDATEs reuse same event_id (first N_UPDATES), DELETEs reuse next N_DELETES event_ids. Union all three → single Bronze table.
+36. **`_commit_timestamp` ordering is critical for APPLY CHANGES.** INSERT rows use `event_ts` as commit time. UPDATE rows use a fixed date AFTER all INSERT dates. DELETE rows use the latest date. SEQUENCE BY resolves to the highest `_commit_timestamp` per key.
+37. **SQL `RANGE(N)` is identical to `spark.range(N)` for serverless fallback.** Same FK integrity via modulo, same distributions, same UNION ALL pattern. Use `CREATE OR REPLACE TABLE ... AS SELECT ... FROM RANGE(N) UNION ALL ...` when cluster auth fails.
+
+### SDP APPLY CHANGES (AUTO CDC)
+38. **SDP APPLY CHANGES clause order: KEYS → APPLY AS DELETE WHEN → SEQUENCE BY → COLUMNS * EXCEPT → STORED AS SCD TYPE.** Getting this wrong causes parse errors.
+39. **COLUMNS * EXCEPT must list only columns that exist in the source.** Exclude CDC columns (`_change_type`, `_commit_timestamp`) and Bronze metadata (`ingest_ts`, `source_system`, `batch_id`).
+40. **SCD TYPE 1 = latest state only (no history). SCD TYPE 2 = full history with `__START_AT`/`__END_AT`.** Type 1 is correct for streaming events where corrections replace originals.
+41. **Silver streaming table from APPLY CHANGES supports CLUSTER BY.** `CREATE OR REFRESH STREAMING TABLE ... CLUSTER BY (event_ts)` works.
+
+### Pipeline Ownership & SCIM
+42. **Pipeline `run_as_user_name` determines execution identity.** If that user is SCIM-inactive, pipeline FAILS silently — no error details in events, just `FAILED` state.
+43. **Fix: delete pipeline, recreate as SP.** `DELETE /api/2.0/pipelines/{id}` then `POST /api/2.0/pipelines` with SP profile. SP-owned pipelines are SCIM-immune.
+44. **`dbx_poll_pipeline` reports "completed" when pipeline reaches IDLE — but IDLE after FAILED is NOT success.** Always verify tables exist after pipeline "completes". Check `latest_updates[0].state` for actual result.
+45. **SP needs explicit catalog grants before SQL access.** `GRANT USE_CATALOG, USE_SCHEMA, CREATE_SCHEMA, CREATE_TABLE, SELECT, MODIFY ON CATALOG ... TO SP_ID`. Also `GRANT ALL PRIVILEGES ON SCHEMA ... TO SP_ID` for table management.
+
+### Metric View
+46. **Metric view with star-schema joins works on streaming table source.** YAML `joins` reference Bronze dims by fully-qualified name. `source` is the Silver streaming table.
+47. **Metric view is NOT SDP syntax — runs on SQL warehouse.** Don't include in pipeline libraries. Create via `dbx_sql` after pipeline completes.
+
 ## Complete Config Block (Copy-Paste Start)
 
 ```python

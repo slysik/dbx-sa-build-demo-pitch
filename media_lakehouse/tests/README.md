@@ -2,9 +2,10 @@
 
 ## Planned
 
-- [ ] Unit tests for Bronze generation logic (schema validation, FK integrity)
-- [ ] Integration tests for Silver dedup correctness
-- [ ] Gold aggregation validation (sum reconciliation Bronze → Gold)
+- [ ] Unit tests for Bronze CDC generation (correct INSERT/UPDATE/DELETE ratios)
+- [ ] Integration tests for APPLY CHANGES correctness (99K rows, updated values, no deleted rows)
+- [ ] Gold aggregation validation (sum reconciliation Silver → Gold)
+- [ ] Metric view query validation (MEASURE() returns correct aggregates)
 
 ## Run
 

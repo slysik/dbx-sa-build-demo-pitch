@@ -211,6 +211,15 @@ Dashboard datasets (re-aggregate Gold):
 ```
 **Rule: Dashboard SQL should never touch more than ~1000 rows. If it does, add another Gold MV.**
 
+### CDC Pipeline Deployment (media_lakehouse 2026-03-11)
+33. **Pipeline created by PAT user inherits `run_as_user_name: slysik@gmail.com`.** If SCIM-inactive, pipeline fails with zero error details — just `FAILED` in `latest_updates`. No `flow_progress` or `dataset_progress` events are emitted.
+34. **Solution: delete old pipeline, create new one via SP profile.** SP-created pipeline gets `run_as_user_name: {sp_client_id}`. SCIM-immune. Completes in ~42 sec for CDC + 3 Gold MVs.
+35. **Dashboard JSON `queryLines` is FLAT on the dataset object, not nested under `query`.** Wrong: `{"query": {"queryLines": [...]}}`. Right: `{"queryLines": [...]}`. Causes "failed to parse serialized dashboard" error.
+36. **Dashboard pages need `"pageType": "PAGE_TYPE_CANVAS"`.** Missing this field can cause parse failures.
+37. **CDC Bronze validation: check `_change_type` distribution.** `GROUP BY _change_type` should show expected INSERT/UPDATE/DELETE counts. Silver count = INSERT count - DELETE count.
+38. **Gold aggregation reconciliation: all Gold MVs must agree on totals.** `SUM(total_watch_minutes)` from gold_daily, gold_content, and gold_engagement must all match Silver's `SUM(watch_minutes)`. This confirms join integrity and no data loss.
+39. **SP needs `GRANT ALL PRIVILEGES ON SCHEMA` to manage tables.** Without this, SP gets `PERMISSION_DENIED: User does not have MANAGE on Table` when trying to DROP old tables.
+
 ### Pi Footer Extension
-33. **`ctx.ui.setStatus()` is invisible when `ctx.ui.setFooter()` is used.** Custom footers replace the default footer entirely, including all status entries. Pipeline checkmarks must be rendered INSIDE the custom footer's `render()` function, not via `setStatus()`.
-34. **`tool_result` event has `event.content` (array) and `event.toolName` directly on the event.** Match on tool output text (`text.includes("completed")`) for reliable detection regardless of result structure changes.
+40. **`ctx.ui.setStatus()` is invisible when `ctx.ui.setFooter()` is used.** Custom footers replace the default footer entirely, including all status entries. Pipeline checkmarks must be rendered INSIDE the custom footer's `render()` function, not via `setStatus()`.
+41. **`tool_result` event has `event.content` (array) and `event.toolName` directly on the event.** Match on tool output text (`text.includes("completed")`) for reliable detection regardless of result structure changes.
