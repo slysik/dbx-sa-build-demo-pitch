@@ -1,0 +1,33 @@
+bundle:
+  name: media-streaming-demo
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    default: "interview"
+  schema:
+    default: "media"
+  warehouse_id:
+    default: "b89b264d78f9d52e"
+
+targets:
+  dev:
+    default: true
+    mode: development
+    workspace:
+      host: https://adb-7405619449104571.11.azuredatabricks.net
+      profile: slysik
+    variables:
+      catalog: "interview"
+      schema: "media_dev"
+
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-7405619449104571.11.azuredatabricks.net
+    variables:
+      catalog: "interview"
+      schema: "media"
+      warehouse_id: "b89b264d78f9d52e"
