@@ -1,0 +1,238 @@
+{
+  "pages": [
+    {
+      "name": "media_overview",
+      "displayName": "Media Streaming Analytics",
+      "layout": [
+        {
+          "widget": {
+            "name": "title_text",
+            "textbox_spec": ""
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "total_streams_counter",
+            "queries": [
+              {
+                "name": "q_total_streams",
+                "query": {
+                  "datasetName": "ds_daily_streaming",
+                  "fields": [{"name": "total_streams", "expression": "SUM(`total_streams`)"}],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "SUM(`total_streams`)", "displayName": "Total Streams"}
+              }
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "unique_viewers_counter",
+            "queries": [
+              {
+                "name": "q_unique_viewers",
+                "query": {
+                  "datasetName": "ds_daily_streaming",
+                  "fields": [{"name": "unique_viewers", "expression": "SUM(`unique_viewers`)"}],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "SUM(`unique_viewers`)", "displayName": "Unique Viewers"}
+              }
+            }
+          },
+          "position": {"x": 2, "y": 1, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "avg_watch_counter",
+            "queries": [
+              {
+                "name": "q_avg_watch",
+                "query": {
+                  "datasetName": "ds_daily_streaming",
+                  "fields": [{"name": "avg_watch_min", "expression": "AVG(`avg_watch_min`)"}],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "AVG(`avg_watch_min`)", "displayName": "Avg Watch (min)"}
+              }
+            }
+          },
+          "position": {"x": 4, "y": 1, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "daily_streams_line",
+            "queries": [
+              {
+                "name": "q_daily_line",
+                "query": {
+                  "datasetName": "ds_daily_streaming",
+                  "fields": [
+                    {"name": "stream_date", "expression": "`stream_date`"},
+                    {"name": "total_streams", "expression": "`total_streams`"}
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "area",
+              "encodings": {
+                "x": {"fieldName": "stream_date", "scale": {"type": "temporal"}, "displayName": "Date"},
+                "y": {"fieldName": "total_streams", "scale": {"type": "quantitative"}, "displayName": "Streams"}
+              }
+            }
+          },
+          "position": {"x": 0, "y": 3, "width": 6, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "genre_bar",
+            "queries": [
+              {
+                "name": "q_genre",
+                "query": {
+                  "datasetName": "ds_content_popularity",
+                  "fields": [
+                    {"name": "genre", "expression": "`genre`"},
+                    {"name": "total_streams", "expression": "SUM(`total_streams`)"}
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "genre", "scale": {"type": "categorical"}, "displayName": "Genre"},
+                "y": {"fieldName": "SUM(`total_streams`)", "scale": {"type": "quantitative"}, "displayName": "Total Streams"}
+              }
+            }
+          },
+          "position": {"x": 0, "y": 6, "width": 3, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "plan_pie",
+            "queries": [
+              {
+                "name": "q_plan",
+                "query": {
+                  "datasetName": "ds_plan_engagement",
+                  "fields": [
+                    {"name": "plan_type", "expression": "`plan_type`"},
+                    {"name": "total_streams", "expression": "SUM(`total_streams`)"}
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "SUM(`total_streams`)", "displayName": "Streams"},
+                "color": {"fieldName": "plan_type", "scale": {"type": "categorical"}, "displayName": "Plan Type"}
+              }
+            }
+          },
+          "position": {"x": 3, "y": 6, "width": 3, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "device_bar",
+            "queries": [
+              {
+                "name": "q_device",
+                "query": {
+                  "datasetName": "ds_plan_engagement",
+                  "fields": [
+                    {"name": "device", "expression": "`device`"},
+                    {"name": "total_streams", "expression": "SUM(`total_streams`)"}
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "device", "scale": {"type": "categorical"}, "displayName": "Device"},
+                "y": {"fieldName": "SUM(`total_streams`)", "scale": {"type": "quantitative"}, "displayName": "Streams"}
+              }
+            }
+          },
+          "position": {"x": 0, "y": 9, "width": 3, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "completion_by_genre",
+            "queries": [
+              {
+                "name": "q_completion_genre",
+                "query": {
+                  "datasetName": "ds_content_popularity",
+                  "fields": [
+                    {"name": "genre", "expression": "`genre`"},
+                    {"name": "completion_rate_pct", "expression": "AVG(`completion_rate_pct`)"}
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "genre", "scale": {"type": "categorical"}, "displayName": "Genre"},
+                "y": {"fieldName": "AVG(`completion_rate_pct`)", "scale": {"type": "quantitative"}, "displayName": "Completion %"}
+              }
+            }
+          },
+          "position": {"x": 3, "y": 9, "width": 3, "height": 3}
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "name": "ds_daily_streaming",
+      "displayName": "Daily Streaming",
+      "query": "SELECT * FROM interview.media.gold_daily_streaming"
+    },
+    {
+      "name": "ds_content_popularity",
+      "displayName": "Content Popularity",
+      "query": "SELECT * FROM interview.media.gold_content_popularity"
+    },
+    {
+      "name": "ds_plan_engagement",
+      "displayName": "Plan Engagement",
+      "query": "SELECT * FROM interview.media.gold_plan_engagement"
+    }
+  ]
+}

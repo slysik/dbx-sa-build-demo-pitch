@@ -1,0 +1,46 @@
+bundle:
+  name: media_lakehouse
+
+variables:
+  catalog:
+    default: interview
+  schema:
+    default: media
+  warehouse_id:
+    default: b89b264d78f9d52e
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405619449104571.11.azuredatabricks.net
+
+resources:
+  pipelines:
+    media_medallion:
+      name: "media_medallion"
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      development: true
+      serverless: true
+      channel: PREVIEW
+      libraries:
+        - file:
+            path: src/pipeline/02_silver_transforms.sql
+        - file:
+            path: src/pipeline/03_gold_aggregations.sql
+
+  jobs:
+    media_orchestrator:
+      name: "media_orchestrator"
+      tasks:
+        - task_key: generate_bronze
+          notebook_task:
+            notebook_path: src/notebooks/01_generate_bronze.py
+        - task_key: run_pipeline
+          depends_on:
+            - task_key: generate_bronze
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.media_medallion.id}
+            full_refresh: true
