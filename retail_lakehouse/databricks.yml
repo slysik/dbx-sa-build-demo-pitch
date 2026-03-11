@@ -1,0 +1,55 @@
+bundle:
+  name: retail_lakehouse
+
+variables:
+  catalog:
+    default: interview
+  schema:
+    default: retail
+  warehouse_id:
+    default: b89b264d78f9d52e
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405619449104571.11.azuredatabricks.net
+
+resources:
+  pipelines:
+    retail_medallion:
+      name: "retail_medallion"
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      development: true
+      serverless: true
+      channel: PREVIEW
+      libraries:
+        - file:
+            path: src/pipeline/02_silver_transforms.sql
+        - file:
+            path: src/pipeline/03_gold_aggregations.sql
+
+  jobs:
+    retail_orchestrator:
+      name: "retail_orchestrator"
+      tasks:
+        - task_key: generate_bronze
+          notebook_task:
+            notebook_path: src/notebooks/01_generate_bronze.py
+          existing_cluster_id: 0310-193517-r0u8giyo
+
+        - task_key: run_pipeline
+          depends_on:
+            - task_key: generate_bronze
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.retail_medallion.id}
+            full_refresh: true
+
+        - task_key: validate
+          depends_on:
+            - task_key: run_pipeline
+          notebook_task:
+            notebook_path: src/notebooks/02_validate.py
+          existing_cluster_id: 0310-193517-r0u8giyo

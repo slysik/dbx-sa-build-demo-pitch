@@ -1,0 +1,360 @@
+{
+  "datasets": [
+    {
+      "name": "ds_kpi",
+      "displayName": "KPI Summary",
+      "queryLines": [
+        "SELECT ",
+        "  COUNT(*) AS total_transactions, ",
+        "  ROUND(SUM(total_revenue), 2) AS total_revenue, ",
+        "  ROUND(AVG(avg_transaction_value), 2) AS avg_txn_value, ",
+        "  SUM(total_units) AS total_units ",
+        "FROM interview.retail.gold_sales_by_category"
+      ]
+    },
+    {
+      "name": "ds_category",
+      "displayName": "Sales by Category",
+      "queryLines": [
+        "SELECT ",
+        "  category, ",
+        "  SUM(transaction_count) AS transactions, ",
+        "  ROUND(SUM(total_revenue), 2) AS revenue, ",
+        "  SUM(total_units) AS units ",
+        "FROM interview.retail.gold_sales_by_category ",
+        "GROUP BY category ",
+        "ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "ds_region",
+      "displayName": "Sales by Region",
+      "queryLines": [
+        "SELECT ",
+        "  region, ",
+        "  store_format, ",
+        "  SUM(transaction_count) AS transactions, ",
+        "  ROUND(SUM(total_revenue), 2) AS revenue ",
+        "FROM interview.retail.gold_sales_by_store ",
+        "GROUP BY region, store_format ",
+        "ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "ds_daily",
+      "displayName": "Daily Revenue Trend",
+      "queryLines": [
+        "SELECT ",
+        "  transaction_date, ",
+        "  daily_revenue, ",
+        "  transaction_count, ",
+        "  avg_basket_size, ",
+        "  active_stores ",
+        "FROM interview.retail.gold_daily_revenue ",
+        "ORDER BY transaction_date"
+      ]
+    },
+    {
+      "name": "ds_payment",
+      "displayName": "Payment Mix",
+      "queryLines": [
+        "SELECT ",
+        "  transaction_date, ",
+        "  credit_card_txns, ",
+        "  digital_wallet_txns, ",
+        "  transaction_count - credit_card_txns - digital_wallet_txns AS other_txns ",
+        "FROM interview.retail.gold_daily_revenue ",
+        "ORDER BY transaction_date"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "Retail Analytics",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": ["## 🛒 Retail Sales Analytics"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["Medallion pipeline: Bronze → Silver → Gold | 100K transactions across 200 products and 50 stores"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-revenue",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "total_revenue", "expression": "`total_revenue`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_revenue", "displayName": "Total Revenue"}
+              },
+              "frame": {"showTitle": true, "title": "Total Revenue"}
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-transactions",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "total_transactions", "expression": "`total_transactions`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_transactions", "displayName": "Total Transactions"}
+              },
+              "frame": {"showTitle": true, "title": "Total Transactions"}
+            }
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-avg-txn-value",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "avg_txn_value", "expression": "`avg_txn_value`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "avg_txn_value", "displayName": "Avg Transaction"}
+              },
+              "frame": {"showTitle": true, "title": "Avg Transaction Value"}
+            }
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "section-trends",
+            "multilineTextboxSpec": {
+              "lines": ["### 📈 Revenue Trends"]
+            }
+          },
+          "position": {"x": 0, "y": 5, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "daily-revenue-trend",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_daily",
+                "fields": [
+                  {"name": "transaction_date", "expression": "`transaction_date`"},
+                  {"name": "daily_revenue", "expression": "`daily_revenue`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {"fieldName": "transaction_date", "scale": {"type": "temporal"}, "displayName": "Date"},
+                "y": {"fieldName": "daily_revenue", "scale": {"type": "quantitative"}, "displayName": "Daily Revenue"}
+              },
+              "frame": {"showTitle": true, "title": "Daily Revenue"}
+            }
+          },
+          "position": {"x": 0, "y": 6, "width": 6, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-breakdown",
+            "multilineTextboxSpec": {
+              "lines": ["### 📊 Category & Region Breakdown"]
+            }
+          },
+          "position": {"x": 0, "y": 11, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "revenue-by-category",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_category",
+                "fields": [
+                  {"name": "category", "expression": "`category`"},
+                  {"name": "revenue", "expression": "`revenue`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "category", "scale": {"type": "categorical"}, "displayName": "Category"},
+                "y": {"fieldName": "revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue by Category"}
+            }
+          },
+          "position": {"x": 0, "y": 12, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "revenue-by-region",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_region",
+                "fields": [
+                  {"name": "region", "expression": "`region`"},
+                  {"name": "revenue", "expression": "`revenue`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue"},
+                "color": {"fieldName": "region", "scale": {"type": "categorical"}, "displayName": "Region"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue by Region"}
+            }
+          },
+          "position": {"x": 3, "y": 12, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-details",
+            "multilineTextboxSpec": {
+              "lines": ["### 📋 Category Detail Table"]
+            }
+          },
+          "position": {"x": 0, "y": 17, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "category-detail-table",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_category",
+                "fields": [
+                  {"name": "category", "expression": "`category`"},
+                  {"name": "transactions", "expression": "`transactions`"},
+                  {"name": "revenue", "expression": "`revenue`"},
+                  {"name": "units", "expression": "`units`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {"fieldName": "category", "displayName": "Category"},
+                  {"fieldName": "transactions", "displayName": "Transactions"},
+                  {"fieldName": "revenue", "displayName": "Revenue ($)"},
+                  {"fieldName": "units", "displayName": "Units Sold"}
+                ]
+              },
+              "frame": {"showTitle": true, "title": "Category Performance"}
+            }
+          },
+          "position": {"x": 0, "y": 18, "width": 6, "height": 5}
+        }
+      ]
+    },
+    {
+      "name": "filters",
+      "displayName": "Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layout": [
+        {
+          "widget": {
+            "name": "filter-category",
+            "queries": [{
+              "name": "ds_category_filter",
+              "query": {
+                "datasetName": "ds_category",
+                "fields": [{"name": "category", "expression": "`category`"}],
+                "disaggregated": false
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{
+                  "fieldName": "category",
+                  "displayName": "Category",
+                  "queryName": "ds_category_filter"
+                }]
+              },
+              "frame": {"showTitle": true, "title": "Category"}
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "filter-region",
+            "queries": [{
+              "name": "ds_region_filter",
+              "query": {
+                "datasetName": "ds_region",
+                "fields": [{"name": "region", "expression": "`region`"}],
+                "disaggregated": false
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{
+                  "fieldName": "region",
+                  "displayName": "Region",
+                  "queryName": "ds_region_filter"
+                }]
+              },
+              "frame": {"showTitle": true, "title": "Region"}
+            }
+          },
+          "position": {"x": 2, "y": 0, "width": 2, "height": 2}
+        }
+      ]
+    }
+  ]
+}

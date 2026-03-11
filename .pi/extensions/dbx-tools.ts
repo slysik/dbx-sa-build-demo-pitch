@@ -28,6 +28,68 @@ const DEFAULT_CLUSTER = "0310-193517-r0u8giyo";
 
 export default function (pi: ExtensionAPI) {
 
+  // ── Status tracking for footer ─────────────────────────────────
+  const status: Record<string, string> = {};
+
+  function updateFooterStatus(ctx: any) {
+    const theme = ctx.ui.theme;
+    const parts: string[] = [];
+
+    const icon = (ok: boolean) => ok ? theme.fg("success", "✓") : theme.fg("dim", "○");
+
+    parts.push(icon(!!status.auth) + theme.fg("dim", " auth"));
+    parts.push(icon(status.cluster === "RUNNING") + theme.fg("dim", " cluster"));
+    parts.push(icon(!!status.bronze) + theme.fg("dim", " bronze"));
+    parts.push(icon(!!status.pipeline) + theme.fg("dim", " SDP"));
+    parts.push(icon(!!status.dashboard) + theme.fg("dim", " dash"));
+
+    ctx.ui.setStatus("dbx", parts.join(theme.fg("dim", " │ ")));
+  }
+
+  pi.on("session_start", async (_event, ctx) => {
+    const theme = ctx.ui.theme;
+    ctx.ui.setStatus("dbx", theme.fg("dim", "○ auth │ ○ cluster │ ○ bronze │ ○ SDP │ ○ dash"));
+  });
+
+  pi.on("tool_execution_end", async (event, ctx) => {
+    const details = (event as any).result?.details || {};
+    const isOk = !(event as any).isError;
+
+    switch (event.toolName) {
+      case "dbx_auth_check":
+        if (isOk && details.authenticated) status.auth = "ok";
+        break;
+      case "dbx_cluster_status":
+        status.cluster = details.state || "";
+        break;
+      case "dbx_run_notebook":
+        if (isOk && details.state === "SUCCESS") status.bronze = "ok";
+        break;
+      case "dbx_sql": {
+        const text = (event as any).result?.content?.[0]?.text || "";
+        if (text.includes("bronze_") && text.includes("rows")) status.bronze = "ok";
+        break;
+      }
+      case "dbx_poll_pipeline":
+        if (isOk && details.state === "IDLE") status.pipeline = "ok";
+        break;
+      case "dbx_validate_tables": {
+        const results = details.results || [];
+        const hasBronze = results.some((r: any) => r.layer === "bronze" && r.count !== "0");
+        const hasSilver = results.some((r: any) => r.layer === "silver" && r.count !== "0");
+        const hasGold = results.some((r: any) => r.layer === "gold" && r.count !== "0");
+        if (hasBronze) status.bronze = "ok";
+        if (hasSilver || hasGold) status.pipeline = "ok";
+        break;
+      }
+      case "dbx_deploy_dashboard":
+        if (isOk && details.dashboard_id) status.dashboard = "ok";
+        break;
+    }
+
+    updateFooterStatus(ctx);
+  });
+
   // ── Helper: run databricks CLI command ─────────────────────────
   async function dbxExec(args: string, timeout = 30000): Promise<{ stdout: string; stderr: string; code: number }> {
     const result = await pi.exec("databricks", ["-p", PROFILE, ...args.split(/\s+/)], { timeout });
