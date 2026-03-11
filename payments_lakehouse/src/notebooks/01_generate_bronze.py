@@ -79,8 +79,10 @@ display(spark.table(f"{CATALOG}.{SCHEMA}.bronze_payment_types").limit(5))
 
 # Fact: payment_transactions (100M rows)
 # Every column derived from hash(id, salt) — fully deterministic, no rand()
+# SKEW: 40% of rows → payment_type_id 0 (ACH/PayPal hot key)
 
 # Hash buckets for weighted distributions
+h_skew     = F.abs(F.hash(F.col("id"), F.lit("skew")).cast("bigint")) % 100
 h_status   = F.abs(F.hash(F.col("id"), F.lit("status")).cast("bigint")) % 100
 h_currency = F.abs(F.hash(F.col("id"), F.lit("currency")).cast("bigint")) % 100
 
@@ -89,8 +91,10 @@ transactions = (
     # Unique transaction ID
     .withColumn("transaction_id",
         F.concat(F.lit("TXN-"), F.lpad(F.col("id").cast("string"), 10, "0")))
-    # FK to dim — modulo guarantees valid references
-    .withColumn("payment_type_id", (F.col("id") % N_TYPES).cast("bigint"))
+    # FK with SKEW: 40% → type 0 (hot key), 60% → distributed across 1-9999
+    .withColumn("payment_type_id",
+        F.when(h_skew < 40, F.lit(0).cast("bigint"))
+         .otherwise((F.abs(F.hash(F.col("id"), F.lit("fk")).cast("bigint")) % 9999 + 1).cast("bigint")))
     # Amount: hash-derived, always positive ($0.50 to $10,000.49)
     .withColumn("amount",
         F.round(
