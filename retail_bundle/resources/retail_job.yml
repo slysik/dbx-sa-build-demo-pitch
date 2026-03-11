@@ -1,7 +1,7 @@
 # SA: Orchestration job — 3-task DAG: Bronze → SDP → Validate.
 #     Serverless compute for notebook task (no cluster config = serverless).
 #     Pipeline task triggers the SDP pipeline and waits for completion.
-#     SQL validation task proves row counts across all 3 layers.
+#     Validation notebook proves row counts across all 3 layers.
 #     In production: add schedule, notifications, retry policy.
 
 resources:
@@ -17,7 +17,7 @@ resources:
             notebook_path: ../src/01_bronze_data_gen.py
             source: WORKSPACE
 
-        # Task 2: Run SDP pipeline (Silver + Gold)
+        # Task 2: Run SDP pipeline (Silver + Gold materialized views)
         # SA: pipeline_task triggers the SDP pipeline created by this bundle.
         #     full_refresh=true ensures materialized views recompute from scratch.
         - task_key: run_sdp_pipeline
@@ -27,19 +27,12 @@ resources:
             pipeline_id: ${resources.pipelines.retail_medallion.id}
             full_refresh: true
 
-        # Task 3: Cross-layer validation
+        # Task 3: Cross-layer validation (serverless notebook)
         # SA: Proves data flows correctly Bronze → Silver → Gold.
-        #     Row counts should decrease slightly (Silver drops dupes + outliers).
+        #     Row counts decrease slightly (Silver drops dupes + outliers).
         - task_key: validate_layers
           depends_on:
             - task_key: run_sdp_pipeline
-          sql_task:
-            query:
-              query_text: |
-                SELECT 'bronze_orders' AS layer, COUNT(*) AS rows FROM ${var.catalog}.${var.schema}.bronze_orders
-                UNION ALL SELECT 'silver_orders', COUNT(*) FROM ${var.catalog}.${var.schema}.silver_orders
-                UNION ALL SELECT 'gold_daily_sales', COUNT(*) FROM ${var.catalog}.${var.schema}.gold_daily_sales
-                UNION ALL SELECT 'bronze_items', COUNT(*) FROM ${var.catalog}.${var.schema}.bronze_order_items
-                UNION ALL SELECT 'silver_items', COUNT(*) FROM ${var.catalog}.${var.schema}.silver_order_items
-                UNION ALL SELECT 'gold_products', COUNT(*) FROM ${var.catalog}.${var.schema}.gold_product_performance
-            warehouse_id: ${var.warehouse_id}
+          notebook_task:
+            notebook_path: ../src/04_validate.py
+            source: WORKSPACE

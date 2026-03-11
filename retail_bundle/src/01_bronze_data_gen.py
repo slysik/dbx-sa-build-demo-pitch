@@ -1,5 +1,4 @@
 # Databricks notebook source
-# ruff: noqa: F821
 
 # MAGIC %md
 # MAGIC # 🛍️ Retail Bronze Data Generation

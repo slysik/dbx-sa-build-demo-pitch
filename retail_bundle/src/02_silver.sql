@@ -2,22 +2,17 @@
 -- SILVER LAYER — Cleaned, typed, deduped, quality-enforced.
 -- Reusable business semantics. Explicit column contracts.
 --
--- SA NARRATION:
---   "Silver is where data quality becomes a first-class citizen.
+-- SA: "Silver is where data quality becomes a first-class citizen.
 --    Every column is explicitly CAST — no schema inference.
 --    ROW_NUMBER dedup is deterministic and idempotent — safe for re-runs.
 --    Expectations with ON VIOLATION DROP ROW act as quality gates —
 --    bad rows are quarantined, not silently passed downstream.
---    This is the reusable semantic layer that Gold, BI, and ML all consume."
+--    SDP tracks how many rows were dropped per expectation in pipeline metrics."
 --
--- WHY MATERIALIZED VIEWS (not streaming tables):
---   Bronze tables were written by spark.range() → saveAsTable() — they're
---   regular managed Delta tables, NOT streaming tables. SDP materialized
---   views are the correct abstraction: full recompute on refresh, ACID,
---   and expectations support. If Bronze were Auto Loader streaming tables,
---   we'd use CREATE OR REFRESH STREAMING TABLE here instead.
+-- RUNS INSIDE: SDP pipeline only (EXPECT + MATERIALIZED VIEW = SDP syntax)
+-- VIEW IN UI:  Open notebook to narrate, run via pipeline "Start" button
 --
--- LIQUID CLUSTERING STRATEGY (Silver):
+-- LIQUID CLUSTERING STRATEGY:
 --   Keys match downstream Gold join/filter patterns:
 --     customers:    (region, loyalty_tier) → segmentation queries
 --     products:     (category)            → category rollups
@@ -27,10 +22,10 @@
 -- ============================================================================
 
 
--- SA: Customers — dedup on customer_id, COALESCE null emails, enforce NOT NULL on key columns.
+-- SA: Customers — dedup on customer_id, COALESCE null emails, enforce NOT NULL on keys.
 --     ROW_NUMBER PARTITION BY customer_id: deterministic, idempotent, no data loss.
 --     COALESCE(email, 'unknown@missing.com'): Silver normalizes nulls — downstream never sees them.
---     ON VIOLATION DROP ROW: rows failing expectations are quarantined, not silently propagated.
+--     ON VIOLATION DROP ROW: rows failing expectations are quarantined with pipeline metrics.
 CREATE OR REFRESH MATERIALIZED VIEW silver_customers(
   CONSTRAINT valid_customer_id EXPECT (customer_id IS NOT NULL) ON VIOLATION DROP ROW,
   CONSTRAINT valid_signup       EXPECT (signup_date IS NOT NULL) ON VIOLATION DROP ROW
@@ -56,7 +51,7 @@ WHERE _rn = 1;
 --     Two expectations: unit_price > 0 AND cost_price > 0.
 --     If upstream sends a zero-priced product, it's dropped here — not in Gold aggregations.
 --     CLUSTER BY (category): Gold product_performance groups by category, so Silver
---     pre-sorts data for that access pattern. Hilbert curve on single column = optimal.
+--     pre-sorts for that access pattern. Hilbert curve on single column = optimal.
 CREATE OR REFRESH MATERIALIZED VIEW silver_products(
   CONSTRAINT valid_product_id EXPECT (product_id IS NOT NULL) ON VIOLATION DROP ROW,
   CONSTRAINT valid_price      EXPECT (unit_price > 0)         ON VIOLATION DROP ROW,
@@ -81,7 +76,7 @@ WHERE _rn = 1;
 -- SA: Orders — deterministic dedup removes the 1% duplicates injected in Bronze.
 --     ORDER BY order_timestamp ASC: keeps the EARLIEST occurrence of each order_id.
 --     Derived order_date from order_timestamp: enables date-grain Gold aggregations
---     without requiring Gold to re-derive. Silver is the reusable semantic layer.
+--     without Gold needing to re-derive. Silver = reusable semantic layer.
 --     CLUSTER BY (order_date, channel): matches Gold daily_sales GROUP BY pattern.
 CREATE OR REFRESH MATERIALIZED VIEW silver_orders(
   CONSTRAINT valid_order_id    EXPECT (order_id IS NOT NULL)        ON VIOLATION DROP ROW,
@@ -106,12 +101,11 @@ FROM (
 WHERE _rn = 1;
 
 
--- SA: Order items — the outlier filter is the key quality gate here.
+-- SA: Order items — the outlier filter is the key quality gate.
 --     Bronze injected 1% line_totals at 50x normal and some negative values.
---     The expectation (line_total > 0 AND line_total < 50000) drops those rows.
---     This is declarative quality enforcement — no imperative code, no UDFs.
---     SDP tracks how many rows were dropped per expectation in pipeline metrics.
---     CLUSTER BY (order_id): co-locates items with their parent order for fast joins in Gold.
+--     EXPECT (line_total > 0 AND line_total < 50000) drops those rows.
+--     SDP pipeline metrics show exactly how many rows each expectation caught.
+--     CLUSTER BY (order_id): co-locates items with parent order for fast Gold joins.
 CREATE OR REFRESH MATERIALIZED VIEW silver_order_items(
   CONSTRAINT valid_item_id    EXPECT (item_id IS NOT NULL)                        ON VIOLATION DROP ROW,
   CONSTRAINT valid_order_id   EXPECT (order_id IS NOT NULL)                       ON VIOLATION DROP ROW,
