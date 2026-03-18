@@ -6,24 +6,42 @@ variables:
     default: workspace
   schema:
     default: finserv
+  warehouse_id:
+    default: 214e9f2a308e800d
 
 targets:
   dev:
     mode: development
     default: true
     workspace:
-      host: https://dbc-61514402-8451.cloud.databricks.com
+      host: https://dbc-ad74b11b-230d.cloud.databricks.com
 
 resources:
+  pipelines:
+    finserv_medallion:
+      name: "finserv_medallion"
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      development: true
+      serverless: true
+      channel: PREVIEW
+      libraries:
+        - file:
+            path: src/pipeline/02_silver_transforms.sql
+        - file:
+            path: src/pipeline/03_gold_aggregations.sql
+
   jobs:
     finserv_orchestrator:
       name: "finserv_orchestrator"
       tasks:
-        - task_key: run_zerobus_stream
+        - task_key: generate_bronze
           notebook_task:
-            notebook_path: src/notebooks/01_generate_and_ingest_zerobus.py
-          environment_key: default
-      environments:
-        - environment_key: default
-          spec:
-            client: "1"
+            notebook_path: src/notebooks/01_generate_bronze.py
+
+        - task_key: run_pipeline
+          depends_on:
+            - task_key: generate_bronze
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.finserv_medallion.id}
+            full_refresh: true

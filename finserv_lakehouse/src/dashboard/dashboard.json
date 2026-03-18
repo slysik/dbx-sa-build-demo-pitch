@@ -1,0 +1,839 @@
+{
+  "datasets": [
+    {
+      "name": "ds_kpi",
+      "displayName": "KPI Summary — 1 Row",
+      "queryLines": [
+        "SELECT ",
+        "  SUM(txn_count)                                              AS total_txns, ",
+        "  ROUND(SUM(total_revenue), 0)                               AS total_volume, ",
+        "  SUM(high_risk_count)                                       AS flagged_count, ",
+        "  ROUND(SUM(high_risk_count) * 100.0 / SUM(txn_count), 2)   AS risk_rate_pct, ",
+        "  ROUND(AVG(avg_risk_score), 1)                              AS avg_risk_score, ",
+        "  SUM(CASE WHEN txn_status = 'Approved' THEN txn_count ELSE 0 END) AS approved_txns ",
+        "FROM workspace.finserv.gold_txn_by_category"
+      ]
+    },
+    {
+      "name": "ds_daily_trend",
+      "displayName": "Daily Volume & Risk Trend",
+      "queryLines": [
+        "SELECT ",
+        "  txn_date, ",
+        "  SUM(total_txns)                                              AS total_txns, ",
+        "  SUM(high_risk_count)                                        AS high_risk_count, ",
+        "  ROUND(SUM(total_volume), 0)                                 AS daily_volume ",
+        "FROM workspace.finserv.gold_daily_risk ",
+        "GROUP BY txn_date ",
+        "ORDER BY txn_date"
+      ]
+    },
+    {
+      "name": "ds_monthly_category",
+      "displayName": "Monthly Revenue by Merchant Category",
+      "queryLines": [
+        "SELECT ",
+        "  merchant_category, ",
+        "  txn_month, ",
+        "  SUM(txn_count)              AS txn_count, ",
+        "  ROUND(SUM(total_revenue), 0) AS revenue ",
+        "FROM workspace.finserv.gold_txn_by_category ",
+        "WHERE txn_status = 'Approved' ",
+        "  AND merchant_category != 'Other' ",
+        "GROUP BY merchant_category, txn_month ",
+        "ORDER BY txn_month, revenue DESC"
+      ]
+    },
+    {
+      "name": "ds_category_summary",
+      "displayName": "Category Revenue & Risk",
+      "queryLines": [
+        "SELECT ",
+        "  merchant_category, ",
+        "  SUM(txn_count)                                            AS txn_count, ",
+        "  ROUND(SUM(total_revenue), 0)                             AS revenue, ",
+        "  ROUND(SUM(high_risk_count) * 100.0 / SUM(txn_count), 2) AS risk_rate_pct ",
+        "FROM workspace.finserv.gold_txn_by_category ",
+        "WHERE merchant_category != 'Other' ",
+        "GROUP BY merchant_category ",
+        "ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "ds_txn_status",
+      "displayName": "Transaction Status Distribution",
+      "queryLines": [
+        "SELECT ",
+        "  txn_status, ",
+        "  SUM(txn_count)               AS txn_count, ",
+        "  ROUND(SUM(total_revenue), 0) AS revenue, ",
+        "  ROUND(AVG(avg_risk_score), 1) AS avg_risk_score ",
+        "FROM workspace.finserv.gold_txn_by_category ",
+        "GROUP BY txn_status ",
+        "ORDER BY txn_count DESC"
+      ]
+    },
+    {
+      "name": "ds_segment_risk",
+      "displayName": "Segment × Risk Tier Matrix",
+      "queryLines": [
+        "SELECT ",
+        "  segment, ",
+        "  risk_tier, ",
+        "  SUM(unique_customers)        AS customers, ",
+        "  SUM(txn_count)               AS txn_count, ",
+        "  ROUND(SUM(total_volume), 0)  AS volume, ",
+        "  SUM(high_risk_txns)          AS high_risk, ",
+        "  ROUND(AVG(risk_rate_pct), 2) AS risk_rate_pct ",
+        "FROM workspace.finserv.gold_segment_risk ",
+        "GROUP BY segment, risk_tier ",
+        "ORDER BY volume DESC"
+      ]
+    },
+    {
+      "name": "ds_region",
+      "displayName": "Regional Performance",
+      "queryLines": [
+        "SELECT ",
+        "  region, ",
+        "  SUM(total_txns)                                              AS txn_count, ",
+        "  ROUND(SUM(total_volume), 0)                                  AS volume, ",
+        "  ROUND(SUM(high_risk_count) * 100.0 / SUM(total_txns), 2)    AS risk_rate_pct ",
+        "FROM workspace.finserv.gold_daily_risk ",
+        "GROUP BY region ",
+        "ORDER BY volume DESC"
+      ]
+    },
+    {
+      "name": "ds_account_type",
+      "displayName": "Account Type Revenue Split",
+      "queryLines": [
+        "SELECT ",
+        "  account_type, ",
+        "  SUM(unique_accounts)         AS accounts, ",
+        "  SUM(txn_count)               AS txn_count, ",
+        "  ROUND(SUM(total_volume), 0)  AS volume, ",
+        "  ROUND(AVG(avg_txn_amount), 2) AS avg_txn_amount ",
+        "FROM workspace.finserv.gold_segment_risk ",
+        "GROUP BY account_type ",
+        "ORDER BY volume DESC"
+      ]
+    },
+    {
+      "name": "ds_segment_detail",
+      "displayName": "Segment Performance Table",
+      "queryLines": [
+        "SELECT ",
+        "  segment, ",
+        "  SUM(unique_customers)        AS customers, ",
+        "  SUM(unique_accounts)         AS accounts, ",
+        "  SUM(txn_count)               AS txn_count, ",
+        "  ROUND(SUM(total_volume), 0)  AS total_volume, ",
+        "  ROUND(AVG(avg_txn_amount), 2) AS avg_txn_amount, ",
+        "  SUM(high_risk_txns)          AS high_risk_txns, ",
+        "  ROUND(AVG(risk_rate_pct), 2) AS risk_rate_pct, ",
+        "  SUM(flagged_txns)            AS flagged_txns, ",
+        "  SUM(declined_txns)           AS declined_txns ",
+        "FROM workspace.finserv.gold_segment_risk ",
+        "GROUP BY segment ",
+        "ORDER BY total_volume DESC"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "executive-overview",
+      "displayName": "🏦 Executive Overview",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": ["## 🏦 Apex Financial Services — Transaction Risk & Revenue Intelligence"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["100K transactions · Full Year 2024 · Medallion Pipeline on Databricks · Bronze → Silver → Gold → AI/BI"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-txns",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_kpi",
+              "fields": [{"name": "total_txns", "expression": "`total_txns`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "total_txns", "displayName": "Total Transactions"}},
+              "frame": {"showTitle": true, "title": "📊 Total Transactions"}
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-volume",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_kpi",
+              "fields": [{"name": "total_volume", "expression": "`total_volume`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "total_volume", "displayName": "Total Transaction Volume ($)"}},
+              "frame": {"showTitle": true, "title": "💰 Transaction Volume ($)"}
+            }
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-risk-rate",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_kpi",
+              "fields": [{"name": "risk_rate_pct", "expression": "`risk_rate_pct`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "risk_rate_pct", "displayName": "Portfolio Risk Rate (%)"}},
+              "frame": {"showTitle": true, "title": "⚠️ Portfolio Risk Rate (%)"}
+            }
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-flagged",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_kpi",
+              "fields": [{"name": "flagged_count", "expression": "`flagged_count`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "flagged_count", "displayName": "Flagged Transactions"}},
+              "frame": {"showTitle": true, "title": "🚨 Flagged for Review"}
+            }
+          },
+          "position": {"x": 0, "y": 5, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-approved",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_kpi",
+              "fields": [{"name": "approved_txns", "expression": "`approved_txns`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "approved_txns", "displayName": "Approved Transactions"}},
+              "frame": {"showTitle": true, "title": "✅ Approved Transactions"}
+            }
+          },
+          "position": {"x": 2, "y": 5, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-avg-risk",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_kpi",
+              "fields": [{"name": "avg_risk_score", "expression": "`avg_risk_score`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {"value": {"fieldName": "avg_risk_score", "displayName": "Avg Risk Score (0-100)"}},
+              "frame": {"showTitle": true, "title": "🎯 Avg Portfolio Risk Score"}
+            }
+          },
+          "position": {"x": 4, "y": 5, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "section-daily",
+            "multilineTextboxSpec": {
+              "lines": ["### 📈 Daily Transaction Volume — Total vs High-Risk Activity (Full Year 2024)"]
+            }
+          },
+          "position": {"x": 0, "y": 8, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-daily-dual",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_daily_trend",
+              "fields": [
+                {"name": "txn_date",        "expression": "`txn_date`"},
+                {"name": "total_txns",      "expression": "`total_txns`"},
+                {"name": "high_risk_count", "expression": "`high_risk_count`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {"fieldName": "txn_date", "scale": {"type": "temporal"}, "displayName": "Date"},
+                "y": {
+                  "scale": {"type": "quantitative"},
+                  "fields": [
+                    {"fieldName": "total_txns",      "displayName": "Total Transactions"},
+                    {"fieldName": "high_risk_count", "displayName": "High-Risk Transactions"}
+                  ]
+                }
+              },
+              "frame": {"showTitle": true, "title": "Daily Volume vs High-Risk Activity"}
+            }
+          },
+          "position": {"x": 0, "y": 9, "width": 6, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-status-category",
+            "multilineTextboxSpec": {
+              "lines": ["### 🔍 Transaction Outcomes & Spend Distribution"]
+            }
+          },
+          "position": {"x": 0, "y": 15, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-status-pie",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_txn_status",
+              "fields": [
+                {"name": "txn_status", "expression": "`txn_status`"},
+                {"name": "txn_count",  "expression": "`txn_count`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "txn_count", "scale": {"type": "quantitative"}, "displayName": "Transactions"},
+                "color": {"fieldName": "txn_status", "scale": {"type": "categorical"}, "displayName": "Status"}
+              },
+              "frame": {"showTitle": true, "title": "Transaction Status Mix"}
+            }
+          },
+          "position": {"x": 0, "y": 16, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "chart-category-revenue-bar",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_category_summary",
+              "fields": [
+                {"name": "merchant_category", "expression": "`merchant_category`"},
+                {"name": "revenue",           "expression": "`revenue`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "merchant_category", "scale": {"type": "categorical"}, "displayName": "Category"},
+                "y": {"fieldName": "revenue",           "scale": {"type": "quantitative"}, "displayName": "Revenue ($)"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue by Merchant Category ($)"}
+            }
+          },
+          "position": {"x": 3, "y": 16, "width": 3, "height": 6}
+        }
+      ]
+    },
+    {
+      "name": "risk-intelligence",
+      "displayName": "⚠️ Risk Intelligence",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "ri-title",
+            "multilineTextboxSpec": {
+              "lines": ["## ⚠️ Risk Intelligence — Portfolio Exposure & Threat Signals"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "ri-subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["Real-time risk scoring across 100K transactions · Segment × Risk Tier × Merchant Category · Powered by Databricks Gold MV"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "section-risk-segment",
+            "multilineTextboxSpec": {
+              "lines": ["### 👥 High-Risk Exposure — Customer Segment × Risk Tier"]
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 3, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "section-category-risk",
+            "multilineTextboxSpec": {
+              "lines": ["### 🏪 Risk Rate % by Merchant Category"]
+            }
+          },
+          "position": {"x": 3, "y": 2, "width": 3, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-segment-risk-grouped",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_segment_risk",
+              "fields": [
+                {"name": "segment",        "expression": "`segment`"},
+                {"name": "risk_tier",      "expression": "`risk_tier`"},
+                {"name": "high_risk",      "expression": "`high_risk`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "mark": {"layout": "group"},
+              "encodings": {
+                "x":     {"fieldName": "segment",   "scale": {"type": "categorical"}, "displayName": "Segment"},
+                "y":     {"fieldName": "high_risk",  "scale": {"type": "quantitative"}, "displayName": "High-Risk Transactions"},
+                "color": {"fieldName": "risk_tier",  "scale": {"type": "categorical"}, "displayName": "Risk Tier"}
+              },
+              "frame": {"showTitle": true, "title": "High-Risk Transactions by Segment & Risk Tier"}
+            }
+          },
+          "position": {"x": 0, "y": 3, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "chart-category-risk-rate",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_category_summary",
+              "fields": [
+                {"name": "merchant_category", "expression": "`merchant_category`"},
+                {"name": "risk_rate_pct",     "expression": "`risk_rate_pct`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "merchant_category", "scale": {"type": "categorical"}, "displayName": "Category"},
+                "y": {"fieldName": "risk_rate_pct",     "scale": {"type": "quantitative"}, "displayName": "Risk Rate (%)"}
+              },
+              "frame": {"showTitle": true, "title": "Risk Rate % by Merchant Category"}
+            }
+          },
+          "position": {"x": 3, "y": 3, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-regional",
+            "multilineTextboxSpec": {
+              "lines": ["### 🗺️ Regional Risk & Volume Breakdown"]
+            }
+          },
+          "position": {"x": 0, "y": 9, "width": 3, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "section-monthly-trend",
+            "multilineTextboxSpec": {
+              "lines": ["### 📅 Monthly Transaction Trends by Merchant Category"]
+            }
+          },
+          "position": {"x": 3, "y": 9, "width": 3, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-region-risk-pie",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_region",
+              "fields": [
+                {"name": "region",       "expression": "`region`"},
+                {"name": "risk_rate_pct","expression": "`risk_rate_pct`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "risk_rate_pct", "scale": {"type": "quantitative"}, "displayName": "Risk Rate (%)"},
+                "color": {"fieldName": "region",        "scale": {"type": "categorical"}, "displayName": "Region"}
+              },
+              "frame": {"showTitle": true, "title": "Risk Rate Distribution by Region"}
+            }
+          },
+          "position": {"x": 0, "y": 10, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "chart-monthly-category-line",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_monthly_category",
+              "fields": [
+                {"name": "merchant_category", "expression": "`merchant_category`"},
+                {"name": "txn_month",         "expression": "`txn_month`"},
+                {"name": "txn_count",         "expression": "`txn_count`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x":     {"fieldName": "txn_month",         "scale": {"type": "temporal"},      "displayName": "Month"},
+                "y":     {"fieldName": "txn_count",         "scale": {"type": "quantitative"},  "displayName": "Transaction Count"},
+                "color": {"fieldName": "merchant_category", "scale": {"type": "categorical"},   "displayName": "Category"}
+              },
+              "frame": {"showTitle": true, "title": "Monthly Volume Trend by Merchant Category"}
+            }
+          },
+          "position": {"x": 3, "y": 10, "width": 3, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-detail-table",
+            "multilineTextboxSpec": {
+              "lines": ["### 📋 Full Segment Risk Detail — Drill-Down"]
+            }
+          },
+          "position": {"x": 0, "y": 16, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "table-segment-detail",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_segment_detail",
+              "fields": [
+                {"name": "segment",       "expression": "`segment`"},
+                {"name": "customers",     "expression": "`customers`"},
+                {"name": "txn_count",     "expression": "`txn_count`"},
+                {"name": "total_volume",  "expression": "`total_volume`"},
+                {"name": "avg_txn_amount","expression": "`avg_txn_amount`"},
+                {"name": "high_risk_txns","expression": "`high_risk_txns`"},
+                {"name": "risk_rate_pct", "expression": "`risk_rate_pct`"},
+                {"name": "flagged_txns",  "expression": "`flagged_txns`"},
+                {"name": "declined_txns", "expression": "`declined_txns`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {"fieldName": "segment",        "displayName": "Customer Segment"},
+                  {"fieldName": "customers",      "displayName": "Customers"},
+                  {"fieldName": "txn_count",      "displayName": "Transactions"},
+                  {"fieldName": "total_volume",   "displayName": "Total Volume ($)"},
+                  {"fieldName": "avg_txn_amount", "displayName": "Avg Txn ($)"},
+                  {"fieldName": "high_risk_txns", "displayName": "High-Risk Txns"},
+                  {"fieldName": "risk_rate_pct",  "displayName": "Risk Rate (%)"},
+                  {"fieldName": "flagged_txns",   "displayName": "Flagged"},
+                  {"fieldName": "declined_txns",  "displayName": "Declined"}
+                ]
+              },
+              "frame": {"showTitle": true, "title": "Segment Risk Intelligence — Full Drill-Down"}
+            }
+          },
+          "position": {"x": 0, "y": 17, "width": 6, "height": 7}
+        }
+      ]
+    },
+    {
+      "name": "revenue-analytics",
+      "displayName": "💰 Revenue Analytics",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "rev-title",
+            "multilineTextboxSpec": {
+              "lines": ["## 💰 Revenue Analytics — Customer Segments & Account Performance"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "rev-subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["$167M total transaction volume · Segment profitability · Account type revenue split · Regional coverage"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "section-segment-volume",
+            "multilineTextboxSpec": {
+              "lines": ["### 👥 Transaction Volume by Customer Segment × Risk Tier"]
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 4, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "section-account-split",
+            "multilineTextboxSpec": {
+              "lines": ["### 🏦 Revenue by Account Type"]
+            }
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-segment-volume-stacked",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_segment_risk",
+              "fields": [
+                {"name": "segment",   "expression": "`segment`"},
+                {"name": "risk_tier", "expression": "`risk_tier`"},
+                {"name": "volume",    "expression": "`volume`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x":     {"fieldName": "segment",   "scale": {"type": "categorical"}, "displayName": "Segment"},
+                "y":     {"fieldName": "volume",    "scale": {"type": "quantitative"}, "displayName": "Volume ($)"},
+                "color": {"fieldName": "risk_tier", "scale": {"type": "categorical"}, "displayName": "Risk Tier"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue by Customer Segment (Stacked by Risk Tier)"}
+            }
+          },
+          "position": {"x": 0, "y": 3, "width": 4, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "chart-account-type-pie",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_account_type",
+              "fields": [
+                {"name": "account_type", "expression": "`account_type`"},
+                {"name": "volume",       "expression": "`volume`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "volume",       "scale": {"type": "quantitative"}, "displayName": "Volume ($)"},
+                "color": {"fieldName": "account_type", "scale": {"type": "categorical"}, "displayName": "Account Type"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue Split by Account Type"}
+            }
+          },
+          "position": {"x": 4, "y": 3, "width": 2, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-monthly-revenue",
+            "multilineTextboxSpec": {
+              "lines": ["### 📈 Monthly Revenue Trend by Merchant Category — Full Year 2024"]
+            }
+          },
+          "position": {"x": 0, "y": 9, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-monthly-revenue-stacked",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_monthly_category",
+              "fields": [
+                {"name": "merchant_category", "expression": "`merchant_category`"},
+                {"name": "txn_month",         "expression": "`txn_month`"},
+                {"name": "revenue",           "expression": "`revenue`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x":     {"fieldName": "txn_month",         "scale": {"type": "temporal"},     "displayName": "Month"},
+                "y":     {"fieldName": "revenue",           "scale": {"type": "quantitative"}, "displayName": "Revenue ($)"},
+                "color": {"fieldName": "merchant_category", "scale": {"type": "categorical"},  "displayName": "Category"}
+              },
+              "frame": {"showTitle": true, "title": "Monthly Revenue by Merchant Category (Stacked)"}
+            }
+          },
+          "position": {"x": 0, "y": 10, "width": 6, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-regional-vol",
+            "multilineTextboxSpec": {
+              "lines": ["### 🗺️ Regional Volume — Geographic P&L Overview"]
+            }
+          },
+          "position": {"x": 0, "y": 16, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "chart-region-volume-bar",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "ds_region",
+              "fields": [
+                {"name": "region",  "expression": "`region`"},
+                {"name": "volume",  "expression": "`volume`"},
+                {"name": "txn_count","expression": "`txn_count`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "mark": {"layout": "group"},
+              "encodings": {
+                "x": {"fieldName": "region", "scale": {"type": "categorical"}, "displayName": "Region"},
+                "y": {
+                  "scale": {"type": "quantitative"},
+                  "fields": [
+                    {"fieldName": "volume",   "displayName": "Volume ($)"},
+                    {"fieldName": "txn_count","displayName": "Transaction Count"}
+                  ]
+                }
+              },
+              "frame": {"showTitle": true, "title": "Regional Volume vs Transaction Count"}
+            }
+          },
+          "position": {"x": 0, "y": 17, "width": 6, "height": 6}
+        }
+      ]
+    },
+    {
+      "name": "global-filters",
+      "displayName": "Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layout": [
+        {
+          "widget": {
+            "name": "filter-merchant-category",
+            "queries": [{"name": "ds_cat_filter", "query": {
+              "datasetName": "ds_category_summary",
+              "fields": [{"name": "merchant_category", "expression": "`merchant_category`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "merchant_category", "displayName": "Merchant Category", "queryName": "ds_cat_filter"}]
+              },
+              "frame": {"showTitle": true, "title": "Merchant Category"}
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "filter-txn-status",
+            "queries": [{"name": "ds_status_filter", "query": {
+              "datasetName": "ds_txn_status",
+              "fields": [{"name": "txn_status", "expression": "`txn_status`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "txn_status", "displayName": "Transaction Status", "queryName": "ds_status_filter"}]
+              },
+              "frame": {"showTitle": true, "title": "Transaction Status"}
+            }
+          },
+          "position": {"x": 2, "y": 0, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "filter-segment",
+            "queries": [{"name": "ds_seg_filter", "query": {
+              "datasetName": "ds_segment_risk",
+              "fields": [{"name": "segment", "expression": "`segment`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "segment", "displayName": "Customer Segment", "queryName": "ds_seg_filter"}]
+              },
+              "frame": {"showTitle": true, "title": "Customer Segment"}
+            }
+          },
+          "position": {"x": 4, "y": 0, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "filter-region",
+            "queries": [{"name": "ds_reg_filter", "query": {
+              "datasetName": "ds_region",
+              "fields": [{"name": "region", "expression": "`region`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "region", "displayName": "Region", "queryName": "ds_reg_filter"}]
+              },
+              "frame": {"showTitle": true, "title": "Region"}
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "filter-risk-tier",
+            "queries": [{"name": "ds_risk_filter", "query": {
+              "datasetName": "ds_segment_risk",
+              "fields": [{"name": "risk_tier", "expression": "`risk_tier`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "risk_tier", "displayName": "Risk Tier", "queryName": "ds_risk_filter"}]
+              },
+              "frame": {"showTitle": true, "title": "Risk Tier"}
+            }
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 2}
+        }
+      ]
+    }
+  ]
+}
