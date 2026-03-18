@@ -21,11 +21,14 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 
-const PRIMARY_PROFILE = "slysik";
-const FALLBACK_PROFILE = "slysik-sp";
-const WS_HOST = "https://adb-7405619449104571.11.azuredatabricks.net";
-const DEFAULT_WAREHOUSE = "b89b264d78f9d52e";
-const DEFAULT_CLUSTER = "0310-193517-r0u8giyo";
+const PRIMARY_PROFILE = "slysik-aws";
+const FALLBACK_PROFILE = "slysik-aws-sp";
+const WS_HOST = "https://dbc-ad74b11b-230d.cloud.databricks.com";
+const DEFAULT_WAREHOUSE = "214e9f2a308e800d"; // SQL WH (PRO serverless, RUNNING)
+const DEFAULT_CLUSTER = "";                   // No cluster — notebooks run on serverless compute
+const GIT_FOLDER = "/Workspace/Users/slysik@gmail.com/dbx-sa-build-demo-pitch";
+const GIT_FOLDER_URL = `${WS_HOST}/browse/folders/3401527313137932?o=1562063418817826`;
+const GITHUB_REPO = "https://github.com/slysik/dbx-sa-build-demo-pitch";
 
 // Auth error patterns that trigger failover to SP profile
 const AUTH_ERRORS = ["does not belong to workspace", "Invalid access token", "401", "403", "SCIM", "principal inactive", "Token expired"];
@@ -146,13 +149,23 @@ export default function (pi: ExtensionAPI) {
   // ══════════════════════════════════════════════════════════════
   pi.registerTool({
     name: "dbx_cluster_status",
-    label: "Databricks Cluster Status",
-    description: "Check interview cluster state. Returns RUNNING, PENDING, TERMINATED, etc.",
+    label: "Databricks Cluster / Warehouse Status",
+    description: "Check interview cluster state. Returns RUNNING, PENDING, TERMINATED, etc. Falls back to SQL warehouse status if no cluster configured.",
     parameters: Type.Object({
       cluster_id: Type.Optional(Type.String({ description: "Cluster ID (defaults to interview-cluster)" })),
     }),
     async execute(_id, params) {
       const clusterId = params.cluster_id || DEFAULT_CLUSTER;
+      // No cluster configured — report warehouse status instead
+      if (!clusterId) {
+        const resp = await dbxApi("get", `/api/2.0/sql/warehouses/${DEFAULT_WAREHOUSE}`);
+        const state = resp?.state || "UNKNOWN";
+        const name = resp?.name || "?";
+        return {
+          content: [{ type: "text", text: `No cluster configured. SQL Warehouse: ${name} | State: ${state}` }],
+          details: { warehouse_name: name, state, warehouse_id: DEFAULT_WAREHOUSE, note: "serverless-only workspace" },
+        };
+      }
       const resp = await dbxApi("get", `/api/2.0/clusters/get?cluster_id=${clusterId}`);
       const state = resp?.state || "UNKNOWN";
       const name = resp?.cluster_name || "?";
@@ -181,12 +194,18 @@ export default function (pi: ExtensionAPI) {
       const pollInterval = (params.poll_interval_sec || 10) * 1000;
       const timeoutMs = (params.timeout_sec || 600) * 1000;
 
-      // Submit run
-      const submitResp = await dbxApi("post", "/api/2.1/jobs/runs/submit", {
+      // Build submit payload — use cluster if provided, else serverless compute
+      const submitPayload: Record<string, any> = {
         run_name: "pi_notebook_run",
-        existing_cluster_id: clusterId,
         notebook_task: { notebook_path: params.notebook_path },
-      });
+      };
+      if (clusterId) {
+        submitPayload.existing_cluster_id = clusterId;
+      }
+      // No cluster → serverless compute is used automatically
+
+      // Submit run
+      const submitResp = await dbxApi("post", "/api/2.1/jobs/runs/submit", submitPayload);
       const runId = submitResp?.run_id;
       if (!runId) {
         return {
@@ -431,7 +450,7 @@ export default function (pi: ExtensionAPI) {
         // Create new
         const resp = await dbxApi("post", "/api/2.0/lakeview/dashboards", {
           display_name: params.display_name,
-          parent_path: "/Users/slysik@gmail.com",
+          parent_path: GIT_FOLDER,
           serialized_dashboard: dashJson,
           warehouse_id: warehouseId,
         });
@@ -452,6 +471,60 @@ export default function (pi: ExtensionAPI) {
       return {
         content: [{ type: "text", text: `✅ Dashboard deployed + published\n  ID: ${dashId}\n  URL: ${url}` }],
         details: { dashboard_id: dashId, url, action: match ? "updated" : "created" },
+      };
+    },
+  });
+
+  // ══════════════════════════════════════════════════════════════
+  // TOOL: dbx_upload_project
+  // ══════════════════════════════════════════════════════════════
+  pi.registerTool({
+    name: "dbx_upload_project",
+    label: "Upload Project to Git Folder",
+    description: "Upload all notebooks (.py) and pipeline SQL (.sql) from a local project into the workspace Git folder dbx-sa-build-demo-pitch/{project}/. Call after every build so demo assets are visible in the workspace.",
+    parameters: Type.Object({
+      project: Type.String({ description: "Project subdirectory name, e.g. retail_lakehouse" }),
+      local_base: Type.Optional(Type.String({ description: "Local base path (defaults to /Users/slysik/databricks)" })),
+    }),
+    async execute(_id, params, _signal, onUpdate) {
+      const localBase = params.local_base || "/Users/slysik/databricks";
+      const destBase = `${GIT_FOLDER}/${params.project}`;
+      const log: string[] = [];
+
+      // Create target subdirs
+      for (const sub of ["notebooks", "pipeline"]) {
+        const result = await dbxExec(`workspace mkdirs ${destBase}/${sub}`);
+        if (result.code !== 0) log.push(`  ⚠ mkdirs ${sub}: ${result.stderr}`);
+      }
+
+      // Upload .py notebooks
+      const nbDir = `${localBase}/${params.project}/src/notebooks`;
+      const nbList = await pi.exec("find", [nbDir, "-name", "*.py", "-type", "f"], { timeout: 5000 });
+      for (const f of nbList.stdout.trim().split("\n").filter(Boolean)) {
+        const name = f.split("/").pop()!.replace(".py", "");
+        const dest = `${destBase}/notebooks/${name}`;
+        const r = await dbxExec(`workspace import ${dest} --file ${f} --format SOURCE --language PYTHON --overwrite`);
+        const status = r.code === 0 ? "✓" : "✗";
+        log.push(`  ${status} notebooks/${name}`);
+        onUpdate?.({ content: [{ type: "text", text: `${status} notebooks/${name}` }] });
+      }
+
+      // Upload .sql pipeline files
+      const sqlDir = `${localBase}/${params.project}/src/pipeline`;
+      const sqlList = await pi.exec("find", [sqlDir, "-name", "*.sql", "-type", "f"], { timeout: 5000 });
+      for (const f of sqlList.stdout.trim().split("\n").filter(Boolean)) {
+        const name = f.split("/").pop()!.replace(".sql", "");
+        const dest = `${destBase}/pipeline/${name}`;
+        const r = await dbxExec(`workspace import ${dest} --file ${f} --format SOURCE --language SQL --overwrite`);
+        const status = r.code === 0 ? "✓" : "✗";
+        log.push(`  ${status} pipeline/${name}`);
+        onUpdate?.({ content: [{ type: "text", text: `${status} pipeline/${name}` }] });
+      }
+
+      const summary = `Uploaded ${params.project} → ${destBase}\n${log.join("\n")}\n\nWorkspace: ${GIT_FOLDER_URL}\nGitHub:    ${GITHUB_REPO}`;
+      return {
+        content: [{ type: "text", text: summary }],
+        details: { project: params.project, destination: destBase, url: GIT_FOLDER_URL, log },
       };
     },
   });

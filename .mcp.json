@@ -7,7 +7,7 @@
       ],
       "defer_loading": true,
       "env": {
-        "DATABRICKS_CONFIG_PROFILE": "slysik-sp"
+        "DATABRICKS_CONFIG_PROFILE": "slysik-aws-sp"
       }
     }
   }

@@ -22,12 +22,14 @@ import { truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 function dbOrange(s: string): string {
 	return `\x1b[38;2;255;54;33m${s}\x1b[39m`;
 }
+// Databricks "New" button rose — matches the top-left New pill in the workspace UI
+// bg: #FFE4E1 (soft rose)  fg: #B4281C (dark crimson)
 function dbOrangeBg(s: string): string {
-	return `\x1b[48;2;255;54;33m\x1b[38;2;255;255;255m${s}\x1b[39m\x1b[49m`;
+	return `\x1b[48;2;255;228;225m\x1b[38;2;180;40;28m${s}\x1b[39m\x1b[49m`;
 }
-// Dark surface for widget bar
+// Dark surface for widget/footer bar — rose-tinted (not solid black)
 function bgDark(s: string): string {
-	return `\x1b[48;2;30;28;28m${s}\x1b[49m`;
+	return `\x1b[48;2;26;13;12m${s}\x1b[49m`;
 }
 function green(s: string): string {
 	return `\x1b[38;2;0;212;170m${s}\x1b[39m`;
@@ -66,10 +68,10 @@ const PHASE_HINTS: Record<string, string> = {
 // ── Workspace config ─────────────────────────────────────────────
 
 const WORKSPACE = {
-	host: "adb-7405619449104571.11",
-	name: "dbx-interview",
-	catalog: "interview",
-	schema: "retail",
+	host: "dbc-ad74b11b-230d",
+	name: "dbc-ad74b11b-230d (AWS)",
+	catalog: "workspace",
+	schema: "finance",
 };
 
 export default function (pi: ExtensionAPI) {
@@ -133,18 +135,35 @@ export default function (pi: ExtensionAPI) {
 	// ── /prompt — manually set/update the interview prompt ───────
 
 	pi.registerCommand("prompt", {
-		description: "Set or update the interview prompt",
+		description: "Set or update the interview prompt. Use 'clear' to remove it.",
 		handler: async (args, ctx) => {
-			if (args.trim()) {
-				interviewPrompt = args.trim();
+			const trimmed = args.trim();
+			if (trimmed === "clear") {
+				interviewPrompt = undefined;
+				ctx.ui.notify("Prompt cleared", "success");
+			} else if (trimmed) {
+				interviewPrompt = trimmed;
 				ctx.ui.notify("Prompt updated", "success");
 			} else {
-				const answer = await ctx.ui.input("Interview Prompt", "Paste the interviewer's prompt");
-				if (answer?.trim()) {
+				const answer = await ctx.ui.input("Interview Prompt", "Paste the scenario prompt (or type 'clear')");
+				if (answer?.trim() === "clear") {
+					interviewPrompt = undefined;
+					ctx.ui.notify("Prompt cleared", "success");
+				} else if (answer?.trim()) {
 					interviewPrompt = answer.trim();
 					ctx.ui.notify("Prompt captured", "success");
 				}
 			}
+		},
+	});
+
+	// ── /clear-prompt — one-shot clear ───────────────────────────
+
+	pi.registerCommand("clear-prompt", {
+		description: "Clear the captured interview prompt from the widget",
+		handler: async (_args, ctx) => {
+			interviewPrompt = undefined;
+			ctx.ui.notify("Prompt cleared", "success");
 		},
 	});
 
@@ -219,7 +238,7 @@ export default function (pi: ExtensionAPI) {
 		handler: async (_args, ctx) => {
 			ctx.ui.notify(
 				`◆ ${WORKSPACE.name}\n` +
-				`  Host: ${WORKSPACE.host}.azuredatabricks.net\n` +
+				`  Host: ${WORKSPACE.host}.cloud.databricks.com\n` +
 				`  Catalog: ${WORKSPACE.catalog}\n` +
 				`  Schema: ${WORKSPACE.schema}`,
 				"info"
@@ -240,7 +259,7 @@ export default function (pi: ExtensionAPI) {
 		}
 
 		// Terminal title
-		setTimeout(() => ctx.ui.setTitle("◆ Databricks Interview"), 150);
+		setTimeout(() => ctx.ui.setTitle("Databricks: Build, Demo, Pitch!"), 150);
 
 		// Status line: workspace badge
 		ctx.ui.setStatus("workspace",
