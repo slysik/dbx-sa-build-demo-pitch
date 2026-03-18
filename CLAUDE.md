@@ -128,8 +128,11 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 - **`DROP SCHEMA IF EXISTS catalog.schema CASCADE`** — drops all tables + schema in one call; run after `dbx_cleanup`
 - **Stale tfstate** — if `bundle deploy` fails with permission error, delete `.databricks/bundle/dev/terraform/terraform.tfstate` and redeploy
 - **Bronze column naming** — name fact status/type columns with domain prefix (`txn_status`, not `status`) BEFORE broadcast join. Dim tables also have `status` → collision causes `withColumnRenamed` to rename both silently
-- **Genie Space `serialized_space` format** — proto3 JSON: `{"version": 2, "data_sources": {"tables": [{"identifier": "cat.schema.tbl"}]}, "config": {"sample_questions": [{"id": "<32hex>", "question": ["Q?"]}]}}`. Tables MUST be sorted alphabetically by identifier. Pass `table_identifiers` as top-level API field (not inside serialized_space). `create_or_update_genie` MCP tool abstracts all of this — prefer it.
+- **Genie Space `serialized_space` format** — proto3 JSON: `{"version": 2, "data_sources": {"tables": [{"identifier": "cat.schema.tbl"}]}, "config": {"sample_questions": [{"id": "<32hex>", "question": ["Q?"]}]}}`. Tables MUST be sorted alphabetically by identifier. Pass `table_identifiers` as top-level API field (not inside serialized_space). `create_or_update_genie` MCP tool abstracts all of this — prefer it. See sdp-and-dashboard-patterns.md #80-92.
 - **Build metrics** — always run `python3 {project}/scripts/generate_build_metrics.py` after every build. Outputs `docs/BUILD_METRICS.md` + `docs/metrics/{date}.json`. Add to git commit.
+- **NEVER hardcode secrets** — no fallback values in `os.environ.get("KEY", "hardcoded")`. Store all keys in `~/.zshrc`. Use `git-filter-repo` to purge if leaked. GitHub detects `dose*` (Databricks OAuth) and `sk-ant-api03-*` (Anthropic) within 3 min of push.
+- **Git remote** — always verify `git remote -v` before pushing. Canonical remote: `https://github.com/slysik/dbx-sa-build-demo-pitch.git`
+- **SQL Statements API wait_timeout** — max 50s (not 60s). Use `"wait_timeout": "50s"` in all SQL API calls.
 
 ---
 

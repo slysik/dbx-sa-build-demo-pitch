@@ -339,3 +339,135 @@ Use `parent_path: "/Users/slysik@gmail.com/dashboards"` (pre-created DIRECTORY).
 - **Mosaic AI** → narrate only: *"Gold tables are feature-ready — next step is `ai_query()` risk scoring or a served MLflow model on the transaction stream"*
 - **Streaming** → narrate only: *"In production this lands via Auto Loader or Zerobus — I'm using `spark.range()` here so the full pipeline runs in under 2 min on serverless"*
 - **UC Govern/Discover/Share/Audit** → narrate only: *"UC system tables give us full query lineage and audit trail — Delta Sharing publishes Gold to external consumers without data copies"*
+
+## Test Run Learnings (2026-03-18 finserv_lakehouse full clean build — post-interview)
+
+### Genie Space `serialized_space` — CORRECTED Proto Format
+80. **Entry #44 was WRONG — `config.sample_questions` IS valid in `GenieSpaceConfig` proto.** Correct full format:
+```json
+{
+  "version": 2,
+  "data_sources": {
+    "tables": [{"identifier": "catalog.schema.table"}]
+  },
+  "config": {
+    "sample_questions": [
+      {"id": "<32-char-hex-uuid-no-hyphens>", "question": ["Question string?"]}
+    ]
+  }
+}
+```
+Key rules:
+- `tables` array MUST be sorted alphabetically by `identifier` — fails with `data_sources.tables must be sorted by identifier` otherwise
+- `SampleQuestion.id` is REQUIRED — lowercase 32-hex UUID without hyphens (use `uuid.uuid4().hex`)
+- `SampleQuestion.question` is an ARRAY of strings, not a plain string
+- `version: 1` works but API upgrades to `version: 2` when `table_identifiers` top-level field is used
+
+81. **`table_identifiers` is a top-level API request field, not inside `serialized_space`.** Pass it alongside `serialized_space` in the outer JSON payload. The API converts it to `data_sources.tables` internally:
+```python
+payload = {
+    "warehouse_id": "...",
+    "serialized_space": json.dumps(inner),  # version + config only
+    "title": "...",
+    "description": "...",
+    "parent_path": "/Users/user@email.com/dashboards",
+    "table_identifiers": [                  # ← top-level, NOT in serialized_space
+        "workspace.finserv.gold_daily_risk",
+        "workspace.finserv.silver_transactions"
+    ]
+}
+```
+
+82. **Genie Space PATCH (update) accepts `serialized_space` with both `data_sources` and `config`.** Use `PATCH /api/2.0/genie/spaces/{id}` to add/update tables + sample questions on an existing space. Combine `data_sources.tables` (sorted) + `config.sample_questions` (with ids) in one call.
+
+83. **`create_or_update_genie` MCP tool still preferred over raw REST for Genie.** The raw REST approach required ~15 probe calls to discover the proto format. MCP abstracts all of this. Only use raw REST when MCP is unavailable.
+
+### Build Metrics — Standard Post-Build Step
+84. **Always run `generate_build_metrics.py` after every demo build.** It:
+- Queries live Databricks for row counts + revenue reconciliation
+- Fires a live Genie test question and captures SQL + answer
+- Outputs `docs/BUILD_METRICS.md` (human-readable) + `docs/metrics/YYYY-MM-DD.json` (machine-readable)
+- Captures: phase runtimes, row counts, revenue recon, Delta health, AI asset details, LLM/token stats, all URLs
+```bash
+just metrics finserv_lakehouse <pipeline_id> <run_id> <dashboard_id> <genie_id>
+# or
+python3 finserv_lakehouse/scripts/generate_build_metrics.py \
+  --phase-times '{"cleanup":8,"bundle":22,"bronze":75,"sdp":47,"validate":12,"dashboard":6,"genie":18}' \
+  --pipeline-id "..." --run-id "..." --dashboard-id "..." --genie-id "..."
+```
+
+85. **SQL Statements API `wait_timeout` hard cap is 50s, not 60s.** Use `"wait_timeout": "50s"` — anything higher returns "must be between 5 and 50 seconds". Update all SQL helper scripts.
+
+### Git Security — Critical Lessons
+86. **NEVER hardcode API keys, OAuth tokens, or client_secret values in any `.py`, `.json`, or `.yml` file.** Even as `os.environ.get("KEY", "fallback_value")` — the fallback is committed and leaked. Pattern:
+```python
+# ❌ WRONG — fallback leaks to git
+client_secret = os.environ.get("DATABRICKS_CLIENT_SECRET", "dose8aa3af746...")
+# ✅ RIGHT — fail fast if not set
+client_secret = os.environ.get("DATABRICKS_CLIENT_SECRET")
+if not client_secret:
+    raise ValueError("DATABRICKS_CLIENT_SECRET not set")
+```
+
+87. **Store all API keys in `~/.zshrc` or `~/.zshenv` as env vars — never in repo files.** Confirmed working pattern:
+```bash
+echo 'export ANTHROPIC_API_KEY="sk-ant-..."' >> ~/.zshrc
+echo 'export DATABRICKS_CLIENT_SECRET="dose..."' >> ~/.zshrc
+source ~/.zshrc
+```
+Both files are outside any repo and never committed.
+
+88. **Use `git-filter-repo` to purge secrets from ALL git history.** If a secret lands in any commit (even a deleted file), it persists in history and is visible to GitHub secret scanning:
+```bash
+pip3 install git-filter-repo
+# Create replacements file
+echo "actual_secret_value==>REDACTED" > /tmp/replacements.txt
+# Rewrite all history
+git filter-repo --replace-text /tmp/replacements.txt --force
+# Re-add remote (filter-repo removes it) and force push
+git remote add origin https://github.com/...
+git push origin main --force
+```
+Then revoke the leaked token immediately — treat all public-duration exposure as compromised.
+
+89. **GitHub secret scanning fires within ~3 minutes of push.** GitHub's push protection detects Databricks OAuth tokens (`dose*`) and Anthropic API keys (`sk-ant-api03-*`) automatically. Check Security tab after every push to a public repo.
+
+### Git Remote — Always Verify
+90. **Always verify `git remote -v` before pushing.** The remote may silently point to a different repo. We pushed 4 commits to `databricks-claude-coding` thinking they went to `dbx-sa-build-demo-pitch`. Fix: `git remote set-url origin https://github.com/slysik/dbx-sa-build-demo-pitch.git`. Correct remote is now set and saved.
+
+### Repo Hygiene — node_modules
+91. **Add `node_modules/` to `.gitignore` immediately after any `npm install`.** Pi extension `node_modules` were tracked and committed — 700+ files. Fix: `git rm -r --cached .pi/extensions/node_modules/ && echo "node_modules/" >> .gitignore`. Force push removes them from GitHub. Add to `.gitignore` before first commit in any new repo.
+
+### Genie Space — Confirmed Working Pattern (End-to-End)
+92. **Confirmed working Genie Space creation sequence (2026-03-18, AWS workspace):**
+```python
+import json, subprocess, uuid
+
+tables = sorted([  # MUST be sorted
+    "workspace.finserv.gold_daily_risk",
+    "workspace.finserv.gold_segment_risk",
+    "workspace.finserv.gold_txn_by_category",
+    "workspace.finserv.silver_transactions"
+])
+
+inner = {
+    "version": 2,
+    "data_sources": {"tables": [{"identifier": t} for t in tables]},
+    "config": {
+        "sample_questions": [
+            {"id": uuid.uuid4().hex, "question": ["What is total revenue?"]}
+        ]
+    }
+}
+
+payload = {
+    "warehouse_id": "214e9f2a308e800d",
+    "serialized_space": json.dumps(inner),
+    "title": "My Genie Space",
+    "description": "...",
+    "parent_path": "/Users/slysik@gmail.com/dashboards"
+}
+# POST to /api/2.0/genie/spaces — returns {space_id, title, warehouse_id}
+# URL: https://{host}/genie/rooms/{space_id}?o={org_id}
+```
+PATCH to same endpoint to update existing space. GET does NOT return `serialized_space`.
