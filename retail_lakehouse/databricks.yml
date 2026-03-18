@@ -3,18 +3,18 @@ bundle:
 
 variables:
   catalog:
-    default: interview
+    default: workspace
   schema:
     default: retail
   warehouse_id:
-    default: b89b264d78f9d52e
+    default: 214e9f2a308e800d
 
 targets:
   dev:
     mode: development
     default: true
     workspace:
-      host: https://adb-7405619449104571.11.azuredatabricks.net
+      host: https://dbc-ad74b11b-230d.cloud.databricks.com
 
 resources:
   pipelines:
@@ -38,18 +38,10 @@ resources:
         - task_key: generate_bronze
           notebook_task:
             notebook_path: src/notebooks/01_generate_bronze.py
-          existing_cluster_id: 0310-193517-r0u8giyo
-
+            source: WORKSPACE
         - task_key: run_pipeline
           depends_on:
             - task_key: generate_bronze
           pipeline_task:
             pipeline_id: ${resources.pipelines.retail_medallion.id}
             full_refresh: true
-
-        - task_key: validate
-          depends_on:
-            - task_key: run_pipeline
-          notebook_task:
-            notebook_path: src/notebooks/02_validate.py
-          existing_cluster_id: 0310-193517-r0u8giyo

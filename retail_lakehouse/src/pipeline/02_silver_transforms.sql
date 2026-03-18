@@ -1,45 +1,38 @@
--- Silver: Clean, deduplicate, and type retail transactions
--- Reads from Bronze Delta → produces curated Silver MV
--- SDP Materialized View — runs inside Lakeflow pipeline only
+-- Silver: Transactions
+-- Deduped on txn_id, typed, null-guarded, explicit columns only
+-- Source: workspace.retail.bronze_transactions (already broadcast-joined with dims)
 
-CREATE OR REFRESH MATERIALIZED VIEW silver_transactions
-COMMENT 'Cleaned retail transactions — deduped on transaction_id, nulls handled, typed'
+CREATE OR REFRESH MATERIALIZED VIEW workspace.retail.silver_transactions
+TBLPROPERTIES (
+  "quality" = "silver",
+  "layer"   = "silver"
+)
 AS
 SELECT
-  transaction_id,
+  txn_id,
   product_id,
   store_id,
-  category,
-  brand,
-  product_name,
-  region,
-  store_format,
-  city,
-  transaction_date,
-  transaction_ts,
-  quantity,
-  unit_price,
-  total_amount,
-  payment_method,
+  CAST(txn_date        AS DATE)           AS txn_date,
+  CAST(quantity        AS INT)            AS quantity,
+  CAST(unit_price_sold AS DECIMAL(10, 2)) AS unit_price_sold,
+  CAST(discount_pct    AS DECIMAL(5, 2))  AS discount_pct,
+  CAST(amount          AS DECIMAL(12, 2)) AS amount,
+  -- Dim attributes denormalized for easy Gold aggregation
+  COALESCE(category,     'Unknown')       AS category,
+  COALESCE(brand,        'Unknown')       AS brand,
+  COALESCE(region,       'Unknown')       AS region,
+  COALESCE(store_format, 'Unknown')       AS store_format,
+  COALESCE(city,         'Unknown')       AS city,
+  -- Bronze metadata passthrough
   ingest_ts,
   source_system,
-  batch_id,
-  -- Silver enrichment
-  YEAR(transaction_date) AS txn_year,
-  MONTH(transaction_date) AS txn_month,
-  DAYOFWEEK(transaction_date) AS txn_dow,
-  CASE
-    WHEN total_amount >= 500 THEN 'High'
-    WHEN total_amount >= 100 THEN 'Medium'
-    ELSE 'Low'
-  END AS spend_tier
+  batch_id
 FROM (
   SELECT *,
-    ROW_NUMBER() OVER (PARTITION BY transaction_id ORDER BY ingest_ts DESC) AS rn
-  FROM interview.retail.bronze_transactions
-  WHERE transaction_id IS NOT NULL
-    AND product_id IS NOT NULL
-    AND store_id IS NOT NULL
-    AND total_amount > 0
-)
-WHERE rn = 1;
+    ROW_NUMBER() OVER (PARTITION BY txn_id ORDER BY ingest_ts DESC) AS rn
+  FROM workspace.retail.bronze_transactions
+  WHERE txn_id IS NOT NULL
+    AND amount  IS NOT NULL
+    AND amount  > 0
+) deduped
+WHERE rn = 1

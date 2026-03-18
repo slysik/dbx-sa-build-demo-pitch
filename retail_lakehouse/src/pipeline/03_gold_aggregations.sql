@@ -1,60 +1,63 @@
--- Gold: Pre-aggregated business metrics for BI consumption
--- Reads from Silver MV → produces Gold MVs
--- SDP Materialized Views — runs inside Lakeflow pipeline only
+-- Gold: Sales by Category (pre-aggregated for BI)
+-- ~72 rows (6 categories × 12 months)
 
--- Gold 1: Sales by Product Category
-CREATE OR REFRESH MATERIALIZED VIEW gold_sales_by_category
-COMMENT 'Revenue and volume by product category and month'
+CREATE OR REFRESH MATERIALIZED VIEW workspace.retail.gold_sales_by_category
+TBLPROPERTIES (
+  "quality" = "gold",
+  "layer"   = "gold"
+)
 AS
 SELECT
   category,
-  txn_year,
-  txn_month,
-  COUNT(*) AS transaction_count,
-  SUM(quantity) AS total_units,
-  ROUND(SUM(total_amount), 2) AS total_revenue,
-  ROUND(AVG(total_amount), 2) AS avg_transaction_value,
-  COUNT(DISTINCT product_id) AS unique_products,
-  COUNT(DISTINCT store_id) AS unique_stores
-FROM interview.retail.silver_transactions
-GROUP BY category, txn_year, txn_month;
+  YEAR(txn_date)                     AS txn_year,
+  MONTH(txn_date)                    AS txn_month,
+  COUNT(*)                           AS txn_count,
+  SUM(quantity)                      AS total_units,
+  ROUND(SUM(amount), 2)              AS total_revenue,
+  ROUND(AVG(amount), 2)              AS avg_order_value,
+  ROUND(AVG(discount_pct) * 100, 1) AS avg_discount_pct
+FROM workspace.retail.silver_transactions
+GROUP BY category, YEAR(txn_date), MONTH(txn_date)
+;
 
--- Gold 2: Sales by Store Region
-CREATE OR REFRESH MATERIALIZED VIEW gold_sales_by_store
-COMMENT 'Revenue and performance by store region and format'
+-- Gold: Sales by Store (pre-aggregated for BI)
+-- ~300 rows (50 stores × 12 months, or region/format × months)
+
+CREATE OR REFRESH MATERIALIZED VIEW workspace.retail.gold_sales_by_store
+TBLPROPERTIES (
+  "quality" = "gold",
+  "layer"   = "gold"
+)
 AS
 SELECT
+  store_id,
   region,
   store_format,
   city,
-  txn_year,
-  txn_month,
-  COUNT(*) AS transaction_count,
-  SUM(quantity) AS total_units,
-  ROUND(SUM(total_amount), 2) AS total_revenue,
-  ROUND(AVG(total_amount), 2) AS avg_transaction_value,
-  COUNT(DISTINCT product_id) AS products_sold,
-  ROUND(SUM(CASE WHEN spend_tier = 'High' THEN total_amount ELSE 0 END), 2) AS high_value_revenue
-FROM interview.retail.silver_transactions
-GROUP BY region, store_format, city, txn_year, txn_month;
+  YEAR(txn_date)                     AS txn_year,
+  MONTH(txn_date)                    AS txn_month,
+  COUNT(*)                           AS txn_count,
+  SUM(quantity)                      AS total_units,
+  ROUND(SUM(amount), 2)              AS total_revenue,
+  ROUND(AVG(amount), 2)              AS avg_order_value
+FROM workspace.retail.silver_transactions
+GROUP BY store_id, region, store_format, city, YEAR(txn_date), MONTH(txn_date)
+;
 
--- Gold 3: Daily Revenue Trend
-CREATE OR REFRESH MATERIALIZED VIEW gold_daily_revenue
-COMMENT 'Daily revenue trend with running totals'
+-- Gold: Daily Revenue (365 rows — one per day)
+
+CREATE OR REFRESH MATERIALIZED VIEW workspace.retail.gold_daily_revenue
+TBLPROPERTIES (
+  "quality" = "gold",
+  "layer"   = "gold"
+)
 AS
 SELECT
-  transaction_date,
-  txn_year,
-  txn_month,
-  txn_dow,
-  COUNT(*) AS transaction_count,
-  SUM(quantity) AS total_units,
-  ROUND(SUM(total_amount), 2) AS daily_revenue,
-  ROUND(AVG(total_amount), 2) AS avg_basket_size,
-  COUNT(DISTINCT store_id) AS active_stores,
-  COUNT(DISTINCT product_id) AS products_sold,
-  -- Payment mix
-  SUM(CASE WHEN payment_method = 'Credit Card' THEN 1 ELSE 0 END) AS credit_card_txns,
-  SUM(CASE WHEN payment_method = 'Digital Wallet' THEN 1 ELSE 0 END) AS digital_wallet_txns
-FROM interview.retail.silver_transactions
-GROUP BY transaction_date, txn_year, txn_month, txn_dow;
+  txn_date,
+  COUNT(*)              AS txn_count,
+  SUM(quantity)         AS total_units,
+  ROUND(SUM(amount), 2) AS total_revenue,
+  ROUND(AVG(amount), 2) AS avg_order_value
+FROM workspace.retail.silver_transactions
+GROUP BY txn_date
+ORDER BY txn_date
