@@ -1,0 +1,42 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# demo_config.yml
+# Central configuration for the AI-Native Customer Intelligence demo.
+# Edit these values to match your Databricks workspace before running notebooks.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Unity Catalog coordinates
+catalog: main
+schema: customer_intel
+volume: raw_data          # UC Volume used for raw file landing
+
+# Table names (relative to catalog.schema)
+tables:
+  bronze_customers: bronze_customers
+  bronze_reviews: bronze_reviews
+  silver_customers: silver_customers
+  silver_reviews: silver_reviews
+  gold_customer_features: gold_customer_features
+
+# MLflow / model registry
+mlflow:
+  experiment_name: /Shared/customer_churn_experiment
+  model_name: churn_predictor
+  registered_model_alias: champion
+
+# Databricks Model Serving
+serving:
+  endpoint_name: churn_ep
+  workload_size: Small     # Small | Medium | Large
+  scale_to_zero: true
+
+# Databricks Foundation Model APIs (LLM)
+llm:
+  endpoint: databricks-dbrx-instruct   # or databricks-llama-3-3-70b-instruct
+  max_tokens: 256
+  temperature: 0.0
+
+# Sample-data generation (used by 01_setup.py when no real data is available)
+sample_data:
+  num_customers: 2000
+  num_reviews: 5000
+  random_seed: 42
