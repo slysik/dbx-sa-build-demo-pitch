@@ -177,7 +177,8 @@ Skills load on-demand with full patterns, gotchas, and code templates. **Always 
 | **Unity Catalog / Volumes** | `.agents/skills/databricks-unity-catalog/SKILL.md` |
 | **Structured Streaming** | `.agents/skills/databricks-spark-structured-streaming/SKILL.md` |
 | **Jobs / Workflows** | `.agents/skills/databricks-jobs/SKILL.md` |
-| **Asset Bundles (CI/CD)** | `.agents/skills/asset-bundles/SKILL.md` |
+| **Asset Bundles (CI/CD)** | `.agents/skills/databricks-bundles/SKILL.md` (preferred, Jan 2026) or `.agents/skills/asset-bundles/SKILL.md` |
+| **AI Functions (ai_classify, ai_extract, ai_forecast, ai_query, ai_gen, ai_mask etc.)** | `.agents/skills/databricks-ai-functions/SKILL.md` |
 | **Genie Spaces** | `.agents/skills/databricks-genie/SKILL.md` + `sdp-and-dashboard-patterns.md` #42-59 |
 | **Model Serving** | `.agents/skills/model-serving/SKILL.md` |
 | **Vector Search** | `.agents/skills/databricks-vector-search/SKILL.md` |
