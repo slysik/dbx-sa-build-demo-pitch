@@ -222,6 +222,23 @@ The code structure is identical — only column names and categories change.
 7. "rand() with seed for reproducibility — same data every run for debugging"
 8. "repartition(8) before write sizes files for downstream reads"
 
+## Architecture Slide Narration (4-Layer Databricks Platform)
+
+When the interviewer shows the Databricks platform slide (Spark Compute → Data Lakehouse → Unity Catalog → Analytics & AI), map each layer to the live demo:
+
+**What to say for each layer:**
+
+| Slide Layer | What We Built | Narration |
+|---|---|---|
+| **Spark Compute** | Serverless notebooks + SDP | *"All compute is serverless — no cluster to manage, auto-scales to zero between runs"* |
+| **Data Lakehouse** | Bronze → Silver → Gold → Delta | *"The medallion pattern — Bronze preserves raw fidelity, Silver enforces quality, Gold is consumption-shaped for BI and ML"* |
+| **Streaming and batch** | Batch only in demo | *"In production this lands via Auto Loader on S3 or Zerobus for near-real-time ingest — I'm using spark.range() so we can run the full pipeline in under 2 min on serverless"* |
+| **Unity Catalog** | `workspace.finserv.*` | *"Three-level namespace — catalog, schema, table. UC gives us column-level lineage, row filters, and audit logs out of the box"* |
+| **SQL Warehouses** | PRO serverless WH | *"The Gold MVs are served by a PRO serverless warehouse — Photon-accelerated, no warmup time"* |
+| **BI + AI Apps** | AI/BI Dashboard | *"The dashboard queries Gold directly — sub-second because the aggregation already happened in the pipeline"* |
+| **Mosaic AI** | Not built — narrate | *"The risk_score and is_high_risk columns in Silver are engineered features — next step is ai_query() for LLM-based transaction classification or a served MLflow model"* |
+| **UC Govern/Share/Audit** | Not built — narrate | *"UC system tables give us full query lineage and audit trail. Delta Sharing publishes these Gold tables to external consumers — no data copies, governed access"* |
+
 ## Dashboard Deployment Learnings
 
 1. **`embed_credentials: false`** — Always publish dashboards without embedded credentials on this workspace. The personal MS account (@gmail.com via live.com) intermittently loses active status, causing `Principal is not an active member` errors on embedded-credential dashboards.

@@ -253,3 +253,89 @@ Dashboard datasets (re-aggregate Gold):
 57. **dbx-tools wins for auth failover, pipeline polling, cleanup, and validation.** `dbx_auth_check` (SP auto-failover), `dbx_poll_pipeline`, `dbx_cleanup`, and `dbx_validate_tables` have no MCP equivalent.
 58. **Optimal config: both loaded.** dbx-tools (always) for auth/pipelines/cleanup/SQL. MCP (on-demand via `defer_loading: true`) for Genie/Dashboard/VectorSearch/AgentBricks CRUD. Use dbx-tools for SQL execution (auth failover) even when MCP is available.
 59. **MCP `.mcp.json` should use `slysik-sp` profile, not `slysik` PAT.** SP is SCIM-immune. PAT profile causes MCP tool failures when SCIM deactivates the user mid-session.
+
+## Test Run Learnings (2026-03-18 finserv_lakehouse run)
+
+### SDP TBLPROPERTIES Gotchas
+60. **`"owner"` is a reserved SDP TBLPROPERTIES key.** Using `"owner" = "team-name"` in `CREATE OR REFRESH MATERIALIZED VIEW ... TBLPROPERTIES` causes `UNSUPPORTED_FEATURE.SET_TABLE_PROPERTY`. Remove `"owner"` from all TBLPROPERTIES blocks. Valid properties: `"quality"`, `"layer"`, `"delta.autoOptimize.optimizeWrite"`, etc.
+
+### SQL RANGE() vs spark.range() — Column Availability
+61. **SQL RANGE() Bronze tables only have explicitly generated columns.** When generating Bronze via `CREATE OR REPLACE TABLE ... AS SELECT ... FROM RANGE(N)`, the table contains only the columns you SELECT. Unlike PySpark where `F.current_timestamp()` is easy to add inline, SQL RANGE has no implicit timestamp. If Silver needs a timestamp, derive it: `TO_TIMESTAMP(CONCAT(CAST(txn_date AS STRING), ' 00:00:00'))` or just use `txn_date` as DATE. Do NOT reference a PySpark-derived column (like `txn_ts`) in Silver SQL when Bronze was generated via SQL RANGE.
+
+### Bundle Deployment — tfstate Conflicts
+62. **tfstate ownership conflict recovery.** If `bundle deploy` fails with `"does not have View or Admin or Manage Run or Owner permissions on job"`, the job ID in tfstate was created by a different principal. Fix: delete stale tfstate (`rm .databricks/bundle/dev/terraform/terraform.tfstate`), then `bundle deploy` creates fresh resources. The old job remains in workspace (delete via UI by the original owner if needed).
+
+### Dashboard Deployment — parent_path Must Be a Folder
+63. **Dashboard `parent_path` must be a Workspace FOLDER, not a REPO.** The path `/Users/user@email.com/my-repo` may be a Git-backed REPO object (type=REPO in workspace list). POSTing a dashboard with a REPO as `parent_path` fails: "is not a directory". Use SP home folder `/Users/{sp_client_id}` or create a dedicated folder via `workspace.mkdirs`. Check with `databricks workspace list "/Users/..."` — look for `Type: REPO` vs `Type: DIRECTORY`.
+
+### Dashboard Widget Patterns
+64. **Grouped bar chart: add `"mark": {"layout": "group"}` to bar spec.** Default is stacked. Group mode shows bars side-by-side — better for comparing absolute values across categories when you don't want stacking to hide individual bars.
+65. **Multi-Y line chart syntax: `"y": {"scale": ..., "fields": [...]}`.** For multiple lines sharing one y-axis, use the `fields` array under a single `y` encoding (not multiple x/y pairs). Both fields must exist in the dataset. Each object in `fields` needs `fieldName` and `displayName`.
+66. **`dbx_poll_pipeline` "completed" = IDLE, not necessarily COMPLETED.** After poll returns, ALWAYS verify with `databricks api get "/api/2.0/pipelines/{id}"` and check `latest_updates[0].state`. IDLE after FAILED is a silent failure. Only `state: "COMPLETED"` means success.
+
+## Test Run Learnings (2026-03-18 retail_lakehouse test run)
+
+### Notebook Execution — Serverless Multi-Task Format
+67. **`dbx_run_notebook` tool does NOT support serverless compute.** It submits a single-task run which requires `job_cluster_key`, `new_cluster`, or `existing_cluster_id`. Error: "For serverless compute, please use multi-task with tasks array instead." **Always use direct API call instead:**
+```bash
+databricks -p slysik-aws api post "/api/2.1/jobs/runs/submit" --json '{
+  "run_name": "bronze_gen",
+  "tasks": [{"task_key": "generate_bronze", "notebook_task": {"notebook_path": "/Workspace/..."}}],
+  "queue": {"enabled": true}
+}'
+```
+Then poll with the working URL-param pattern (not `--query`).
+
+### Auth — PAT on AWS is Clean
+68. **AWS workspace with PAT has no SCIM issues.** `current_user()` returns `slysik@gmail.com` (not SP UUID), pipeline `run_as_user_name` is the human user, table ownership is clean. SCIM flakiness was Azure-specific. PAT is the right primary credential on AWS — no SP workarounds needed.
+
+### Dashboard Deployment — Canonical Folder
+69. **Always deploy dashboards to `/Users/slysik@gmail.com/dashboards/`.** Create once with `workspace mkdirs`, reuse every run. Never use the REPO path (`dbx-sa-build-demo-pitch`) as `parent_path` — it's type REPO not DIRECTORY and will fail. Never use `.bundle/` path.
+
+### Jobs List — Not JSON
+70. **`databricks jobs list` returns tabular text, not JSON.** Cannot pipe to `python3 -c json.load()`. Parse as plain text or use `api get "/api/2.1/jobs?limit=25"` for JSON response.
+
+### Workspace Cleanup — DROP SCHEMA CASCADE
+71. **`DROP SCHEMA IF EXISTS catalog.schema CASCADE` drops all tables + the schema in one call.** Faster than dropping tables individually. Use AFTER `dbx_cleanup` (which handles pipeline + job + dashboard deletion first). Order: `dbx_cleanup` → `DROP SCHEMA CASCADE`.
+
+### Build Timing (100K rows, serverless, PAT, AWS)
+72. **Confirmed timings for finserv-scale builds:**
+- Bronze notebook (serverless, multi-task submit): ~75 sec
+- SDP pipeline (3 Silver + 3 Gold MVs): ~47–51 sec
+- Dashboard deploy + publish: ~20 sec
+- Bundle validate + deploy: ~25 sec
+- Total end-to-end: ~6 min (well within interview window)
+
+## Test Run Learnings (2026-03-18 finserv clean rebuild)
+
+### Dashboard Deployment — dbx_deploy_dashboard Always Fails on This Workspace
+73. **`dbx_deploy_dashboard` tool hardcodes the REPO path as `parent_path`.** The tool resolves to `/Users/slysik@gmail.com/dbx-sa-build-demo-pitch` which is a REPO object (type=REPO), not a DIRECTORY. Always bypass this tool and use direct API calls:
+```bash
+# Step 1: create (first time)
+databricks -p slysik-aws api post "/api/2.0/lakeview/dashboards" --json "$PAYLOAD"
+# Step 2: publish
+databricks -p slysik-aws api post "/api/2.0/lakeview/dashboards/{id}/published" \
+  --json '{"embed_credentials": false, "warehouse_id": "214e9f2a308e800d"}'
+```
+Use `parent_path: "/Users/slysik@gmail.com/dashboards"` (pre-created DIRECTORY). Never use the REPO path.
+
+### dbx_cleanup — Deletes ALL Dashboards Workspace-Wide
+74. **`dbx_cleanup` deletes every dashboard in the workspace, not just ones related to the target schema.** Collateral deletions happen (e.g., "Workspace Usage Dashboard" was deleted during retail cleanup). This is acceptable for interview prep but worth knowing. If a specific dashboard must be preserved, delete it manually before running cleanup.
+
+### Bronze Notebook — Column Naming Rules
+75. **Always name fact status/type columns with a domain prefix BEFORE the broadcast join.** Pattern: `txn_status` not `status`, `order_status` not `status`. Dim tables commonly have a `status` column (account_status, product_status). If the fact also has `status`, Spark's `withColumnRenamed("status", ...)` after the join renames ALL matching columns — silently dropping the fact status. Fix at source: name it distinctly in the fact build step.
+76. **Never write a dim table twice.** Write each dim exactly once — in the cell where it's built. Do NOT re-write it inside the broadcast join cell. Double writes cause unnecessary overwrites and confuse the notebook narrative.
+
+### Domain Discipline
+77. **`finserv_lakehouse` / `workspace.finserv` is the permanent demo domain.** Never reuse `retail`, `finance`, or any other schema for the real demo build. Test runs use a throwaway domain (e.g., `retail_lakehouse`) and are cleaned up immediately after. The interview workspace should show only `workspace.finserv` + `workspace.default`.
+78. **Bundle/pipeline names must match the domain.** Use `finserv_medallion` and `finserv_orchestrator` — not `finance_medallion` or generic names. Interviewers see these names in the Pipelines and Jobs UI.
+
+### Architecture Slide Narration — 4-Layer Coverage
+79. **Our build covers 3 of 4 slide layers directly; 1 layer is narrated.** Mapping:
+- **Spark Compute** → serverless notebooks + SDP serverless pipeline ✅ demo
+- **Data Lakehouse** → Bronze → Silver → Gold → Trusted Delta tables ✅ demo
+- **Unity Catalog** → `workspace.finserv.*` 3-level namespace, TBLPROPERTIES quality tags ✅ demo
+- **Analytics & AI** → SQL Warehouse + AI/BI Dashboard + SQL queries ✅ demo
+- **Mosaic AI** → narrate only: *"Gold tables are feature-ready — next step is `ai_query()` risk scoring or a served MLflow model on the transaction stream"*
+- **Streaming** → narrate only: *"In production this lands via Auto Loader or Zerobus — I'm using `spark.range()` here so the full pipeline runs in under 2 min on serverless"*
+- **UC Govern/Discover/Share/Audit** → narrate only: *"UC system tables give us full query lineage and audit trail — Delta Sharing publishes Gold to external consumers without data copies"*

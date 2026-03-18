@@ -1,8 +1,9 @@
 # CLAUDE.md — Databricks Sr. SA Interview
 
-**Interview: Sr. Databricks SA | Wednesday March 11, 2026**
-**Profile: `slysik` | User: `slysik@gmail.com` | Catalog: `dbx_weg`**
-**MCP: adb-7405619449104571.11.azuredatabricks.net (configured in `.mcp.json`, profile `slysik-sp`)**
+**Interview: Sr. Databricks SA | Final Round**
+**Profile: `slysik-aws` | Workspace: `dbc-ad74b11b-230d.cloud.databricks.com` (AWS)**
+**MCP: dbc-ad74b11b-230d.cloud.databricks.com (configured in `.mcp.json`, profile `slysik-aws-sp`)**
+**User: `slysik@gmail.com` | SP: `dbx-ssa-coding-agent`**
 
 ---
 
@@ -46,26 +47,28 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 ---
 
 ## INTERVIEW-DAY CHECKLIST (before the call)
-- [ ] Start `interview-cluster` 10 min early (takes ~3 min to boot)
-- [ ] Verify PAT token not expired: `databricks -p slysik auth describe`
-- [ ] If auth fails, generate new PAT from workspace UI → Settings → Developer → Access tokens
+- [ ] Verify auth: `just dbx-auth` — should show `slysik@gmail.com` via PAT
+- [ ] Verify SQL warehouse is running: `just wh-status` (if STOPPED: `just wh-start`)
+- [ ] Verify SQL works: `just sql "SELECT current_user()"` — must return `slysik@gmail.com`
+- [ ] Verify workspace is clean: `SHOW SCHEMAS IN workspace` → only `default` + `information_schema`
+- [ ] No cluster needed — all compute is serverless (notebooks + SDP pipelines)
 - [ ] When scaling DataFrames, scale ALL related tables (fact + detail) to keep join keys aligned
 - [ ] Paste code into notebooks with **Cmd+Shift+V** (no formatting)
-- [ ] If notebook cell stuck "Waiting", detach/reattach cluster
-- [ ] Dashboard publish: ALWAYS use `embed_credentials: false` (personal MS account flakes with embedded)
-- [ ] Jobs: trigger from **UI "Run now"** if CLI fails with "principal inactive" — browser session works
-- [ ] **Root cause of all auth flakes:** personal MS account (@gmail.com via live.com) SCIM `active: false`. Fix: service principal or org account
+- [ ] Dashboard publish: ALWAYS use `embed_credentials: false`
+- [ ] Dashboard parent folder: `/Users/slysik@gmail.com/dashboards` — verify it exists (`workspace list`)
+- [ ] Demo domain: `workspace.finserv` ONLY — never `finance`, `retail`, or other schemas
 
-### Auth Failover (3 profiles configured)
+### Auth Failover (profiles configured)
 | Profile | Auth Type | When to Use |
 |---------|-----------|-------------|
-| `slysik` | PAT | Default — fast, simple |
-| `slysik-oauth` | OAuth U2M | `databricks auth login -p slysik-oauth` — browser popup, re-activates SCIM |
-| `slysik-sp` | OAuth M2M (SP: `dbx-coding-agent`) | SCIM-immune — auto-failover in dbx-tools extension |
+| `slysik-aws` | **PAT** ✅ (configured 2026-03-18) | Primary — all CLI, bundle, notebook runs |
+| `slysik-aws-sp` | OAuth M2M (SP: `dbx-ssa-coding-agent`) | SCIM-immune auto-failover in dbx-tools extension |
 
-**dbx-tools auto-failover:** If PAT auth fails, all tools automatically retry with `slysik-sp` (service principal). No manual intervention needed.
-**Manual OAuth fix:** `databricks auth login -p slysik-oauth` — re-activates SCIM user, which also fixes PAT.
-**MCP profile:** `.mcp.json` uses `slysik-sp` (SCIM-immune). MCP tools for Genie/Dashboard/VectorSearch CRUD. dbx-tools for auth/SQL/pipelines/cleanup.
+**PAT configured:** `slysik-aws` profile has a valid PAT in `~/.databrickscfg`. Auth is clean — no OAuth U2M needed.
+**If PAT expires:** Workspace UI → Settings → Developer → Access tokens → Generate new token → replace `token = dapi...` in `~/.databrickscfg` under `[slysik-aws]`. Remove `auth_type = databricks-cli` if present — it conflicts with PAT.
+**AWS = no SCIM issues:** `current_user()` returns `slysik@gmail.com` (human email, not SP UUID). Pipeline `run_as_user_name` is clean. No Azure-style SCIM flakiness.
+**dbx-tools auto-failover:** If primary fails with auth error, tools retry with `slysik-aws-sp` automatically.
+**MCP profile:** `.mcp.json` uses `slysik-aws-sp`. MCP tools for Genie/Dashboard/VectorSearch CRUD.
 
 ## PI EXTENSION: dbx-tools (PREFER OVER RAW CLI)
 
@@ -75,11 +78,11 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 |------|----------|------------|
 | `dbx_auth_check` | `databricks auth describe` | Returns structured ok/fail |
 | `dbx_cluster_status` | `clusters get` + JSON parse | One call, clean output |
-| `dbx_run_notebook` | `runs/submit` + polling loop | Handles submit + poll + timeout in one call |
+| `dbx_run_notebook` | `runs/submit` + polling loop | ⚠️ BROKEN for serverless — use direct `api post /api/2.1/jobs/runs/submit` with tasks array |
 | `dbx_poll_pipeline` | Manual pipeline poll loop | Find-by-name + start + poll in one call |
 | `dbx_validate_tables` | Multiple SQL count queries | One call validates entire schema |
 | `dbx_sql` | Raw SQL Statements API | Clean output with column headers |
-| `dbx_deploy_dashboard` | POST/PATCH + publish dance | Create-or-update + publish in one call |
+| `dbx_deploy_dashboard` | POST/PATCH + publish dance | ⚠️ BROKEN — uses REPO path as parent. Always use direct `api post` with `/Users/slysik@gmail.com/dashboards` |
 | `dbx_cleanup` | Manual delete loops | Pipelines → tables → jobs → dashboards in correct order |
 
 **Always prefer these tools over raw `databricks` CLI commands when running in pi.**
@@ -103,34 +106,59 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 
 ---
 
-## CLI GOTCHAS — CRITICAL (learned 2026-03-11 test run)
+## CLI GOTCHAS — CRITICAL
+
+### AWS workspace-specific
+- **GRANT to SP must use `client_id`, not display name** — `GRANT ... TO \`64e5d26a-41fd-4089-b71b-c6b83154bd91\`` not `\`dbx-ssa-coding-agent\``
+- **Workspace admin implicit UC access** — `SHOW GRANTS` won't show admin-derived privileges; workspace admins have full UC access without explicit grants
+- **Serverless-only** — no cluster available; notebooks run on serverless compute (omit `existing_cluster_id` in runs/submit API)
+- **Notebook serverless submit** — `dbx_run_notebook` tool DOES NOT support serverless. Use direct API: `api post "/api/2.1/jobs/runs/submit"` with `tasks` array + `"queue": {"enabled": true}`, no cluster spec
+- **Dashboard parent_path** — ALWAYS use `/Users/slysik@gmail.com/dashboards` (DIRECTORY). The git repo path is type REPO and fails. `dbx_deploy_dashboard` tool uses REPO path — always bypass with direct `api post`
+
+### General (learned 2026-03-11 + 2026-03-18 test runs)
 
 - **`databricks api get --query` is BROKEN** on macOS system Python 3.9. Use URL params: `api get "/api/2.1/jobs/runs/get?run_id=$ID"`
 - **`databricks pipelines list` doesn't exist** — use `pipelines list-pipelines`
-- **Pipeline list = flat JSON array**, Jobs list = `{"jobs": [...]}`
+- **Pipeline list = flat JSON array**, Jobs list = tabular text (not JSON — read as plain text or use `api get "/api/2.1/jobs"`)
 - **`DROP METRIC VIEW` is invalid SQL** — use `DROP VIEW IF EXISTS`
 - **Multi-statement SQL via Statements API fails** — one statement per call
-- **SDP pipeline poll every 20 sec** — completes in 1-2 cycles typically (~50 sec total)
+- **SDP pipeline poll every 15–20 sec** — completes in ~47–51 sec on serverless for 3 MVs
 - **Cleanup order: pipelines → tables → jobs → dashboards → workspace folders**
+- **`dbx_cleanup` deletes ALL dashboards workspace-wide** — not just schema-specific ones
+- **`DROP SCHEMA IF EXISTS catalog.schema CASCADE`** — drops all tables + schema in one call; run after `dbx_cleanup`
+- **Stale tfstate** — if `bundle deploy` fails with permission error, delete `.databricks/bundle/dev/terraform/terraform.tfstate` and redeploy
+- **Bronze column naming** — name fact status/type columns with domain prefix (`txn_status`, not `status`) BEFORE broadcast join. Dim tables also have `status` → collision causes `withColumnRenamed` to rename both silently
 
 ---
 
 ## WORKSPACE — QUICK COMMANDS
 
-**Active workspace:** `dbx-interview` (West US 3) | Auth: PAT token
-**Cluster:** `interview-cluster` (0310-193517-r0u8giyo) — 4-core single node, 16.4 LTS
-**Catalog:** `interview` | **Schema:** `retail` | **Volume:** `/Volumes/interview/retail/raw_data`
-**SDP Pipeline:** `retail_medallion` (ac4d06ae-c2f5-4d12-8f86-a886f6d248d5) — serverless
-**SQL Warehouse:** `b89b264d78f9d52e` (Serverless Starter Warehouse)
+**Active workspace:** `dbc-ad74b11b-230d` (AWS) | Auth: PAT ✅ (`slysik-aws` profile configured)
+**Cluster:** none — workspace is serverless-only. Notebooks use serverless compute, pipelines use serverless SDP.
+**Catalog:** `workspace` ✅
+**Schema:** `finserv` — THE demo domain. Never use `finance`, `retail`, or other schemas for the real demo.
+**SQL Warehouse:** `214e9f2a308e800d` (SQL WH — PRO serverless) ✅
+**User email:** `slysik@gmail.com` ✅
+**Git folder:** `/Workspace/Users/slysik@gmail.com/dbx-sa-build-demo-pitch` (ID: `3401527313137932`) — type REPO
+**Dashboard folder:** `/Users/slysik@gmail.com/dashboards` — type DIRECTORY, use as `parent_path` for all dashboard deploys
+**GitHub repo:** `https://github.com/slysik/dbx-sa-build-demo-pitch`
 
 ```bash
-just dbx-auth                          # Check auth
-just dbx-sql "SELECT 1"               # Run SQL via serverless
-just dbx-catalogs                      # List catalogs
-just dbx-schemas dbx_weg               # List schemas
-just dbx-tables dbx_weg bronze         # List tables
-just nb-upload <local> <workspace>     # Upload notebook
-just nb-upload-all                     # Upload all notebooks
+just upload-project {domain}_lakehouse   # push notebooks + SQL into Git folder
+just open                                 # open Git folder in browser (+ print GitHub URL)
+just open-github                         # open GitHub repo
+just ls-git                              # list projects in Git folder
+just ls-git {domain}_lakehouse           # list files within a project
+```
+
+```bash
+just login                             # First-time OAuth login (browser popup)
+just dbx-auth                          # Check auth status
+just preflight                         # Full pre-flight check
+just sql "SELECT current_user()"       # Verify SQL warehouse works
+just cluster-start                     # Start interview cluster
+just tables media                      # List tables in schema
+just counts media                      # Row counts across schema
 ```
 
 ---
@@ -208,6 +236,7 @@ from pyspark.sql.window import Window
 | CDC | `create_auto_cdc_flow()` (only for true CDC) |
 | Governance | Unity Catalog — 3-level namespace everywhere |
 | BI serving | Databricks SQL / AI/BI Dashboards |
+| Notebook compute | Serverless (no cluster) — omit `existing_cluster_id` in runs/submit |
 | Streaming trigger | `availableNow=True` for serverless; `processingTime` for sustained |
 | Perf tuning | AQE enabled, broadcast small dims, discuss partition count |
 
