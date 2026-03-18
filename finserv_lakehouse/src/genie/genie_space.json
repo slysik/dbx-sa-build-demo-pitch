@@ -1,0 +1,49 @@
+{
+  "space_id": "01f123083e551b77b5eaa2959201f257",
+  "title": "Apex Financial \u2014 Risk & Revenue Intelligence",
+  "description": "Natural language exploration of 100K Apex Financial transactions. Ask about revenue by category, high-risk accounts, daily trends, customer segments, and fraud risk metrics. Powered by Unity Catalog gold and silver tables in workspace.finserv.",
+  "warehouse_id": "214e9f2a308e800d",
+  "table_identifiers": [
+    "workspace.finserv.silver_transactions",
+    "workspace.finserv.gold_txn_by_category",
+    "workspace.finserv.gold_segment_risk",
+    "workspace.finserv.gold_daily_risk"
+  ],
+  "sample_questions": [
+    "What are the top 5 transaction categories by total revenue?",
+    "Which customer segments have the highest average risk score?",
+    "What is the daily transaction volume and revenue trend over the last 30 days?",
+    "How many transactions were flagged as high risk, and what percentage is that?",
+    "What is the total revenue across all transaction categories?",
+    "Which categories have the highest ratio of declined transactions?",
+    "Show me revenue and risk metrics broken down by customer segment",
+    "Which day had the most high-risk transactions?"
+  ],
+  "rebuild_notes": {
+    "serialized_space_format": {
+      "version": 2,
+      "data_sources": {
+        "tables": [
+          {
+            "identifier": "catalog.schema.table"
+          }
+        ]
+      },
+      "config": {
+        "sample_questions": [
+          {
+            "id": "<32hex-uuid>",
+            "question": [
+              "<question string>"
+            ]
+          }
+        ]
+      }
+    },
+    "gotchas": [
+      "Tables must be sorted alphabetically by identifier",
+      "Pass table_identifiers as top-level API field alongside serialized_space",
+      "SampleQuestion.id must be lowercase 32-hex UUID without hyphens"
+    ]
+  }
+}
