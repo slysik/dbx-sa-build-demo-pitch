@@ -1,11 +1,23 @@
 ---
 name: databricks-unity-catalog
-description: "MUST USE this skill proactively for ANY Unity Catalog governance task -- permissions, system tables, volumes, or UC object management. Covers: GRANT/REVOKE/SHOW GRANTS on catalogs, schemas, and tables; volume file operations (upload_to_volume, download_from_volume, list_volume_files, /Volumes/ paths); system table queries (system.access.audit, system.access.table_lineage, system.billing.usage, system.compute); CREATE/ALTER CATALOG and SCHEMA; data profiling and quality monitoring; INFORMATION_SCHEMA; tags and classification. Use when someone mentions permissions, access control, lineage, audit logs, billing/DBU usage, or file operations on volumes. DO NOT USE for: general SQL queries, dashboards (aibi-dashboards skill), pipelines (spark-declarative-pipelines skill), model serving, or data generation."
+description: "Unity Catalog system tables and volumes. Use when querying system tables (audit, lineage, billing) or working with volume file operations (upload, download, list files in /Volumes/)."
 ---
 
 # Unity Catalog
 
 Guidance for Unity Catalog system tables, volumes, and governance.
+
+## When to Use This Skill
+
+Use this skill when:
+- Working with **volumes** (upload, download, list files in `/Volumes/`)
+- Querying **lineage** (table dependencies, column-level lineage)
+- Analyzing **audit logs** (who accessed what, permission changes)
+- Monitoring **billing and usage** (DBU consumption, cost analysis)
+- Tracking **compute resources** (cluster usage, warehouse metrics)
+- Reviewing **job execution** (run history, success rates, failures)
+- Analyzing **query performance** (slow queries, warehouse utilization)
+- Profiling **data quality** (data profiling, drift detection, metric tables)
 
 ## Reference Files
 
@@ -98,7 +110,7 @@ mcp__databricks__execute_sql(
 
 - **[databricks-spark-declarative-pipelines](../databricks-spark-declarative-pipelines/SKILL.md)** - for pipelines that write to Unity Catalog tables
 - **[databricks-jobs](../databricks-jobs/SKILL.md)** - for job execution data visible in system tables
-- **[databricks-synthetic-data-generation](../databricks-synthetic-data-generation/SKILL.md)** - for generating data stored in Unity Catalog Volumes
+- **[databricks-synthetic-data-gen](../databricks-synthetic-data-gen/SKILL.md)** - for generating data stored in Unity Catalog Volumes
 - **[databricks-aibi-dashboards](../databricks-aibi-dashboards/SKILL.md)** - for building dashboards on top of Unity Catalog data
 
 ## Resources

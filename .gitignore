@@ -9,6 +9,7 @@
 # Logs
 logs/
 excalidraw.log
+*.log
 
 # Cache
 .ruff_cache/
@@ -20,6 +21,28 @@ __pycache__/
 
 # Databricks resources (local state)
 .databricks-resources.json
+
+# Python virtual environment
+.venv/
+
+# pi session data (auto-generated, noisy)
+.claude/data/sessions/
+
+# Temporary API output files
+run_err.json
+task_err.json
+sql_test.json
+stmt_id.txt
+dash_id.txt
+publish.json
+export.json
+out.html
+weg_space.json
+*.bak
+
+# Embedded git repos (not submodules)
+ai-dev-kit/repo/
+wealth_management_lakehouse/
 
 # Large files (>100MB GitHub limit)
 archive/design-arch-interview/azure-databricks.pdf

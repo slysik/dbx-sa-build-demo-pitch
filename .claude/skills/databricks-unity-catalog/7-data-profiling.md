@@ -1,385 +1,287 @@
-# Data Profiling
+# Data Profiling (formerly Lakehouse Monitoring)
 
-Comprehensive reference for data profiling, statistics collection, metadata inspection, UC Monitors, and drift detection in Databricks.
+Comprehensive reference for Data Profiling: create quality monitors on Unity Catalog tables to track data profiles, detect drift, and monitor ML model performance.
 
 ## Overview
 
-Data profiling in Databricks spans multiple capabilities:
+Data profiling automatically computes statistical profiles and drift metrics for tables over time. When you create a monitor, Databricks generates two output Delta tables (profile metrics + drift metrics) and an optional dashboard.
 
-| Capability | Purpose |
-|-----------|---------|
-| `ANALYZE TABLE` | Compute column-level statistics for query optimization |
-| `DESCRIBE EXTENDED` | Inspect table metadata, properties, and storage info |
-| `INFORMATION_SCHEMA` | Query UC metadata programmatically |
-| SQL profiling queries | Null counts, distinct counts, min/max, percentiles |
-| UC Monitors | Automated drift detection, data quality monitoring |
+| Component | Description |
+|-----------|-------------|
+| **Monitor** | Configuration attached to a UC table |
+| **Profile Metrics Table** | Summary statistics computed per column |
+| **Drift Metrics Table** | Statistical drift compared to baseline or previous time window |
+| **Dashboard** | Auto-generated visualization of metrics |
 
----
+### Requirements
 
-## ANALYZE TABLE
-
-Compute statistics used by the query optimizer. Essential for accurate cost-based optimization.
-
-```sql
--- Compute statistics for all columns
-ANALYZE TABLE analytics.gold.customers COMPUTE STATISTICS;
-
--- Compute statistics for specific columns
-ANALYZE TABLE analytics.gold.customers
-COMPUTE STATISTICS FOR COLUMNS customer_id, total_orders, lifetime_value;
-
--- Compute statistics for all columns (explicit)
-ANALYZE TABLE analytics.gold.customers COMPUTE STATISTICS FOR ALL COLUMNS;
-
--- Check existing statistics
-DESCRIBE EXTENDED analytics.gold.customers customer_id;
-```
-
-**When to run ANALYZE:**
-- After large batch loads or MERGE operations
-- After significant deletes or updates
-- When query plans show poor estimates (table scans on small result sets)
-- As part of your Gold table build pipeline
+- Unity Catalog enabled workspace
+- Databricks SQL access
+- Privileges: `USE CATALOG`, `USE SCHEMA`, `SELECT`, and `MANAGE` on the table
+- Only Delta tables supported (managed, external, views, materialized views, streaming tables)
 
 ---
 
-## DESCRIBE EXTENDED
+## Profile Types
 
-Inspect table metadata, column details, and storage properties.
+| Type | Use Case | Key Params | Limitations |
+|------|----------|------------|-------------|
+| **Snapshot** | General-purpose tables without time column | None required | Max 4TB table size |
+| **TimeSeries** | Tables with a timestamp column | `timestamp_column`, `granularities` | Last 30 days only |
+| **InferenceLog** | ML model monitoring | `timestamp_column`, `granularities`, `model_id_column`, `problem_type`, `prediction_column` | Last 30 days only |
 
-```sql
--- Full table metadata
-DESCRIBE EXTENDED analytics.gold.customers;
+### Granularities (for TimeSeries and InferenceLog)
 
--- Single column detail (includes stats if computed)
-DESCRIBE EXTENDED analytics.gold.customers customer_id;
-
--- Table properties only
-SHOW TBLPROPERTIES analytics.gold.customers;
-
--- Delta table detail (history, file count, size)
-DESCRIBE DETAIL analytics.gold.customers;
-
--- Delta history
-DESCRIBE HISTORY analytics.gold.customers LIMIT 10;
-```
+Supported `AggregationGranularity` values: `AGGREGATION_GRANULARITY_5_MINUTES`, `AGGREGATION_GRANULARITY_30_MINUTES`, `AGGREGATION_GRANULARITY_1_HOUR`, `AGGREGATION_GRANULARITY_1_DAY`, `AGGREGATION_GRANULARITY_1_WEEK` – `AGGREGATION_GRANULARITY_4_WEEKS`, `AGGREGATION_GRANULARITY_1_MONTH`, `AGGREGATION_GRANULARITY_1_YEAR`
 
 ---
 
-## Information Schema Queries
+## MCP Tools
 
-Query UC metadata programmatically for data discovery and governance.
+Use the `manage_uc_monitors` tool for all monitor operations:
 
-```sql
--- Column inventory for a table
-SELECT
-    column_name,
-    data_type,
-    is_nullable,
-    column_default,
-    comment
-FROM system.information_schema.columns
-WHERE table_catalog = 'analytics'
-  AND table_schema = 'gold'
-  AND table_name = 'customers'
-ORDER BY ordinal_position;
+| Action | Description |
+|--------|-------------|
+| `create` | Create a quality monitor on a table |
+| `get` | Get monitor details and status |
+| `run_refresh` | Trigger a metric refresh |
+| `list_refreshes` | List refresh history |
+| `delete` | Delete the monitor (assets are not deleted) |
 
--- Find tables with a specific column name (data discovery)
-SELECT DISTINCT
-    table_catalog,
-    table_schema,
-    table_name
-FROM system.information_schema.columns
-WHERE column_name LIKE '%customer_id%'
-  AND table_catalog NOT IN ('system', 'hive_metastore');
+### Create a Monitor
 
--- Tables without comments (governance gap)
-SELECT
-    table_catalog || '.' || table_schema || '.' || table_name AS full_name,
-    table_type
-FROM system.information_schema.tables
-WHERE comment IS NULL
-  AND table_catalog NOT IN ('system', 'hive_metastore')
-ORDER BY full_name;
-
--- Column count per table (complexity indicator)
-SELECT
-    table_catalog || '.' || table_schema || '.' || table_name AS full_name,
-    COUNT(*) AS column_count
-FROM system.information_schema.columns
-WHERE table_catalog = 'analytics'
-GROUP BY 1
-ORDER BY column_count DESC;
-```
-
----
-
-## Data Profiling Patterns
-
-### Null Analysis
-
-```sql
--- Null counts and percentages for all columns
-SELECT
-    COUNT(*) AS total_rows,
-    COUNT(customer_id) AS customer_id_non_null,
-    COUNT(*) - COUNT(customer_id) AS customer_id_nulls,
-    ROUND(100.0 * (COUNT(*) - COUNT(customer_id)) / COUNT(*), 2) AS customer_id_null_pct,
-    COUNT(*) - COUNT(email) AS email_nulls,
-    ROUND(100.0 * (COUNT(*) - COUNT(email)) / COUNT(*), 2) AS email_null_pct
-FROM analytics.gold.customers;
-```
-
-### Distinct Counts
-
-```sql
--- Distinct value counts
-SELECT
-    COUNT(DISTINCT customer_id) AS distinct_customers,
-    COUNT(DISTINCT region) AS distinct_regions,
-    COUNT(DISTINCT status) AS distinct_statuses,
-    COUNT(*) AS total_rows
-FROM analytics.gold.customers;
-```
-
-### Min/Max/Avg Profile
-
-```sql
--- Numeric column profile
-SELECT
-    MIN(order_amount) AS min_amount,
-    MAX(order_amount) AS max_amount,
-    AVG(order_amount) AS avg_amount,
-    STDDEV(order_amount) AS stddev_amount,
-    PERCENTILE(order_amount, 0.5) AS median_amount,
-    PERCENTILE(order_amount, 0.95) AS p95_amount,
-    PERCENTILE(order_amount, 0.99) AS p99_amount
-FROM analytics.silver.orders;
-```
-
-### Percentile Distribution
-
-```sql
--- Full percentile profile for a numeric column
-SELECT
-    PERCENTILE(amount, 0.01) AS p01,
-    PERCENTILE(amount, 0.05) AS p05,
-    PERCENTILE(amount, 0.10) AS p10,
-    PERCENTILE(amount, 0.25) AS p25,
-    PERCENTILE(amount, 0.50) AS p50,
-    PERCENTILE(amount, 0.75) AS p75,
-    PERCENTILE(amount, 0.90) AS p90,
-    PERCENTILE(amount, 0.95) AS p95,
-    PERCENTILE(amount, 0.99) AS p99
-FROM analytics.silver.orders;
-```
-
-### Categorical Distribution
-
-```sql
--- Top values for a categorical column
-SELECT
-    status,
-    COUNT(*) AS cnt,
-    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS pct
-FROM analytics.gold.customers
-GROUP BY status
-ORDER BY cnt DESC;
-```
-
-### Freshness Check
-
-```sql
--- Data freshness: latest record timestamps
-SELECT
-    MAX(updated_at) AS latest_update,
-    MIN(updated_at) AS earliest_update,
-    DATEDIFF(current_timestamp(), MAX(updated_at)) AS days_since_update
-FROM analytics.gold.customers;
-```
-
----
-
-## UC Monitors
-
-Lakehouse Monitoring provides automated data quality and drift detection on Delta tables.
-
-### Create Monitor
-
-```sql
--- Snapshot monitor (point-in-time quality)
-CREATE MONITOR analytics.gold.customers
-SCHEDULE CRON '0 0 * * *'
-USING SNAPSHOT;
-
--- Time series monitor (tracks metrics over time)
-CREATE MONITOR analytics.gold.daily_revenue
-SCHEDULE CRON '0 6 * * *'
-USING TIME_SERIES
-  TIMESTAMP_COL order_date
-  GRANULARITIES ('1 day', '1 week');
-
--- Inference monitor (ML model quality)
-CREATE MONITOR analytics.ml.predictions
-SCHEDULE CRON '0 8 * * *'
-USING INFERENCE
-  TIMESTAMP_COL prediction_time
-  PREDICTION_COL predicted_label
-  LABEL_COL actual_label
-  PROBLEM_TYPE 'CLASSIFICATION'
-  GRANULARITIES ('1 day');
-```
-
-### Monitor Options
-
-```sql
--- Monitor with slicing and custom metrics
-CREATE MONITOR analytics.gold.transactions
-SCHEDULE CRON '0 0 * * *'
-USING TIME_SERIES
-  TIMESTAMP_COL event_date
-  GRANULARITIES ('1 day')
-  SLICING_EXPRS ('region', 'product_category')
-  CUSTOM_METRICS (
-    STRUCT(
-      'high_value_ratio' AS name,
-      'double' AS type,
-      'SUM(CASE WHEN amount > 1000 THEN 1 ELSE 0 END) / COUNT(*)' AS definition,
-      ARRAY('amount') AS input_columns,
-      'aggregate' AS output_data_type
-    )
-  );
-```
-
-### Monitor Output Tables
-
-Each monitor creates two output tables in the same schema:
-
-| Output Table | Purpose |
-|-------------|---------|
-| `{table_name}_profile_metrics` | Per-column statistics (null count, distinct count, min, max, mean, percentiles) |
-| `{table_name}_drift_metrics` | Statistical drift scores comparing current window to baseline |
-
-```sql
--- Query profile metrics
-SELECT
-    column_name,
-    null_count,
-    distinct_count,
-    min,
-    max,
-    mean,
-    percentile_25,
-    percentile_50,
-    percentile_75
-FROM analytics.gold.customers_profile_metrics
-WHERE window_end = (SELECT MAX(window_end) FROM analytics.gold.customers_profile_metrics);
-
--- Query drift metrics
-SELECT
-    column_name,
-    drift_type,
-    statistic,
-    drift_score,
-    CASE WHEN drift_score > 0.1 THEN 'DRIFT DETECTED' ELSE 'STABLE' END AS status
-FROM analytics.gold.customers_drift_metrics
-WHERE window_end = (SELECT MAX(window_end) FROM analytics.gold.customers_drift_metrics)
-ORDER BY drift_score DESC;
-```
-
-### Manage Monitors
-
-```sql
--- Refresh monitor (run now)
-REFRESH MONITOR analytics.gold.customers;
-
--- Describe monitor configuration
-DESCRIBE MONITOR analytics.gold.customers;
-
--- Drop monitor (removes output tables too)
-DROP MONITOR analytics.gold.customers;
-
--- Drop monitor but keep output tables
-DROP MONITOR analytics.gold.customers KEEP OUTPUT TABLES;
-```
-
-### MCP Tool for Monitors
+> **Note:** The MCP tool currently only creates **snapshot** monitors. For TimeSeries or InferenceLog monitors, use the Python SDK directly (see below).
 
 ```python
-# Create/manage monitors via MCP
 manage_uc_monitors(
     action="create",
-    table_name="analytics.gold.customers",
-    monitor_type="SNAPSHOT",
-    schedule="0 0 * * *"
+    table_name="catalog.schema.my_table",
+    output_schema_name="catalog.schema",
 )
+```
 
-# List monitors
-manage_uc_monitors(action="list", schema_name="analytics.gold")
+### Get Monitor Status
 
-# Get monitor status
-manage_uc_monitors(action="get", table_name="analytics.gold.customers")
+```python
+manage_uc_monitors(
+    action="get",
+    table_name="catalog.schema.my_table",
+)
+```
+
+### Trigger a Refresh
+
+```python
+manage_uc_monitors(
+    action="run_refresh",
+    table_name="catalog.schema.my_table",
+)
+```
+
+### Delete a Monitor
+
+```python
+manage_uc_monitors(
+    action="delete",
+    table_name="catalog.schema.my_table",
+)
 ```
 
 ---
 
-## Drift Detection Patterns
+## Python SDK Examples
 
-### Chi-Square Test (Categorical Drift)
+**Doc:** https://databricks-sdk-py.readthedocs.io/en/stable/workspace/dataquality/data_quality.html
 
-```sql
--- Compare categorical distributions across two time windows
-WITH baseline AS (
-    SELECT status, COUNT(*) AS cnt
-    FROM analytics.gold.customers
-    WHERE updated_at < '2024-06-01'
-    GROUP BY status
-),
-current_window AS (
-    SELECT status, COUNT(*) AS cnt
-    FROM analytics.gold.customers
-    WHERE updated_at >= '2024-06-01'
-    GROUP BY status
+The new SDK provides full control over all profile types via `w.data_quality`.
+
+### Create Snapshot Monitor
+
+```python
+from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.dataquality import (
+    Monitor, DataProfilingConfig, SnapshotConfig,
 )
-SELECT
-    COALESCE(b.status, c.status) AS status,
-    COALESCE(b.cnt, 0) AS baseline_count,
-    COALESCE(c.cnt, 0) AS current_count
-FROM baseline b
-FULL OUTER JOIN current_window c ON b.status = c.status
-ORDER BY status;
+
+w = WorkspaceClient()
+
+# Look up UUIDs — the new API uses object_id and output_schema_id (both UUIDs)
+table_info = w.tables.get("catalog.schema.my_table")
+schema_info = w.schemas.get(f"{table_info.catalog_name}.{table_info.schema_name}")
+
+monitor = w.data_quality.create_monitor(
+    monitor=Monitor(
+        object_type="table",
+        object_id=table_info.table_id,
+        data_profiling_config=DataProfilingConfig(
+            assets_dir="/Workspace/Users/user@example.com/monitoring/my_table",
+            output_schema_id=schema_info.schema_id,
+            snapshot=SnapshotConfig(),
+        ),
+    ),
+)
+print(f"Monitor status: {monitor.data_profiling_config.status}")
 ```
 
-### Numeric Distribution Shift
+### Create TimeSeries Monitor
 
-```sql
--- Compare numeric distributions (baseline vs current)
-SELECT
-    'baseline' AS period,
-    AVG(amount) AS mean_amount,
-    STDDEV(amount) AS stddev_amount,
-    PERCENTILE(amount, 0.5) AS median
-FROM analytics.silver.orders
-WHERE order_date < '2024-06-01'
+```python
+from databricks.sdk.service.dataquality import (
+    Monitor, DataProfilingConfig, TimeSeriesConfig, AggregationGranularity,
+)
 
-UNION ALL
+table_info = w.tables.get("catalog.schema.events")
+schema_info = w.schemas.get(f"{table_info.catalog_name}.{table_info.schema_name}")
 
-SELECT
-    'current' AS period,
-    AVG(amount) AS mean_amount,
-    STDDEV(amount) AS stddev_amount,
-    PERCENTILE(amount, 0.5) AS median
-FROM analytics.silver.orders
-WHERE order_date >= '2024-06-01';
+monitor = w.data_quality.create_monitor(
+    monitor=Monitor(
+        object_type="table",
+        object_id=table_info.table_id,
+        data_profiling_config=DataProfilingConfig(
+            assets_dir="/Workspace/Users/user@example.com/monitoring/events",
+            output_schema_id=schema_info.schema_id,
+            time_series=TimeSeriesConfig(
+                timestamp_column="event_timestamp",
+                granularities=[AggregationGranularity.AGGREGATION_GRANULARITY_1_DAY],
+            ),
+        ),
+    ),
+)
+```
+
+### Create InferenceLog Monitor
+
+```python
+from databricks.sdk.service.dataquality import (
+    Monitor, DataProfilingConfig, InferenceLogConfig,
+    AggregationGranularity, InferenceProblemType,
+)
+
+table_info = w.tables.get("catalog.schema.model_predictions")
+schema_info = w.schemas.get(f"{table_info.catalog_name}.{table_info.schema_name}")
+
+monitor = w.data_quality.create_monitor(
+    monitor=Monitor(
+        object_type="table",
+        object_id=table_info.table_id,
+        data_profiling_config=DataProfilingConfig(
+            assets_dir="/Workspace/Users/user@example.com/monitoring/predictions",
+            output_schema_id=schema_info.schema_id,
+            inference_log=InferenceLogConfig(
+                timestamp_column="prediction_timestamp",
+                granularities=[AggregationGranularity.AGGREGATION_GRANULARITY_1_HOUR],
+                model_id_column="model_version",
+                problem_type=InferenceProblemType.INFERENCE_PROBLEM_TYPE_CLASSIFICATION,
+                prediction_column="prediction",
+                label_column="label",
+            ),
+        ),
+    ),
+)
+```
+
+### Schedule a Monitor
+
+```python
+from databricks.sdk.service.dataquality import (
+    Monitor, DataProfilingConfig, SnapshotConfig, CronSchedule,
+)
+
+table_info = w.tables.get("catalog.schema.my_table")
+schema_info = w.schemas.get(f"{table_info.catalog_name}.{table_info.schema_name}")
+
+monitor = w.data_quality.create_monitor(
+    monitor=Monitor(
+        object_type="table",
+        object_id=table_info.table_id,
+        data_profiling_config=DataProfilingConfig(
+            assets_dir="/Workspace/Users/user@example.com/monitoring/my_table",
+            output_schema_id=schema_info.schema_id,
+            snapshot=SnapshotConfig(),
+            schedule=CronSchedule(
+                quartz_cron_expression="0 0 12 * * ?",  # Daily at noon
+                timezone_id="UTC",
+            ),
+        ),
+    ),
+)
+```
+
+### Get, Refresh, and Delete
+
+```python
+# Get monitor details
+monitor = w.data_quality.get_monitor(
+    object_type="table",
+    object_id=table_info.table_id,
+)
+
+# Trigger refresh
+from databricks.sdk.service.dataquality import Refresh
+
+refresh = w.data_quality.create_refresh(
+    object_type="table",
+    object_id=table_info.table_id,
+    refresh=Refresh(
+        object_type="table",
+        object_id=table_info.table_id,
+    ),
+)
+
+# Delete monitor (does not delete output tables or dashboard)
+w.data_quality.delete_monitor(
+    object_type="table",
+    object_id=table_info.table_id,
+)
 ```
 
 ---
 
-## Best Practices
+## Output Tables
 
-1. **Run ANALYZE TABLE after large writes** -- keeps the query optimizer accurate, especially for Gold tables used in dashboards.
-2. **Use UC Monitors for automated quality** -- set up snapshot monitors on critical Gold tables; review drift metrics weekly.
-3. **Profile before and after migrations** -- capture null counts, distinct counts, and distributions before/after schema changes.
-4. **Slice monitors by business dimensions** -- use `SLICING_EXPRS` to detect drift in specific segments (regions, product lines).
-5. **Set alerts on drift scores** -- pipe monitor output tables to notification workflows when `drift_score > threshold`.
-6. **Use INFORMATION_SCHEMA for governance audits** -- find tables without comments, columns without tags, or schemas with no access controls.
+When a monitor is created, two metric tables are generated in the specified output schema:
+
+| Table | Naming Convention | Contents |
+|-------|-------------------|----------|
+| **Profile Metrics** | `{table_name}_profile_metrics` | Per-column statistics (nulls, min, max, mean, distinct count, etc.) |
+| **Drift Metrics** | `{table_name}_drift_metrics` | Statistical tests comparing current vs. baseline or previous window |
+
+### Query Output Tables
+
+```sql
+-- View latest profile metrics
+SELECT *
+FROM catalog.schema.my_table_profile_metrics
+ORDER BY window_end DESC
+LIMIT 100;
+
+-- View latest drift metrics
+SELECT *
+FROM catalog.schema.my_table_drift_metrics
+ORDER BY window_end DESC
+LIMIT 100;
+```
+
+---
+
+## Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `FEATURE_NOT_ENABLED` | Data profiling not enabled on workspace | Contact workspace admin to enable the feature |
+| `PERMISSION_DENIED` | Missing `MANAGE` privilege on the table | Grant `MANAGE` on the table to your user/group |
+| Monitor refresh stuck in `PENDING` | No SQL warehouse available | Ensure a SQL warehouse is running or set `warehouse_id` |
+| Profile metrics table empty | Refresh has not completed yet | Check refresh state with `list_refreshes`; wait for `SUCCESS` |
+| Snapshot monitor on large table fails | Table exceeds 4TB limit | Switch to TimeSeries profile type instead |
+| TimeSeries shows limited data | Only processes last 30 days | Expected behavior; contact account team to adjust |
+
+---
+
+> **Note:** Data profiling was formerly known as Lakehouse Monitoring. The legacy SDK accessor
+> `w.lakehouse_monitors` and the MCP tool `manage_uc_monitors` still use the previous API.
+
+## Resources
+
+- [Data Quality Monitoring Documentation](https://docs.databricks.com/aws/en/data-quality-monitoring/)
+- [Data Quality SDK Reference](https://databricks-sdk-py.readthedocs.io/en/stable/workspace/dataquality/data_quality.html)
+- [Legacy Lakehouse Monitors SDK Reference](https://databricks-sdk-py.readthedocs.io/en/stable/workspace/catalog/lakehouse_monitors.html)

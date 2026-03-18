@@ -77,37 +77,7 @@ def main():
         tool_response = input_data.get('tool_response', {})
         tool_use_id = input_data.get('tool_use_id', '')
 
-        # Ensure log directory exists
-        log_dir = Path.cwd() / 'logs'
-        log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = log_dir / 'post_tool_use.json'
-
-        # Read existing log data or initialize empty list
-        if log_path.exists():
-            with open(log_path, 'r') as f:
-                try:
-                    log_data = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    log_data = []
-        else:
-            log_data = []
-
-        # Append new data with all relevant fields
-        log_entry = {
-            'tool_name': tool_name,
-            'tool_input': tool_input,
-            'tool_response': tool_response,
-            'tool_use_id': tool_use_id,
-            'session_id': input_data.get('session_id', ''),
-            'cwd': input_data.get('cwd', ''),
-            'permission_mode': input_data.get('permission_mode', ''),
-            'raw_input': input_data
-        }
-        log_data.append(log_entry)
-
-        # Write back to file with formatting
-        with open(log_path, 'w') as f:
-            json.dump(log_data, f, indent=2)
+        # Logging disabled for interview performance
 
         # Example: Provide feedback to Claude based on tool result
         # Uncomment to use:

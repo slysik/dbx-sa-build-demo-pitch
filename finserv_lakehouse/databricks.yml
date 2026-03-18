@@ -1,0 +1,29 @@
+bundle:
+  name: finserv_lakehouse
+
+variables:
+  catalog:
+    default: workspace
+  schema:
+    default: finserv
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-61514402-8451.cloud.databricks.com
+
+resources:
+  jobs:
+    finserv_orchestrator:
+      name: "finserv_orchestrator"
+      tasks:
+        - task_key: run_zerobus_stream
+          notebook_task:
+            notebook_path: src/notebooks/01_generate_and_ingest_zerobus.py
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"

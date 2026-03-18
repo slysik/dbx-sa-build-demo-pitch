@@ -2,7 +2,31 @@
   "session_id": "6fb3d826-060b-4b66-8b8f-d3a7d0ac4d82",
   "prompts": [
     "/prime",
-    "can the dbx_weg catalog be renamed?"
+    "can the dbx_weg catalog be renamed?",
+    "create a fresh interview_demo catalog.",
+    "yes",
+    "done",
+    "check for updates  https://github.com/databricks-solutions/ai-dev-kit",
+    "yes and see how the update improves us for tomorrow's interview"
   ],
-  "agent_name": "Rivena"
+  "agent_name": "Rivena",
+  "extras": {
+    "project": "databricks-interview-prep",
+    "status": "Interview TOMORROW - March 11",
+    "workspace": "dbx-interview | adb-7405619449104571.11.azuredatabricks.net",
+    "catalog": "interview",
+    "date": "2026-03-10",
+    "interview": "Sr. Databricks SA | TOMORROW 2026-03-11",
+    "cluster": "interview-cluster (0310-193517-r0u8giyo)",
+    "checklist": "Start cluster 10min early | Verify PAT | Cmd+Shift+V paste",
+    "readiness": "READY - Medallion pipeline verified, 1M orders scaled, SDP confirmed ~30s",
+    "session_start": "2026-03-10 17:35:58",
+    "ai_dev_kit": "Checked for updates",
+    "session_resumed": "2026-03-10 17:35:05",
+    "last_updated": "2026-03-10 17:47:28",
+    "session_start_current": "2026-03-10 17:47:28",
+    "interview": "Sr. Databricks SA | TOMORROW 2026-03-11",
+    "status": "Interview EVE — Final prep session | Ready to build",
+    "next_action": "Start cluster 10min early | Verify PAT | Cmd+Shift+V paste | Narrate in Databricks orange"
+  }
 }

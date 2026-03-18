@@ -1,6 +1,6 @@
 ---
 name: databricks-genie
-description: "MUST USE this skill proactively for ANY Databricks Genie task -- creating Genie Spaces, querying them, or building natural language data interfaces. Covers: Genie Space CRUD (create_or_update_genie, get_genie, delete_genie), asking questions via ask_genie / Conversation API, NL-to-SQL / text-to-SQL setup, conversational data exploration, chatbot interfaces for business users, and sample question curation. Use when someone wants non-technical users to ask data questions in plain English against Unity Catalog tables. DO NOT USE for: raw SQL queries, dashboards (aibi-dashboards skill), notebooks, model serving, grants/permissions (unity-catalog skill), or data generation."
+description: "Create and query Databricks Genie Spaces for natural language SQL exploration. Use when building Genie Spaces or asking questions via the Genie Conversation API."
 ---
 
 # Databricks Genie
@@ -107,7 +107,7 @@ Before creating a Genie Space:
 ### Creating Tables
 
 Use these skills in sequence:
-1. `databricks-synthetic-data-generation` - Generate raw parquet files
+1. `databricks-synthetic-data-gen` - Generate raw parquet files
 2. `databricks-spark-declarative-pipelines` - Create bronze/silver/gold tables
 
 ## Common Issues
@@ -121,6 +121,6 @@ Use these skills in sequence:
 ## Related Skills
 
 - **[databricks-agent-bricks](../databricks-agent-bricks/SKILL.md)** - Use Genie Spaces as agents inside Supervisor Agents
-- **[databricks-synthetic-data-generation](../databricks-synthetic-data-generation/SKILL.md)** - Generate raw parquet data to populate tables for Genie
+- **[databricks-synthetic-data-gen](../databricks-synthetic-data-gen/SKILL.md)** - Generate raw parquet data to populate tables for Genie
 - **[databricks-spark-declarative-pipelines](../databricks-spark-declarative-pipelines/SKILL.md)** - Build bronze/silver/gold tables consumed by Genie Spaces
 - **[databricks-unity-catalog](../databricks-unity-catalog/SKILL.md)** - Manage the catalogs, schemas, and tables Genie queries

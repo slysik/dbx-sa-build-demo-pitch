@@ -2,7 +2,7 @@
 
 **Interview: Sr. Databricks SA | Wednesday March 11, 2026**
 **Profile: `slysik` | User: `slysik@gmail.com` | Catalog: `dbx_weg`**
-**MCP: adb-7405619449104571.11.azuredatabricks.net (configured in `.mcp.json`, profile `slysik`)**
+**MCP: adb-7405619449104571.11.azuredatabricks.net (configured in `.mcp.json`, profile `slysik-sp`)**
 
 ---
 
@@ -56,6 +56,17 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 - [ ] Jobs: trigger from **UI "Run now"** if CLI fails with "principal inactive" — browser session works
 - [ ] **Root cause of all auth flakes:** personal MS account (@gmail.com via live.com) SCIM `active: false`. Fix: service principal or org account
 
+### Auth Failover (3 profiles configured)
+| Profile | Auth Type | When to Use |
+|---------|-----------|-------------|
+| `slysik` | PAT | Default — fast, simple |
+| `slysik-oauth` | OAuth U2M | `databricks auth login -p slysik-oauth` — browser popup, re-activates SCIM |
+| `slysik-sp` | OAuth M2M (SP: `dbx-coding-agent`) | SCIM-immune — auto-failover in dbx-tools extension |
+
+**dbx-tools auto-failover:** If PAT auth fails, all tools automatically retry with `slysik-sp` (service principal). No manual intervention needed.
+**Manual OAuth fix:** `databricks auth login -p slysik-oauth` — re-activates SCIM user, which also fixes PAT.
+**MCP profile:** `.mcp.json` uses `slysik-sp` (SCIM-immune). MCP tools for Genie/Dashboard/VectorSearch CRUD. dbx-tools for auth/SQL/pipelines/cleanup.
+
 ## PI EXTENSION: dbx-tools (PREFER OVER RAW CLI)
 
 **Location:** `.pi/extensions/dbx-tools.ts` — custom Databricks tools that eliminate CLI brittleness.
@@ -72,6 +83,23 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 | `dbx_cleanup` | Manual delete loops | Pipelines → tables → jobs → dashboards in correct order |
 
 **Always prefer these tools over raw `databricks` CLI commands when running in pi.**
+
+### Tool Selection: dbx-tools vs MCP
+
+| Task | Use | Why |
+|------|-----|-----|
+| SQL execution | **dbx-tools** (`dbx_sql`) | Auth failover to SP |
+| Genie Space CRUD | **MCP** (`create_or_update_genie`) | Abstracts proto format, 22:1 call reduction |
+| Dashboard deploy | **dbx-tools** (`dbx_deploy_dashboard`) | Auth failover + publish in one call |
+| Table exploration | **MCP** (`get_table_details`) | Schemas + stats + cardinality in 1 call |
+| Vector Search / Agent Bricks | **MCP** | Complex multi-step CRUD abstracted |
+| Pipeline polling | **dbx-tools** (`dbx_poll_pipeline`) | No MCP equivalent |
+| Notebook execution | **dbx-tools** (`dbx_run_notebook`) | No MCP equivalent |
+| Cleanup | **dbx-tools** (`dbx_cleanup`) | Correct deletion order in one call |
+| Auth check | **dbx-tools** (`dbx_auth_check`) | SP auto-failover |
+| Genie questions | **MCP** (`ask_genie`) | Structured response with columns/data |
+
+**Heuristic:** MCP for complex resource CRUD (proto/serialization). dbx-tools for operations (polling, cleanup, auth, SQL).
 
 ---
 
@@ -122,7 +150,7 @@ Skills load on-demand with full patterns, gotchas, and code templates. **Always 
 | **Structured Streaming** | `.agents/skills/databricks-spark-structured-streaming/SKILL.md` |
 | **Jobs / Workflows** | `.agents/skills/databricks-jobs/SKILL.md` |
 | **Asset Bundles (CI/CD)** | `.agents/skills/asset-bundles/SKILL.md` |
-| **Genie Spaces** | `.agents/skills/databricks-genie/SKILL.md` |
+| **Genie Spaces** | `.agents/skills/databricks-genie/SKILL.md` + `sdp-and-dashboard-patterns.md` #42-59 |
 | **Model Serving** | `.agents/skills/model-serving/SKILL.md` |
 | **Vector Search** | `.agents/skills/databricks-vector-search/SKILL.md` |
 | **SA knowledge base** | `.pi/skills/databricks-sa/SKILL.md` |

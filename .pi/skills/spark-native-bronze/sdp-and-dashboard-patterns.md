@@ -223,3 +223,33 @@ Dashboard datasets (re-aggregate Gold):
 ### Pi Footer Extension
 40. **`ctx.ui.setStatus()` is invisible when `ctx.ui.setFooter()` is used.** Custom footers replace the default footer entirely, including all status entries. Pipeline checkmarks must be rendered INSIDE the custom footer's `render()` function, not via `setStatus()`.
 41. **`tool_result` event has `event.content` (array) and `event.toolName` directly on the event.** Match on tool output text (`text.includes("completed")`) for reliable detection regardless of result structure changes.
+
+## Test Run Learnings (2026-03-12 Genie Space build)
+
+### Genie Space API — Two Completely Different APIs
+42. **`/api/2.0/genie/spaces` (SDK) requires opaque `serialized_space` protobuf JSON.** The `GenieSpaceExport` proto has undocumented field names, mandatory sorting, and NO sample question support. Do NOT use this API directly.
+43. **`/api/2.0/data-rooms/{id}` is the higher-level Genie API.** Accepts simple `table_identifiers: string[]`, `display_name`, `description`. Used by the Databricks MCP server's `create_or_update_genie` tool. **Always prefer data-rooms over genie/spaces.**
+44. **`serialized_space` proto field names: `identifier` (not `full_name`, `table_identifier`, or `catalog_name`).** Tables go in `{"version": 2, "data_sources": {"tables": [{"identifier": "catalog.schema.table"}]}}`. Tables MUST be sorted alphabetically by identifier or creation fails with `data_sources.tables must be sorted by identifier`.
+45. **`sample_questions` is NOT in the `GenieSpaceExport` proto.** Cannot add sample questions via `/api/2.0/genie/spaces` create/update. Must use `/api/2.0/data-rooms/{id}/curated-questions/batch-actions` API separately.
+
+### Genie Space — Sample Questions & Instructions
+46. **Add sample questions via batch API:** `POST /api/2.0/data-rooms/{id}/curated-questions/batch-actions` with `{"actions": [{"action_type": "CREATE", "curated_question": {"data_room_id": space_id, "question_text": "...", "question_type": "SAMPLE_QUESTION"}}]}`. Also supports `DELETE` action with `{"id": question_id}`.
+47. **SQL Instructions teach Genie certified query patterns:** `POST /api/2.0/data-rooms/{id}/instructions` with `{"title": "...", "content": "SELECT ...", "instruction_type": "SQL_INSTRUCTION"}`. Genie uses these as templates when generating SQL.
+48. **Text Instructions guide Genie behavior:** Same endpoint with `"instruction_type": "TEXT_INSTRUCTION"`. Use for chart preferences ("prefer line charts for trends"), terminology mapping ("revenue = total_revenue"), and table relationship hints.
+49. **Chart-oriented sample questions drive visualization:** Questions like "Show monthly revenue trends by region as a line chart" or "Revenue breakdown by category as a pie chart" prime Genie to render visual results, not just tables.
+
+### Genie Space — Permissions
+50. **SP-created tables need ownership transfer for Genie.** When `dbx_sql` (which auto-failovers to SP) creates Gold tables, the SP owns them. Genie runs queries as the user's identity. Fix: `ALTER TABLE ... SET OWNER TO 'user@email.com'` from SP profile.
+51. **Schema/catalog ownership ≠ table SELECT access in UC.** Even if `slysik@gmail.com` owns the schema and catalog, SP-created tables within that schema require explicit SELECT grants or ownership transfer. UC doesn't grant implicit SELECT to schema owners on tables they don't own.
+52. **`GRANT USE SCHEMA` requires MANAGE on schema.** If SP doesn't have MANAGE (only inherited USE_SCHEMA from catalog grants), it can't grant USE SCHEMA to others. Workaround: the schema owner runs the grant, or transfer table ownership instead.
+
+### Genie Space — SCIM Impact
+53. **SCIM `active: false` breaks Genie even when browser SSO works.** Error: `Principal {id} is not an active member of account`. The user can log into the workspace UI via Azure AD, but Genie's UC schema retrieval fails because SCIM marks the identity inactive.
+54. **Fix: `databricks auth login -p slysik-oauth` re-activates SCIM user.** This requires an interactive browser popup — cannot be automated through pi/Claude Code. Must be run manually in a terminal.
+
+### MCP vs dbx-tools — Quantified Comparison
+55. **MCP `create_or_update_genie` = 1 call. Manual REST = 17 calls (12 failures).** The MCP tool abstracts the proto format, handles sorting, and includes sample questions. The 22:1 call reduction on Genie creation alone justifies having MCP loaded.
+56. **MCP `get_table_details` = 1 call for all schemas + stats + cardinality.** Replaces 8 separate `dbx_sql` calls (3 DESCRIBE + 4 SELECT DISTINCT + 1 aggregate). 8:1 reduction.
+57. **dbx-tools wins for auth failover, pipeline polling, cleanup, and validation.** `dbx_auth_check` (SP auto-failover), `dbx_poll_pipeline`, `dbx_cleanup`, and `dbx_validate_tables` have no MCP equivalent.
+58. **Optimal config: both loaded.** dbx-tools (always) for auth/pipelines/cleanup/SQL. MCP (on-demand via `defer_loading: true`) for Genie/Dashboard/VectorSearch/AgentBricks CRUD. Use dbx-tools for SQL execution (auth failover) even when MCP is available.
+59. **MCP `.mcp.json` should use `slysik-sp` profile, not `slysik` PAT.** SP is SCIM-immune. PAT profile causes MCP tool failures when SCIM deactivates the user mid-session.

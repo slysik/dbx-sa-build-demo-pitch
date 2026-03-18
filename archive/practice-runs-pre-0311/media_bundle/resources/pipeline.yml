@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    media_medallion:
+      name: "[${bundle.target}] media_medallion"
+      catalog: ${var.catalog}
+      target: ${var.schema}
+      serverless: true
+      continuous: false
+      development: true
+      channel: current
+      libraries:
+        - file:
+            path: ../src/pipeline/media_silver.sql
+        - file:
+            path: ../src/pipeline/media_gold.sql

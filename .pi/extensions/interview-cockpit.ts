@@ -79,13 +79,38 @@ export default function (pi: ExtensionAPI) {
 	// ── Pipeline status checkmarks (updated by tool_result) ──────
 	const pipeStatus: Record<string, boolean> = {};
 
+	// ── Auth status tracking ─────────────────────────────────────
+	// Tracks which profile authenticated and whether failover occurred
+	let authStatus: { ok: boolean; profile: string; failover: boolean } | null = null;
+
 	// ── Track tool results for pipeline status ──────────────────
 
 	pi.on("tool_result", async (event) => {
 		const text = Array.isArray((event as any).content)
 			? (event as any).content.map((c: any) => c?.text ?? "").join("")
 			: "";
-		if (event.toolName === "dbx_auth_check" && text.includes("Auth OK")) pipeStatus.auth = true;
+
+		// Auth status — capture profile and failover state
+		if (event.toolName === "dbx_auth_check") {
+			if (text.includes("Auth OK")) {
+				const profileMatch = text.match(/profile:\s*(\S+)\)/);
+				authStatus = { ok: true, profile: profileMatch?.[1] || "slysik", failover: false };
+				pipeStatus.auth = true;
+			} else if (text.includes("auto-failover")) {
+				const profileMatch = text.match(/profile\s*\((\S+)\)/);
+				authStatus = { ok: true, profile: profileMatch?.[1] || "slysik-sp", failover: true };
+				pipeStatus.auth = true;
+			} else if (text.includes("Auth FAILED")) {
+				authStatus = { ok: false, profile: "none", failover: false };
+				pipeStatus.auth = false;
+			}
+		}
+
+		// Detect mid-session failover from any dbx tool (sticky SP switch)
+		if (event.toolName?.startsWith("dbx_") && text.includes("Failover to SP profile")) {
+			authStatus = { ok: true, profile: "slysik-sp", failover: true };
+		}
+
 		if (event.toolName === "dbx_cluster_status" && text.includes("RUNNING")) pipeStatus.cluster = true;
 		if (event.toolName === "dbx_sql" && /bronze|CREATE|100000/.test(text)) pipeStatus.bronze = true;
 		if (event.toolName === "dbx_run_notebook" && text.includes("completed")) pipeStatus.bronze = true;
@@ -290,7 +315,20 @@ export default function (pi: ExtensionAPI) {
 				const ck = (key: string, label: string) =>
 					(pipeStatus[key] ? green("✓") : dim("○")) + dim(" " + label);
 				const sep = dim(" │ ");
-				const l2Right = ck("auth", "auth") + sep + ck("cluster", "cluster") + sep + ck("bronze", "bronze") + sep + ck("silver", "silver") + sep + ck("gold", "gold") + sep + ck("dash", "dash") + " ";
+
+				// Auth badge: shows profile + method instead of just ✓/○
+				let authBadge: string;
+				if (!authStatus) {
+					authBadge = dim("○") + dim(" auth");
+				} else if (!authStatus.ok) {
+					authBadge = red("✗") + red(" auth:FAIL");
+				} else if (authStatus.failover) {
+					authBadge = yellow("⚡") + yellow(` SP:${authStatus.profile}`);
+				} else {
+					authBadge = green("✓") + green(` PAT:${authStatus.profile}`);
+				}
+
+				const l2Right = authBadge + sep + ck("cluster", "cluster") + sep + ck("bronze", "bronze") + sep + ck("silver", "silver") + sep + ck("gold", "gold") + sep + ck("dash", "dash") + " ";
 
 				const pad2 = " ".repeat(Math.max(1, width - visibleWidth(l2Left) - visibleWidth(l2Right)));
 				const line2 = truncateToWidth(l2Left + pad2 + l2Right, width, "");

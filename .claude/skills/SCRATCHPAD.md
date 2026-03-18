@@ -4,13 +4,14 @@
 > Updated automatically by Stop hook or manually via `/checkpoint`.
 > After `/clear`, Claude reads this to resume without re-explanation.
 
-Last updated: 2026-03-03 16:12:05 (auto-saved by stop hook)
+Last updated: 2026-03-10 22:36:30 (auto-saved by stop hook)
 
 Scratchpad Update:
 
-1. Task Worked On:  
-Analyzed and identified duplicate files within the Databricks-related code directories, specifically comparing `databricks-` prefixed files to non-prefixed versions to determine which to retain based on date recency.
+(1) Task:  
+Review and update the handling of Databricks skills affecting context usage and inference speed, including disabling specific skills.
 
-2. Completed:  
-- Confirmed that `databricks-` prefixed files (dated Mar 3) are newer than non-prefixed ones (dated Feb 14).  
-- Provided a safe, explicit command for the
+(2) Completed:  
+- Provided clarification that skill descriptions, not contents, impact context size and inference speed.  
+- Listed current active skills (38), with an initial audit summary.  
+- Executed user request to disable the skills: `excalidraw-architect`, `databricks-docs`, and `databr

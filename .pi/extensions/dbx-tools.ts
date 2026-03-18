@@ -21,31 +21,61 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 
-const PROFILE = "slysik";
+const PRIMARY_PROFILE = "slysik";
+const FALLBACK_PROFILE = "slysik-sp";
 const WS_HOST = "https://adb-7405619449104571.11.azuredatabricks.net";
 const DEFAULT_WAREHOUSE = "b89b264d78f9d52e";
 const DEFAULT_CLUSTER = "0310-193517-r0u8giyo";
 
+// Auth error patterns that trigger failover to SP profile
+const AUTH_ERRORS = ["does not belong to workspace", "Invalid access token", "401", "403", "SCIM", "principal inactive", "Token expired"];
+
 export default function (pi: ExtensionAPI) {
 
-  // ── Helper: run databricks CLI command ─────────────────────────
+  // Track which profile is active (sticky after failover)
+  let activeProfile = PRIMARY_PROFILE;
+
+  function isAuthError(output: string): boolean {
+    return AUTH_ERRORS.some(e => output.includes(e));
+  }
+
+  // ── Helper: run databricks CLI command with failover ───────────
   async function dbxExec(args: string, timeout = 30000): Promise<{ stdout: string; stderr: string; code: number }> {
-    const result = await pi.exec("databricks", ["-p", PROFILE, ...args.split(/\s+/)], { timeout });
+    const result = await pi.exec("databricks", ["-p", activeProfile, ...args.split(/\s+/)], { timeout });
+    // Failover: if primary fails with auth error, retry with SP
+    if (result.code !== 0 && activeProfile === PRIMARY_PROFILE && isAuthError(result.stdout + result.stderr)) {
+      activeProfile = FALLBACK_PROFILE;
+      const retry = await pi.exec("databricks", ["-p", activeProfile, ...args.split(/\s+/)], { timeout });
+      return { stdout: `⚡ Failover to SP profile\n${retry.stdout}`, stderr: retry.stderr, code: retry.code };
+    }
     return { stdout: result.stdout, stderr: result.stderr, code: result.code };
   }
 
-  // ── Helper: run databricks API call ────────────────────────────
+  // ── Helper: run databricks API call with failover ──────────────
   async function dbxApi(method: string, path: string, body?: object, timeout = 30000): Promise<any> {
-    const args = ["-p", PROFILE, "api", method, path];
-    if (body) {
-      args.push("--json", JSON.stringify(body));
+    async function tryApi(profile: string): Promise<{ parsed: any; raw: string; err: string; code: number }> {
+      const args = ["-p", profile, "api", method, path];
+      if (body) {
+        args.push("--json", JSON.stringify(body));
+      }
+      const result = await pi.exec("databricks", args, { timeout });
+      try {
+        return { parsed: JSON.parse(result.stdout), raw: result.stdout, err: result.stderr, code: result.code };
+      } catch {
+        return { parsed: null, raw: result.stdout, err: result.stderr, code: result.code || 1 };
+      }
     }
-    const result = await pi.exec("databricks", args, { timeout });
-    try {
-      return JSON.parse(result.stdout);
-    } catch {
-      throw new Error(`API ${method} ${path} failed: ${result.stderr || result.stdout}`);
+
+    const result = await tryApi(activeProfile);
+    // Failover: if primary fails with auth error, retry with SP
+    if (result.parsed === null && activeProfile === PRIMARY_PROFILE && isAuthError(result.raw + result.err)) {
+      activeProfile = FALLBACK_PROFILE;
+      const retry = await tryApi(activeProfile);
+      if (retry.parsed !== null) return retry.parsed;
+      throw new Error(`API ${method} ${path} failed (after SP failover): ${retry.err || retry.raw}`);
     }
+    if (result.parsed !== null) return result.parsed;
+    throw new Error(`API ${method} ${path} failed: ${result.err || result.raw}`);
   }
 
   // ── Helper: run SQL via Statements API ─────────────────────────
@@ -78,12 +108,35 @@ export default function (pi: ExtensionAPI) {
     description: "Verify Databricks PAT token is working. Returns auth status, user, and host.",
     parameters: Type.Object({}),
     async execute() {
-      const result = await pi.exec("databricks", ["-p", PROFILE, "auth", "describe"], { timeout: 10000 });
-      const output = result.stdout + result.stderr;
-      const isOk = output.includes("Authenticated with:") || output.includes("User:");
+      // Try primary first
+      const primary = await pi.exec("databricks", ["-p", PRIMARY_PROFILE, "auth", "describe"], { timeout: 10000 });
+      const primaryOut = primary.stdout + primary.stderr;
+      const primaryOk = primaryOut.includes("Authenticated with:") && !isAuthError(primaryOut);
+
+      if (primaryOk) {
+        activeProfile = PRIMARY_PROFILE;
+        return {
+          content: [{ type: "text", text: `✅ Auth OK (profile: ${PRIMARY_PROFILE})\n${primaryOut}` }],
+          details: { authenticated: true, profile: PRIMARY_PROFILE, output: primaryOut },
+        };
+      }
+
+      // Primary failed — try SP fallback
+      const fallback = await pi.exec("databricks", ["-p", FALLBACK_PROFILE, "auth", "describe"], { timeout: 10000 });
+      const fallbackOut = fallback.stdout + fallback.stderr;
+      const fallbackOk = fallbackOut.includes("Authenticated with:");
+
+      if (fallbackOk) {
+        activeProfile = FALLBACK_PROFILE;
+        return {
+          content: [{ type: "text", text: `⚡ PAT auth failed — auto-failover to SP profile (${FALLBACK_PROFILE})\n${fallbackOut}` }],
+          details: { authenticated: true, profile: FALLBACK_PROFILE, failover: true, output: fallbackOut },
+        };
+      }
+
       return {
-        content: [{ type: "text", text: isOk ? `✅ Auth OK\n${output}` : `❌ Auth FAILED\n${output}` }],
-        details: { authenticated: isOk, output },
+        content: [{ type: "text", text: `❌ Auth FAILED on both profiles\nPrimary (${PRIMARY_PROFILE}):\n${primaryOut}\nFallback (${FALLBACK_PROFILE}):\n${fallbackOut}` }],
+        details: { authenticated: false, output: primaryOut + "\n" + fallbackOut },
       };
     },
   });

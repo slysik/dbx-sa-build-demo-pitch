@@ -1,0 +1,379 @@
+{
+  "datasets": [
+    {
+      "name": "kpi_summary",
+      "displayName": "KPI Summary",
+      "queryLines": [
+        "SELECT SUM(total_revenue) AS total_revenue, ",
+        "SUM(order_count) AS total_orders, ",
+        "SUM(unique_customers) AS total_customers, ",
+        "ROUND(SUM(total_revenue) / SUM(order_count), 2) AS avg_order_value ",
+        "FROM interview.retail.gold_daily_sales"
+      ]
+    },
+    {
+      "name": "daily_trend",
+      "displayName": "Daily Revenue Trend",
+      "queryLines": [
+        "SELECT order_date, channel, ",
+        "SUM(total_revenue) AS revenue, ",
+        "SUM(order_count) AS orders ",
+        "FROM interview.retail.gold_daily_sales ",
+        "GROUP BY order_date, channel ",
+        "ORDER BY order_date"
+      ]
+    },
+    {
+      "name": "category_perf",
+      "displayName": "Category Performance",
+      "queryLines": [
+        "SELECT category, ",
+        "SUM(total_revenue) AS revenue, ",
+        "SUM(total_units_sold) AS units, ",
+        "ROUND(AVG(margin_pct), 1) AS avg_margin_pct ",
+        "FROM interview.retail.gold_product_performance ",
+        "GROUP BY category ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "regional",
+      "displayName": "Regional Summary",
+      "queryLines": [
+        "SELECT region, ",
+        "SUM(total_revenue) AS revenue, ",
+        "SUM(order_count) AS orders, ",
+        "SUM(active_customers) AS customers ",
+        "FROM interview.retail.gold_regional_summary ",
+        "GROUP BY region ORDER BY revenue DESC"
+      ]
+    },
+    {
+      "name": "tier_ltv",
+      "displayName": "Customer Tier LTV",
+      "queryLines": [
+        "SELECT loyalty_tier, ",
+        "COUNT(*) AS customers, ",
+        "ROUND(AVG(total_spend), 2) AS avg_spend, ",
+        "ROUND(AVG(total_orders), 1) AS avg_orders, ",
+        "ROUND(AVG(days_since_last_order), 0) AS avg_recency_days ",
+        "FROM interview.retail.gold_customer_ltv ",
+        "GROUP BY loyalty_tier ORDER BY avg_spend DESC"
+      ]
+    },
+    {
+      "name": "top_products",
+      "displayName": "Top Products",
+      "queryLines": [
+        "SELECT product_name, category, total_revenue, ",
+        "total_units_sold, margin_pct ",
+        "FROM interview.retail.gold_product_performance ",
+        "ORDER BY total_revenue DESC LIMIT 15"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "Retail Performance Overview",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": ["## 🛍️ Retail Performance Dashboard"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["Medallion architecture: Bronze → Silver → Gold | 1M+ orders across 6 months"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "kpi-revenue",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "kpi_summary",
+              "fields": [{"name": "total_revenue", "expression": "`total_revenue`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_revenue", "displayName": "Total Revenue"}
+              },
+              "frame": {"showTitle": true, "title": "💰 Total Revenue"}
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-orders",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "kpi_summary",
+              "fields": [{"name": "total_orders", "expression": "`total_orders`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_orders", "displayName": "Total Orders"}
+              },
+              "frame": {"showTitle": true, "title": "📦 Total Orders"}
+            }
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-aov",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "kpi_summary",
+              "fields": [{"name": "avg_order_value", "expression": "`avg_order_value`"}],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "avg_order_value", "displayName": "Avg Order Value"}
+              },
+              "frame": {"showTitle": true, "title": "🎯 Avg Order Value"}
+            }
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "section-trends",
+            "multilineTextboxSpec": {
+              "lines": ["### 📈 Revenue Trends"]
+            }
+          },
+          "position": {"x": 0, "y": 5, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "revenue-trend-line",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "daily_trend",
+              "fields": [
+                {"name": "order_date", "expression": "`order_date`"},
+                {"name": "revenue", "expression": "`revenue`"},
+                {"name": "channel", "expression": "`channel`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {"fieldName": "order_date", "scale": {"type": "temporal"}, "displayName": "Date"},
+                "y": {"fieldName": "revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue"},
+                "color": {"fieldName": "channel", "scale": {"type": "categorical"}, "displayName": "Channel"}
+              },
+              "frame": {"showTitle": true, "title": "Daily Revenue by Channel"}
+            }
+          },
+          "position": {"x": 0, "y": 6, "width": 6, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-segments",
+            "multilineTextboxSpec": {
+              "lines": ["### 🎯 Segments & Categories"]
+            }
+          },
+          "position": {"x": 0, "y": 12, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "category-revenue-bar",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "category_perf",
+              "fields": [
+                {"name": "category", "expression": "`category`"},
+                {"name": "revenue", "expression": "`revenue`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "category", "scale": {"type": "categorical"}, "displayName": "Category"},
+                "y": {"fieldName": "revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue by Category"}
+            }
+          },
+          "position": {"x": 0, "y": 13, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "region-pie",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "regional",
+              "fields": [
+                {"name": "region", "expression": "`region`"},
+                {"name": "revenue", "expression": "`revenue`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "revenue", "scale": {"type": "quantitative"}, "displayName": "Revenue"},
+                "color": {"fieldName": "region", "scale": {"type": "categorical"}, "displayName": "Region"}
+              },
+              "frame": {"showTitle": true, "title": "Revenue by Region"}
+            }
+          },
+          "position": {"x": 3, "y": 13, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "category-margin-bar",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "category_perf",
+              "fields": [
+                {"name": "category", "expression": "`category`"},
+                {"name": "avg_margin_pct", "expression": "`avg_margin_pct`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "category", "scale": {"type": "categorical"}, "displayName": "Category"},
+                "y": {"fieldName": "avg_margin_pct", "scale": {"type": "quantitative"}, "displayName": "Margin %"}
+              },
+              "frame": {"showTitle": true, "title": "Avg Margin % by Category"}
+            }
+          },
+          "position": {"x": 0, "y": 18, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "tier-ltv-bar",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "tier_ltv",
+              "fields": [
+                {"name": "loyalty_tier", "expression": "`loyalty_tier`"},
+                {"name": "avg_spend", "expression": "`avg_spend`"},
+                {"name": "customers", "expression": "`customers`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "loyalty_tier", "scale": {"type": "categorical"}, "displayName": "Tier"},
+                "y": {"fieldName": "avg_spend", "scale": {"type": "quantitative"}, "displayName": "Avg Spend"}
+              },
+              "frame": {"showTitle": true, "title": "Avg Customer Spend by Tier"}
+            }
+          },
+          "position": {"x": 3, "y": 18, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-details",
+            "multilineTextboxSpec": {
+              "lines": ["### 📋 Top Products"]
+            }
+          },
+          "position": {"x": 0, "y": 23, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "top-products-table",
+            "queries": [{"name": "main_query", "query": {
+              "datasetName": "top_products",
+              "fields": [
+                {"name": "product_name", "expression": "`product_name`"},
+                {"name": "category", "expression": "`category`"},
+                {"name": "total_revenue", "expression": "`total_revenue`"},
+                {"name": "total_units_sold", "expression": "`total_units_sold`"},
+                {"name": "margin_pct", "expression": "`margin_pct`"}
+              ],
+              "disaggregated": true
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {"fieldName": "product_name", "displayName": "Product"},
+                  {"fieldName": "category", "displayName": "Category"},
+                  {"fieldName": "total_revenue", "displayName": "Revenue"},
+                  {"fieldName": "total_units_sold", "displayName": "Units Sold"},
+                  {"fieldName": "margin_pct", "displayName": "Margin %"}
+                ]
+              },
+              "frame": {"showTitle": true, "title": "Top 15 Products by Revenue"}
+            }
+          },
+          "position": {"x": 0, "y": 24, "width": 6, "height": 6}
+        }
+      ]
+    },
+    {
+      "name": "filters",
+      "displayName": "Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layout": [
+        {
+          "widget": {
+            "name": "filter-channel",
+            "queries": [{"name": "ds_daily_trend_channel", "query": {
+              "datasetName": "daily_trend",
+              "fields": [{"name": "channel", "expression": "`channel`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "channel", "displayName": "Channel", "queryName": "ds_daily_trend_channel"}]
+              },
+              "frame": {"showTitle": true, "title": "Channel"}
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 2, "height": 2}
+        },
+        {
+          "widget": {
+            "name": "filter-region",
+            "queries": [{"name": "ds_regional_region", "query": {
+              "datasetName": "regional",
+              "fields": [{"name": "region", "expression": "`region`"}],
+              "disaggregated": false
+            }}],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [{"fieldName": "region", "displayName": "Region", "queryName": "ds_regional_region"}]
+              },
+              "frame": {"showTitle": true, "title": "Region"}
+            }
+          },
+          "position": {"x": 2, "y": 0, "width": 2, "height": 2}
+        }
+      ]
+    }
+  ]
+}

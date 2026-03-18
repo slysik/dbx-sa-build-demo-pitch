@@ -1,4 +1,4 @@
 
 [mcp_servers.databricks]
-command = "/Users/slysik/.ai-dev-kit/.venv/bin/python"
-args = ["/Users/slysik/.ai-dev-kit/repo/databricks-mcp-server/run_server.py"]
+command = "/usr/bin/env"
+args = ["DATABRICKS_CONFIG_PROFILE=slysik-sp", "/Users/slysik/databricks/ai-dev-kit/.venv/bin/python", "/Users/slysik/databricks/ai-dev-kit/repo/databricks-mcp-server/run_server.py"]

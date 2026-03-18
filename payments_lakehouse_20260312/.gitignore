@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.databricks/
+spark-warehouse/
+.DS_Store
+.env

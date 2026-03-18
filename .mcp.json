@@ -1,9 +1,14 @@
 {
   "mcpServers": {
-    "databricks": {
-      "command": "/Users/slysik/.ai-dev-kit/.venv/bin/python",
-      "args": ["/Users/slysik/.ai-dev-kit/repo/databricks-mcp-server/run_server.py"],
-      "env": {"DATABRICKS_CONFIG_PROFILE": "slysik"}
+"databricks": {
+      "command": "/Users/slysik/databricks/ai-dev-kit/.venv/bin/python",
+      "args": [
+        "/Users/slysik/databricks/ai-dev-kit/repo/databricks-mcp-server/run_server.py"
+      ],
+      "defer_loading": true,
+      "env": {
+        "DATABRICKS_CONFIG_PROFILE": "slysik-sp"
+      }
     }
   }
 }

@@ -1663,3 +1663,8 @@
 2026-03-10 11:28:45 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
 2026-03-10 11:28:45 | INFO | file_path: /Users/slysik/databricks/.gitignore
 2026-03-10 11:28:45 | INFO | Skipping non-Python file
+2026-03-10 14:01:10 | INFO | ==================================================
+2026-03-10 14:01:10 | INFO | RUFF VALIDATOR POSTTOOLUSE HOOK TRIGGERED
+2026-03-10 14:01:10 | INFO | hook_input keys: ['session_id', 'transcript_path', 'cwd', 'permission_mode', 'hook_event_name', 'tool_name', 'tool_input', 'tool_response', 'tool_use_id']
+2026-03-10 14:01:10 | INFO | file_path: /Users/slysik/databricks/.mcp.json
+2026-03-10 14:01:10 | INFO | Skipping non-Python file

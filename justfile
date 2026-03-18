@@ -1,226 +1,253 @@
-# Databricks SA Workspace
+# Databricks SA Interview — Justfile v3
+# Workspace: adb-7405619449104571.11.azuredatabricks.net (West US 3)
+# Catalog: interview | Schema: varies per prompt (retail, media, etc.)
 set dotenv-load := true
 
-# List all recipes
 default:
   @just --list
 
-# --- Claude Code Modes ---
+# ═══════════════════════════════════════════════════════════════════
+# INTERVIEW DAY — Primary Commands
+# ═══════════════════════════════════════════════════════════════════
 
-# Interactive Claude session (default)
+# Launch Pi with dbx-tools extension (custom Databricks tools + cockpit)
+# Optionally pass a plan file: just interview plan.md
+interview *file:
+  cd {{justfile_directory()}} && pi -e .pi/extensions/dbx-tools.ts -e .pi/extensions/interview-cockpit.ts {{file}}
+
+# Launch Pi with dbx-tools only (no cockpit)
+interview-lite *file:
+  cd {{justfile_directory()}} && pi -e .pi/extensions/dbx-tools.ts {{file}}
+
+# Pre-flight check before the interview starts
+preflight:
+  #!/usr/bin/env bash
+  echo "╔══════════════════════════════════════════════╗"
+  echo "║   ◆ Databricks SA Interview — Pre-Flight    ║"
+  echo "╚══════════════════════════════════════════════╝"
+  echo ""
+  echo "── Auth ──"
+  databricks -p slysik auth describe 2>&1 | head -3 || echo "  ✗ Auth failed — generate new PAT"
+  echo ""
+  echo "── Cluster ──"
+  databricks -p slysik clusters get 0310-193517-r0u8giyo 2>&1 | python3 -c "
+  import json,sys
+  try:
+    d=json.load(sys.stdin)
+    print(f'  {d[\"cluster_name\"]}: {d[\"state\"]}')
+    if d['state'] != 'RUNNING': print('  → Start: just cluster-start')
+  except: print('  ✗ Could not check cluster')
+  " 2>&1
+  echo ""
+  echo "── Extensions ──"
+  for f in .pi/extensions/dbx-tools.ts .pi/extensions/interview-cockpit.ts; do
+    test -f "$f" && echo "  ✓ $(basename $f)" || echo "  ✗ MISSING: $f"
+  done
+  echo ""
+  echo "── Theme ──"
+  test -f .pi/themes/databricks.json && echo "  ✓ databricks theme" || echo "  ✗ MISSING"
+  echo ""
+  echo "── Skills ──"
+  for f in \
+    ".pi/skills/repo-best-practices/SKILL.md:Repo Scaffold" \
+    ".pi/skills/spark-native-bronze/SKILL.md:Bronze Gen + Workflow" \
+    ".pi/skills/databricks-sa/SKILL.md:SA Knowledge Base"; do
+    FILE="${f%%:*}"
+    LABEL="${f##*:}"
+    test -f "$FILE" && echo "  ✓ $LABEL" || echo "  ✗ MISSING: $LABEL"
+  done
+  echo ""
+  echo "── Workspace ──"
+  databricks -p slysik pipelines list-pipelines --output json 2>&1 | python3 -c "
+  import json,sys
+  try:
+    data=json.load(sys.stdin)
+    if not data: print('  No pipelines (clean slate ✓)')
+    else:
+      for p in data: print(f'  Pipeline: {p.get(\"name\",\"?\")} | {p.get(\"state\",\"?\")}')
+  except: print('  ✗ Could not list pipelines')
+  " 2>&1
+  echo ""
+  echo "── Ready ──"
+  echo "  Launch: just interview"
+
+# ═══════════════════════════════════════════════════════════════════
+# WORKSPACE CLEANUP — Run before each interview
+# ═══════════════════════════════════════════════════════════════════
+
+# Full cleanup: pipelines → tables → jobs → dashboards (correct order)
+clean-workspace schema="media":
+  #!/usr/bin/env bash
+  echo "=== Cleaning interview.{{schema}} + workspace ==="
+  echo ""
+  echo "── Deleting Pipelines ──"
+  databricks -p slysik pipelines list-pipelines --output json 2>&1 | python3 -c "
+  import json,sys,subprocess
+  data=json.load(sys.stdin)
+  for p in data:
+    pid=p['pipeline_id']
+    subprocess.run(['databricks','-p','slysik','pipelines','delete',pid])
+    print(f'  Deleted: {p.get(\"name\",\"?\")}')
+  if not data: print('  None')
+  " 2>&1
+  echo ""
+  echo "── Dropping Tables ──"
+  just sql "SELECT table_name, table_type FROM interview.information_schema.tables WHERE table_schema='{{schema}}'" 2>&1 | tail -n+2 | while IFS=$'\t' read -r tbl ttype; do
+    [ -z "$tbl" ] && continue
+    CMD="DROP TABLE"
+    [ "$ttype" = "VIEW" ] && CMD="DROP VIEW"
+    just sql "$CMD IF EXISTS interview.{{schema}}.\`$tbl\`" >/dev/null 2>&1
+    echo "  Dropped: $tbl"
+  done
+  echo ""
+  echo "── Deleting Jobs ──"
+  databricks -p slysik jobs list --output json 2>&1 | python3 -c "
+  import json,sys,subprocess
+  data=json.load(sys.stdin)
+  jobs=data.get('jobs',data) if isinstance(data,dict) else data
+  for j in jobs:
+    jid=str(j['job_id'])
+    subprocess.run(['databricks','-p','slysik','jobs','delete',jid])
+    print(f'  Deleted: {j.get(\"settings\",{}).get(\"name\",\"?\")}')
+  if not jobs: print('  None')
+  " 2>&1
+  echo ""
+  echo "── Deleting Dashboards ──"
+  databricks -p slysik api get /api/2.0/lakeview/dashboards 2>&1 | python3 -c "
+  import json,sys,subprocess
+  data=json.load(sys.stdin)
+  for d in data.get('dashboards',[]):
+    did=d['dashboard_id']
+    subprocess.run(['databricks','-p','slysik','api','delete',f'/api/2.0/lakeview/dashboards/{did}'])
+    print(f'  Deleted: {d.get(\"display_name\",\"?\")}')
+  if not data.get('dashboards'): print('  None')
+  " 2>&1
+  echo ""
+  echo "── Cleaning Workspace Folders ──"
+  databricks -p slysik workspace list /Users/slysik@gmail.com --output json 2>&1 | python3 -c "
+  import json,sys,subprocess
+  skip={'.assistant','.bundle','Sample Dashboards','sa-workflows','databricks-claude-coding'}
+  items=json.load(sys.stdin)
+  for i in items:
+    name=i['path'].split('/')[-1]
+    if name in skip or i.get('object_type')=='REPO': continue
+    subprocess.run(['databricks','-p','slysik','workspace','delete','--recursive',i['path']])
+    print(f'  Deleted: {i[\"path\"]}')
+  " 2>&1
+  echo ""
+  echo "=== Clean slate ✓ ==="
+
+# ═══════════════════════════════════════════════════════════════════
+# DATABRICKS CLI
+# ═══════════════════════════════════════════════════════════════════
+
+# Check auth status
+dbx-auth:
+  databricks -p slysik auth describe
+
+# Start the interview cluster
+cluster-start:
+  databricks -p slysik clusters start 0310-193517-r0u8giyo
+  @echo "Cluster starting — takes ~3 min"
+
+# Check cluster status
+cluster-status:
+  databricks -p slysik clusters get 0310-193517-r0u8giyo 2>&1 | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'{d[\"cluster_name\"]}: {d[\"state\"]}')"
+
+# Run SQL on serverless warehouse
+sql query:
+  #!/usr/bin/env bash
+  databricks -p slysik api post /api/2.0/sql/statements --json "{
+    \"warehouse_id\": \"b89b264d78f9d52e\",
+    \"statement\": \"{{query}}\",
+    \"wait_timeout\": \"50s\"
+  }" 2>&1 | python3 -c "
+  import json,sys
+  d=json.load(sys.stdin)
+  cols = [c['name'] for c in d.get('manifest',{}).get('schema',{}).get('columns',[])]
+  if cols: print('\t'.join(cols))
+  for r in d.get('result',{}).get('data_array',[]):
+    print('\t'.join(str(v) for v in r))
+  "
+
+# List tables in a schema (default: media)
+tables schema="media":
+  just sql "SELECT table_name, table_type FROM interview.information_schema.tables WHERE table_schema='{{schema}}' AND table_name NOT LIKE '__materialization%' ORDER BY table_name"
+
+# Row counts for all non-materialization tables in a schema
+counts schema="media":
+  #!/usr/bin/env bash
+  just sql "SELECT table_name FROM interview.information_schema.tables WHERE table_schema='{{schema}}' AND table_name NOT LIKE '__materialization%' ORDER BY table_name" 2>&1 | tail -n+2 | while read tbl; do
+    [ -z "$tbl" ] && continue
+    cnt=$(just sql "SELECT COUNT(*) FROM interview.{{schema}}.\`$tbl\`" 2>&1 | tail -1)
+    printf "  %-40s %s\n" "$tbl" "$cnt"
+  done
+
+# ═══════════════════════════════════════════════════════════════════
+# BUNDLE DEPLOYMENT (per-project)
+# ═══════════════════════════════════════════════════════════════════
+
+# Validate + deploy a project bundle (e.g., just bundle media_lakehouse)
+bundle project:
+  cd {{justfile_directory()}}/{{project}} && databricks -p slysik bundle validate && databricks -p slysik bundle deploy
+
+# Upload project notebooks to workspace for interviewer viewing
+upload-project project:
+  #!/usr/bin/env bash
+  PROJ="{{project}}"
+  WS_DIR="/Users/slysik@gmail.com/$PROJ"
+  databricks -p slysik workspace mkdirs "$WS_DIR" 2>/dev/null
+  for f in {{justfile_directory()}}/$PROJ/src/notebooks/*.py; do
+    NAME=$(basename "$f" .py)
+    databricks -p slysik workspace import "$WS_DIR/$NAME" --file "$f" --language PYTHON --overwrite
+    echo "  Uploaded: $NAME"
+  done
+  for f in {{justfile_directory()}}/$PROJ/src/pipeline/*.sql; do
+    NAME=$(basename "$f" .sql)
+    databricks -p slysik workspace import "$WS_DIR/$NAME" --file "$f" --language SQL --overwrite
+    echo "  Uploaded: $NAME"
+  done
+
+# ═══════════════════════════════════════════════════════════════════
+# WORKSPACE NAVIGATION
+# ═══════════════════════════════════════════════════════════════════
+
+# List workspace contents
+ls path="/Users/slysik@gmail.com":
+  databricks -p slysik workspace list {{path}}
+
+# Upload a notebook
+upload local_path workspace_path:
+  databricks -p slysik workspace import {{workspace_path}} --file {{local_path}} --format SOURCE --language PYTHON --overwrite
+
+# Upload SQL file
+upload-sql local_path workspace_path:
+  databricks -p slysik workspace import {{workspace_path}} --file {{local_path}} --format SOURCE --language SQL --overwrite
+
+# ═══════════════════════════════════════════════════════════════════
+# DELTA PROOF POINTS (for interview narration)
+# ═══════════════════════════════════════════════════════════════════
+
+# Show Liquid Clustering on a table (e.g., just detail media.bronze_stream_events)
+detail table:
+  just sql "DESCRIBE DETAIL interview.{{table}}"
+
+# Show Delta history (audit trail)
+history table:
+  just sql "DESCRIBE HISTORY interview.{{table}} LIMIT 5"
+
+# Show table properties (governance metadata)
+tblproperties table:
+  just sql "SHOW TBLPROPERTIES interview.{{table}}"
+
+# ═══════════════════════════════════════════════════════════════════
+# CLAUDE CODE (alternate interface)
+# ═══════════════════════════════════════════════════════════════════
+
+# Interactive Claude session
 claude:
   claude --model opus
-
-# Plan a feature with 7-review team workflow
-plan prompt:
-  claude --model opus --dangerously-skip-permissions "/plan_w_team_v3 {{prompt}}"
 
 # Headless Claude with full permissions
 auto prompt:
   claude --model opus --dangerously-skip-permissions -p "{{prompt}}"
-
-# --- Databricks CLI ---
-
-# Check Databricks auth status
-dbx-auth:
-  databricks -p slysik auth describe
-
-# Run SQL query against workspace (serverless)
-dbx-sql query:
-  databricks -p slysik api post /api/2.0/sql/statements --json '{"warehouse_id": "auto", "statement": "{{query}}", "wait_timeout": "30s"}'
-
-# List catalogs in Unity Catalog
-dbx-catalogs:
-  databricks -p slysik catalogs list
-
-# List schemas in a catalog
-dbx-schemas catalog:
-  databricks -p slysik schemas list {{catalog}}
-
-# List tables in a schema
-dbx-tables catalog schema:
-  databricks -p slysik tables list {{catalog}} {{schema}}
-
-# List running clusters
-dbx-clusters:
-  databricks -p slysik clusters list -o json | python3 -m json.tool
-
-# List SQL warehouses
-dbx-warehouses:
-  databricks -p slysik warehouses list
-
-# List workspace contents
-dbx-ls path="/":
-  databricks -p slysik workspace list {{path}}
-
-# --- Notebooks ---
-
-# Upload a local notebook to workspace
-nb-upload local_path workspace_path:
-  databricks -p slysik workspace import {{local_path}} {{workspace_path}} --format SOURCE --language PYTHON --overwrite
-
-# Upload all demo notebooks to workspace
-nb-upload-all:
-  #!/usr/bin/env bash
-  for nb in notebooks/*.py; do
-    name=$(basename "$nb" .py)
-    echo "Uploading $name..."
-    databricks -p slysik workspace import "$nb" "/Users/slysik@gmail.com/finserv-demo/$name" --format SOURCE --language PYTHON --overwrite
-  done
-  echo "Done. All notebooks uploaded."
-
-# Download a notebook from workspace
-nb-download workspace_path local_path:
-  databricks -p slysik workspace export {{workspace_path}} {{local_path}} --format SOURCE
-
-# --- Jobs & Pipelines ---
-
-# List all jobs
-dbx-jobs:
-  databricks -p slysik jobs list
-
-# Run a job by ID
-dbx-run job_id:
-  databricks -p slysik jobs run-now --job-id {{job_id}}
-
-# --- Quick Explore ---
-
-# Show full medallion architecture (all tables across bronze/silver/gold)
-medallion:
-  #!/usr/bin/env bash
-  for schema in bronze silver gold; do
-    echo "=== $schema ==="
-    databricks -p slysik tables list dbx_weg $schema 2>/dev/null || echo "  (empty)"
-    echo
-  done
-
-# ─── Databricks Coding Interview (Pi) ────────────────────────────────────────
-
-# Launch Pi for the coding interview — full copilot with task tracker + phase gate
-# Uses updated extensions: coding-interview-tasks.ts + coding-interview-gate.ts
-coding-interview:
-  pi -e .pi/extensions/coding-interview-tasks.ts -e .pi/extensions/coding-interview-gate.ts -e .pi/extensions/interview-focus.ts
-
-# Launch coding interview with a specific vertical pre-set
-# Usage: just coding-interview-vertical retail
-coding-interview-vertical vertical:
-  pi -e .pi/extensions/coding-interview-tasks.ts -e .pi/extensions/coding-interview-gate.ts -e .pi/extensions/interview-focus.ts \
-     "Vertical is {{vertical}}. Catalog is dbx_weg. I have a full Azure workspace with serverless, Unity Catalog, and MCP. Waiting for interviewer prompt."
-
-# Practice run with Pi — simulates the full interview
-# Usage: just coding-practice retail  or  just coding-practice media
-coding-practice vertical:
-  #!/usr/bin/env bash
-  if [ "{{vertical}}" = "retail" ]; then
-    PROMPT="Build a data pipeline for a retail company: ingest online orders, clean and deduplicate, then build daily revenue aggregations by store and product category with loyalty tier breakdowns."
-  elif [ "{{vertical}}" = "media" ]; then
-    PROMPT="Build a data pipeline for a streaming media platform: ingest viewing events, deduplicate and clean, then build daily engagement metrics by content type and subscription tier."
-  else
-    echo "Usage: just coding-practice retail  or  just coding-practice media"
-    exit 0
-  fi
-  pi -e .pi/extensions/coding-interview-tasks.ts -e .pi/extensions/coding-interview-gate.ts -e .pi/extensions/interview-focus.ts \
-     "The interviewer prompt is: $PROMPT. Catalog: dbx_weg. Full Azure workspace. Go straight to building — skip discovery. Start with /next."
-
-# Open live-arch.md in browser for real-time architecture diagram
-live-arch:
-  bash .pi/skills/databricks-sa/scripts/open-live.sh ./live-arch.md
-
-# ─── Claude Code Interview Copilot ──────────────────────────────────────────
-
-# Generate a structured interview prompt from a plain-English use case description
-# Usage: just interview-prompt "streaming payment authorizations with fraud detection"
-# Output: saves to interview-prompt.md, ready for `just interview interview-prompt.md`
-interview-prompt usecase:
-  claude --model opus --dangerously-skip-permissions -p "You are a Databricks SA interview prompt writer. Given this use case description, generate a detailed structured interview prompt in the style of a coding challenge. Include: use case summary, constraints (SQL-first, idempotent, validation harness), data model with field definitions, and numbered deliverable sections (discovery, data gen, bronze, silver, gold, dashboard queries, validation harness, distributed reasoning notes). Output format: markdown. Use case: {{usecase}}" > interview-prompt.md && echo "Saved to interview-prompt.md. Run: just interview interview-prompt.md"
-
-# Execute interview pipeline (headless, defaults baked in)
-# Usage: just interview "create a dataset with 10k rows, then end to end medallion layer sdp"
-interview prompt:
-  @claude --model opus --dangerously-skip-permissions -p "/dbx-interview-playbook Step 0 answers: (1) Catalog: dbx_weg (2) Real Azure workspace with serverless, no Free Edition constraints (3) Time budget: 60 min. Skip questions — go straight to building. Generate the full pipeline for: {{prompt}}. PySpark for data gen (~100k rows via spark.range + Faker UDFs), SQL for all transforms. Include TALK/SCALING/DW-BRIDGE narration comments in ALL code — output narration lines in Databricks orange ANSI (\033[38;2;255;106;0m). Execute SQL via MCP. Create dashboard. Include proof points. Be ready for scaling discussion at every stage. EXECUTION RULES: (A) Follow Pipeline Execution Protocol — verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary]."
-
-# Execute a single pipeline stage (for targeted re-runs)
-# Usage: just interview-stage gold "retail orders pipeline with loyalty tiers"
-interview-stage stage prompt:
-  @claude --model opus --dangerously-skip-permissions -p "/dbx-interview-playbook Re-run ONLY the {{stage}} stage for: {{prompt}}. Catalog: dbx_weg. Execute SQL via MCP. Verify stage gate. Report: STAGE [{{stage}}] -- GATE [PASS/FAIL] -- [summary]. If SQL fails, fix autonomously and capture lesson in tasks/lessons.md."
-
-# Execute interview pipeline — interactive mode (inline prompt)
-# Usage: just interview-interactive "create a dataset with 10k rows, then medallion sdp"
-interview-interactive prompt:
-  @claude --model opus "/dbx-interview-playbook Before generating code, run Step 0: Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3) Time budget? Then generate the full pipeline for: {{prompt}}. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol — verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary]."
-
-# Execute interview pipeline — interactive mode (read prompt from file)
-# Usage: just dbx-coding-agent-interactive-file prompt1.md
-dbx-coding-agent-interactive-file prompt_file:
-  #!/usr/bin/env bash
-  PROMPT="$(cat {{prompt_file}})"
-  claude --model opus "/dbx-interview-playbook Before generating code, run Step 0: Session Setup. Ask me: (1) What catalog to use? (2) Any workspace constraints? (3) Time budget? Then generate the full pipeline for: $PROMPT. Execute SQL via MCP. Create dashboard. Include proof points. Narrate everything for interview read-aloud. EXECUTION RULES: (A) Follow Pipeline Execution Protocol — verify each stage gate before advancing. (B) Use subagents for dashboard query testing and proof points. (C) If any SQL fails, fix autonomously using Quick Fixes table, then capture lesson in tasks/lessons.md. (D) After each stage report: STAGE [name] -- GATE [PASS/FAIL] -- [summary]."
-
-# Practice run: full pipeline with a retail or media prompt (Claude Code)
-# Usage: just practice-run retail  or  just practice-run media
-practice-run vertical:
-  #!/usr/bin/env bash
-  if [ "{{vertical}}" = "retail" ]; then
-    PROMPT="Build a streaming retail orders pipeline: ingest 100k orders, deduplicate, aggregate daily revenue by store and loyalty tier, build a dashboard."
-  elif [ "{{vertical}}" = "media" ]; then
-    PROMPT="Build a streaming media engagement pipeline: ingest 100k stream events, deduplicate, aggregate daily watch time by content type and subscription tier, build a dashboard."
-  else
-    echo "Usage: just practice-run retail  or  just practice-run media"
-    exit 0
-  fi
-  claude --model opus --dangerously-skip-permissions -p "/dbx-interview-playbook Step 0 answers: (1) Catalog: dbx_weg (2) Real Azure workspace with serverless (3) Time budget: 60 min. Skip questions. Generate the full pipeline for: $PROMPT. PySpark for data gen (~100k rows via spark.range + Faker UDFs), SQL for all transforms. Include TALK/SCALING/DW-BRIDGE narration comments. Execute SQL via MCP. Create dashboard. Include proof points."
-
-# ─── Pre-Flight & Verification ──────────────────────────────────────────────
-
-# Verify all interview tooling before the session (Pi + Claude Code)
-interview-check:
-  #!/usr/bin/env bash
-  echo "╔══════════════════════════════════════════╗"
-  echo "║   Coding Interview Pre-Flight Check      ║"
-  echo "╚══════════════════════════════════════════╝"
-  echo ""
-  # Databricks auth
-  echo "── Databricks ──"
-  databricks -p slysik auth describe 2>&1 | head -3
-  echo ""
-  # Claude Code files
-  echo "── Claude Code ──"
-  for f in \
-    ".claude/skills/dbx-interview-playbook/SKILL.md:Interview Playbook (Skill)" \
-    "vertical-quick-swap.md:Vertical Quick-Swap" \
-    "tasks/lessons.md:Lessons Learned" \
-    ".claude/hooks/validators/dbx_best_practices_validator.py:Best Practices Validator"; do
-    FILE="${f%%:*}"
-    LABEL="${f##*:}"
-    test -f "$FILE" && echo "  ✓ $LABEL" || echo "  ✗ MISSING: $LABEL ($FILE)"
-  done
-  echo ""
-  # Pi files
-  echo "── Pi ──"
-  for f in \
-    ".pi/agents/databricks-code-gen.md:Code Gen Agent" \
-    ".pi/agents/spark-explainer.md:Spark Explainer Agent" \
-    ".pi/agents/coding-interview-chain.yaml:Interview Chain" \
-    ".pi/extensions/coding-interview-tasks.ts:Task Tracker" \
-    ".pi/extensions/coding-interview-gate.ts:Interview Gate" \
-    ".pi/extensions/interview-focus.ts:Focus Mode UI"; do
-    FILE="${f%%:*}"
-    LABEL="${f##*:}"
-    test -f "$FILE" && echo "  ✓ $LABEL" || echo "  ✗ MISSING: $LABEL ($FILE)"
-  done
-  echo ""
-  # Skills count
-  echo "── Skills ──"
-  CLAUDE_SKILLS=$(find .claude/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
-  PI_SKILLS=$(find .pi/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
-  echo "  $CLAUDE_SKILLS Claude Code skills | $PI_SKILLS Pi skills"
-  echo ""
-  # MCP
-  echo "── MCP ──"
-  test -f .mcp.json && echo "  ✓ MCP config present" || echo "  ✗ MISSING: .mcp.json"
-  echo ""
-  echo "── Ready! ──"
-  echo "  Pi:          just coding-interview"
-  echo "  Pi practice: just coding-practice retail"
-  echo "  Claude:      just interview 'prompt here'"
-  echo "  Claude file: just dbx-coding-agent-interactive-file prompt.md"

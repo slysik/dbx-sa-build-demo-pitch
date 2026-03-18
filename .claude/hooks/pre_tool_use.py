@@ -253,31 +253,7 @@ def main():
         #     print(json.dumps(output))
         #     sys.exit(0)
 
-        # ====================================================================
-        # Logging (optional - for debugging/auditing)
-        # ====================================================================
-
-        # Ensure log directory exists
-        log_dir = Path.cwd() / 'logs'
-        log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = log_dir / 'pre_tool_use.json'
-
-        # Read existing log data or initialize empty list
-        if log_path.exists():
-            with open(log_path, 'r') as f:
-                try:
-                    log_data = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    log_data = []
-        else:
-            log_data = []
-
-        # Append new data
-        log_data.append(input_data)
-
-        # Write back to file with formatting
-        with open(log_path, 'w') as f:
-            json.dump(log_data, f, indent=2)
+        # Logging disabled for interview performance
 
         # ====================================================================
         # Default: Allow the tool call

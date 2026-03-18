@@ -1,0 +1,43 @@
+resources:
+  jobs:
+    media_orchestrator:
+      name: "[${bundle.target}] media_streaming_orchestrator"
+
+      # ── Task 1: Generate Bronze data (PySpark notebook) ──
+      tasks:
+        - task_key: "generate_bronze"
+          notebook_task:
+            notebook_path: ../src/notebooks/01_synthetic_media_data.py
+            source: WORKSPACE
+          # Serverless — no cluster config needed
+
+        # ── Task 2: Run SDP pipeline (Silver + Gold) ──
+        - task_key: "run_medallion_pipeline"
+          depends_on:
+            - task_key: "generate_bronze"
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.media_medallion.id}
+            full_refresh: false
+
+        # ── Task 3: Create metric view ──
+        - task_key: "create_metric_view"
+          depends_on:
+            - task_key: "run_medallion_pipeline"
+          sql_task:
+            file:
+              path: ../src/pipeline/media_metric_view.sql
+            warehouse_id: ${var.warehouse_id}
+
+        # ── Task 4: Validate row counts ──
+        - task_key: "validate"
+          depends_on:
+            - task_key: "create_metric_view"
+          sql_task:
+            file:
+              path: ../src/pipeline/validate.sql
+            warehouse_id: ${var.warehouse_id}
+
+      # On-demand (no schedule) — trigger manually or add cron later
+      # schedule:
+      #   quartz_cron_expression: "0 0 6 * * ?"
+      #   timezone_id: "America/New_York"
