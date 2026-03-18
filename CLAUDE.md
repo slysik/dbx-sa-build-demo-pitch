@@ -128,6 +128,8 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 - **`DROP SCHEMA IF EXISTS catalog.schema CASCADE`** — drops all tables + schema in one call; run after `dbx_cleanup`
 - **Stale tfstate** — if `bundle deploy` fails with permission error, delete `.databricks/bundle/dev/terraform/terraform.tfstate` and redeploy
 - **Bronze column naming** — name fact status/type columns with domain prefix (`txn_status`, not `status`) BEFORE broadcast join. Dim tables also have `status` → collision causes `withColumnRenamed` to rename both silently
+- **Genie Space `serialized_space` format** — proto3 JSON: `{"version": 2, "data_sources": {"tables": [{"identifier": "cat.schema.tbl"}]}, "config": {"sample_questions": [{"id": "<32hex>", "question": ["Q?"]}]}}`. Tables MUST be sorted alphabetically by identifier. Pass `table_identifiers` as top-level API field (not inside serialized_space). `create_or_update_genie` MCP tool abstracts all of this — prefer it.
+- **Build metrics** — always run `python3 {project}/scripts/generate_build_metrics.py` after every build. Outputs `docs/BUILD_METRICS.md` + `docs/metrics/{date}.json`. Add to git commit.
 
 ---
 
@@ -159,6 +161,7 @@ just sql "SELECT current_user()"       # Verify SQL warehouse works
 just cluster-start                     # Start interview cluster
 just tables media                      # List tables in schema
 just counts media                      # Row counts across schema
+just metrics finserv_lakehouse <pipeline> <run_id> <dashboard> <genie>   # Build metrics report
 ```
 
 ---
