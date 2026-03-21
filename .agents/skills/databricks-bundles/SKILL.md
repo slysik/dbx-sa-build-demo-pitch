@@ -244,9 +244,15 @@ databricks bundle deploy --force             # Force overwrite remote changes
 databricks bundle run resource_name          # Run a pipeline or job
 databricks bundle run pipeline_name -t prod  # Run in specific environment
 
+# Run a single task within a job
+databricks bundle run job_name --only task_key       # ← --only, NOT --task (--task doesn't exist)
+databricks bundle run banking_orchestrator --only generate_bronze   # example
+
 # Apps require bundle run to start after deployment
 databricks bundle run app_resource_key -t dev    # Start/deploy the app
 ```
+
+⚠️ **`--only <task_key>` not `--task`** — `databricks bundle run <job> --only <task_key>` runs a single task. The flag `--task` does not exist and will error.
 
 ### Monitoring & Logs
 
