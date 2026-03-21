@@ -68,10 +68,10 @@ const PHASE_HINTS: Record<string, string> = {
 // ── Workspace config ─────────────────────────────────────────────
 
 const WORKSPACE = {
-	host: "dbc-ad74b11b-230d",
-	name: "dbc-ad74b11b-230d (AWS)",
-	catalog: "workspace",
-	schema: "finance",
+	host: "dbc-61514402-8451",
+	name: "dbc-61514402-8451 (AWS)",
+	catalog: "finserv",
+	schema: "demo",
 };
 
 export default function (pi: ExtensionAPI) {
@@ -272,7 +272,7 @@ export default function (pi: ExtensionAPI) {
 			render(width: number): string[] {
 				if (!interviewPrompt) return [];
 				const pad = bgDark(" ".repeat(width));
-				const badge = dbOrangeBg(" ◆ PROMPT ");
+				const badge = dbOrangeBg(" 🎯 SCENARIO ");
 				const line = bgDark(
 					truncateToWidth(
 						"  " + badge + "  " + white(interviewPrompt!) + " ".repeat(width),

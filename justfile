@@ -1,16 +1,18 @@
-# Databricks SA Interview — Justfile v4
-# Workspace: dbc-ad74b11b-230d.cloud.databricks.com (AWS)
-# Profile: slysik-aws  |  User: slysik@gmail.com  |  SP: dbx-ssa-coding-agent
+# Databricks SA Interview — Justfile v5
+# Workspace: dbc-61514402-8451.cloud.databricks.com (AWS) — NEW PRIMARY (2026-03-19)
+# Profile: slysik-aws-sp  |  User: lysiak043@gmail.com  |  SP: dbx-agent (5d54409d-...)
 set dotenv-load := true
 
 # ── WORKSPACE CONFIG ────────────────────────────────────────────
-PROFILE        := "slysik-aws-sp"   # SP — always authenticated. Switch to slysik-aws after `just login`
-WS_HOST        := "https://dbc-ad74b11b-230d.cloud.databricks.com"
-WAREHOUSE_ID   := "214e9f2a308e800d"   # SQL WH (PRO serverless, RUNNING)
-WS_USER        := "slysik@gmail.com"
-CATALOG        := "workspace"
-GIT_FOLDER     := "/Workspace/Users/slysik@gmail.com/dbx-sa-build-demo-pitch"
-GIT_FOLDER_ID  := "3401527313137932"   # for direct browser URL
+PROFILE        := "slysik-aws-sp"   # SP OAuth M2M — always authenticated
+WS_HOST        := "https://dbc-61514402-8451.cloud.databricks.com"
+WS_ORG         := "7474656067656578"
+WAREHOUSE_ID   := "4bbaafe9538467a0"   # Serverless Starter Warehouse (PRO, RUNNING, auto_resume)
+WS_USER        := "lysiak043@gmail.com"
+SP_ID          := "5d54409d-304c-42aa-8a21-8070a8879443"   # dbx-agent SP
+CATALOG        := "finserv"
+GIT_FOLDER     := "/Workspace/Users/lysiak043@gmail.com/dbx-sa-build-demo-pitch"
+GIT_FOLDER_ID  := "TBD"   # update after cloning GitHub repo into workspace
 GITHUB_REPO    := "https://github.com/slysik/dbx-sa-build-demo-pitch"
 # ────────────────────────────────────────────────────────────────
 
@@ -132,10 +134,10 @@ clean-workspace schema="media":
   if not data.get('dashboards'): print('  None')
   " 2>&1
   echo ""
-  echo "── Cleaning Workspace Folders ──"
-  databricks -p {{PROFILE}} workspace list /Users/{{WS_USER}} --output json 2>&1 | python3 -c "
+  echo "── Cleaning SP Workspace Folders ──"
+  databricks -p {{PROFILE}} workspace list /Users/{{SP_ID}} --output json 2>&1 | python3 -c "
   import json,sys,subprocess
-  skip={'.assistant','.bundle','Sample Dashboards'}
+  skip={'.assistant','.bundle','Sample Dashboards','dashboards'}
   items=json.load(sys.stdin)
   for i in items:
     name=i['path'].split('/')[-1]
@@ -202,9 +204,9 @@ counts schema="media":
 
 # Open the Git folder in the Databricks workspace browser
 open:
-  @echo "Workspace: {{WS_HOST}}/browse/folders/{{GIT_FOLDER_ID}}?o=1562063418817826"
+  @echo "Workspace: {{WS_HOST}}/browse/folders/{{GIT_FOLDER_ID}}?o={{WS_ORG}}"
   @echo "GitHub:    {{GITHUB_REPO}}"
-  @open "{{WS_HOST}}/browse/folders/{{GIT_FOLDER_ID}}?o=1562063418817826" 2>/dev/null || true
+  @open "{{WS_HOST}}/browse/folders/{{GIT_FOLDER_ID}}?o={{WS_ORG}}" 2>/dev/null || true
 
 # Open the GitHub repo directly
 open-github:
@@ -244,7 +246,7 @@ upload-project project:
 
   echo ""
   echo "✅ Uploaded to: $BASE"
-  echo "   Open: {{WS_HOST}}/browse/folders/{{GIT_FOLDER_ID}}?o=1562063418817826"
+  echo "   Open: {{WS_HOST}}/browse/folders/{{GIT_FOLDER_ID}}?o={{WS_ORG}}"
 
 # List what's currently in the Git folder
 ls-git project="":

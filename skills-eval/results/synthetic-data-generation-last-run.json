@@ -1,0 +1,63 @@
+{
+  "skill": "synthetic-data-generation",
+  "timestamp": "2026-03-20T17:24:02.493697",
+  "fts": 8.2,
+  "skill_tokens": 3200,
+  "prompts": [
+    {
+      "prompt": "Scalable Bronze fact table",
+      "fts": 8.46,
+      "scores": {
+        "correct_imports": 0.85,
+        "no_antipatterns": 1.69,
+        "pattern_adherence": 2.54,
+        "completeness": 1.69,
+        "first_try_runnable": 1.69
+      }
+    },
+    {
+      "prompt": "Bronze metadata columns",
+      "fts": 7.85,
+      "scores": {
+        "correct_imports": 0.78,
+        "no_antipatterns": 1.57,
+        "pattern_adherence": 2.35,
+        "completeness": 1.57,
+        "first_try_runnable": 1.57
+      }
+    },
+    {
+      "prompt": "Dimension table design constraints",
+      "fts": 8.1,
+      "scores": {
+        "correct_imports": 0.81,
+        "no_antipatterns": 1.62,
+        "pattern_adherence": 2.43,
+        "completeness": 1.62,
+        "first_try_runnable": 1.62
+      }
+    },
+    {
+      "prompt": "Non-uniform category distribution",
+      "fts": 8.04,
+      "scores": {
+        "correct_imports": 0.8,
+        "no_antipatterns": 1.61,
+        "pattern_adherence": 2.41,
+        "completeness": 1.61,
+        "first_try_runnable": 1.61
+      }
+    },
+    {
+      "prompt": "Direct Delta write pattern",
+      "fts": 8.56,
+      "scores": {
+        "correct_imports": 0.86,
+        "no_antipatterns": 1.71,
+        "pattern_adherence": 2.57,
+        "completeness": 1.71,
+        "first_try_runnable": 1.71
+      }
+    }
+  ]
+}

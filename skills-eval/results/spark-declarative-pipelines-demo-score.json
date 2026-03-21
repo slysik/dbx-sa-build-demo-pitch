@@ -1,0 +1,16 @@
+{
+  "skill": "spark-declarative-pipelines",
+  "timestamp": "2026-03-21T17:46:56.030119",
+  "scores": {
+    "sa": 3.0,
+    "sc": 2.5,
+    "pf": 3.0,
+    "te": 2.0,
+    "bp": 3.0,
+    "cp": null
+  },
+  "fts_matrix": 0.925,
+  "fts_matrix_100": 92.5,
+  "is_demo_ready": true,
+  "notes": "Strong demo-ready skill"
+}

@@ -1,9 +1,9 @@
 # CLAUDE.md — Databricks Sr. SA Interview
 
 **Interview: Sr. Databricks SA | Final Round**
-**Profile: `slysik-aws` | Workspace: `dbc-ad74b11b-230d.cloud.databricks.com` (AWS)**
-**MCP: dbc-ad74b11b-230d.cloud.databricks.com (configured in `.mcp.json`, profile `slysik-aws-sp`)**
-**User: `slysik@gmail.com` | SP: `dbx-ssa-coding-agent`**
+**Profile: `slysik-aws` | Workspace: `dbc-61514402-8451.cloud.databricks.com` (AWS)**
+**MCP: dbc-61514402-8451.cloud.databricks.com (configured in `.mcp.json`, profile `slysik-aws-sp`)**
+**User: `lysiak043@gmail.com` | SP: `dbx-agent` (client_id: `5d54409d-304c-42aa-8a21-8070a8879443`)**
 
 ---
 
@@ -47,26 +47,39 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 ---
 
 ## INTERVIEW-DAY CHECKLIST (before the call)
-- [ ] Verify auth: `just dbx-auth` — should show `slysik@gmail.com` via PAT
-- [ ] Verify SQL warehouse is running: `just wh-status` (if STOPPED: `just wh-start`)
-- [ ] Verify SQL works: `just sql "SELECT current_user()"` — must return `slysik@gmail.com`
-- [ ] Verify workspace is clean: `SHOW SCHEMAS IN workspace` → only `default` + `information_schema`
+
+### Primary Workspace
+- [ ] Verify auth: `just dbx-auth` — should show SP `5d54409d-304c-42aa-8a21-8070a8879443` via OAuth M2M
+- [ ] Verify SQL works: `just sql "SELECT current_user()"` — returns SP UUID (no PAT yet; SP runs SQL)
+- [ ] Verify SQL warehouse is running: `just wh-status` (ID: `4bbaafe9538467a0` — auto_resume enabled)
+- [ ] Verify catalog is clean: `SHOW SCHEMAS IN finserv` → only `default` + `information_schema`
 - [ ] No cluster needed — all compute is serverless (notebooks + SDP pipelines)
 - [ ] When scaling DataFrames, scale ALL related tables (fact + detail) to keep join keys aligned
 - [ ] Paste code into notebooks with **Cmd+Shift+V** (no formatting)
 - [ ] Dashboard publish: ALWAYS use `embed_credentials: false`
-- [ ] Dashboard parent folder: `/Users/slysik@gmail.com/dashboards` — verify it exists (`workspace list`)
-- [ ] Demo domain: `workspace.finserv` ONLY — never `finance`, `retail`, or other schemas
+- [ ] Dashboard parent folder: SP home `/Users/5d54409d-304c-42aa-8a21-8070a8879443/dashboards` OR `lysiak043@gmail.com/dashboards` if SP granted folder access via UI
+- [ ] ⚠️ SP not yet in workspace admins — SP CANNOT write to `/Users/lysiak043@gmail.com/`. Fix: Workspace UI → Admin Console → Groups → admins → Add `5d54409d-304c-42aa-8a21-8070a8879443`
+- [ ] Demo catalog: `finserv` | Demo schema: project-specific (e.g., `finserv.demo`) — never raw `default`
+
+### Backup Workspace (failover check — run if primary has issues)
+- [ ] Verify backup SP auth: `databricks auth describe -p slysik-aws-backup-sp` — should show `oauth-m2m`
+- [ ] Start backup warehouse: `databricks -p slysik-aws-backup-sp api post "/api/2.0/sql/warehouses/228419b788367ab7/start" --json '{}'`
+- [ ] Verify backup tables exist: count `workspace.finserv.bronze_fact_transactions` — should be 100,000
+- [ ] Verify backup pipeline state: `databricks -p slysik-aws-backup-sp api get "/api/2.0/pipelines/203da4c9-d48e-46df-8e9f-fa64b91a546e"` → state=IDLE
+- [ ] If redeploying: `cd finserv_lakehouse && databricks bundle deploy -t backup`
+- [ ] Get fresh OAuth token via curl (NOT `databricks auth token`) for direct REST calls on backup
 
 ### Auth Failover (profiles configured)
 | Profile | Auth Type | When to Use |
 |---------|-----------|-------------|
-| `slysik-aws` | **PAT** ✅ (configured 2026-03-18) | Primary — all CLI, bundle, notebook runs |
-| `slysik-aws-sp` | OAuth M2M (SP: `dbx-ssa-coding-agent`) | SCIM-immune auto-failover in dbx-tools extension |
+| `slysik-aws` | OAuth M2M ✅ (SP: `dbx-agent`, configured 2026-03-19) | Primary — all CLI, bundle, notebook runs |
+| `slysik-aws-sp` | OAuth M2M ✅ (SP: `dbx-agent`) | MCP auto-failover in dbx-tools extension |
+| `slysik-aws-backup` | OAuth CLI (run `databricks auth login -p slysik-aws-backup`) | Old backup workspace — `slysik@yahoo.com` |
+| `slysik-aws-backup-sp` | OAuth M2M (SP: `databricks-agent`) | Old backup workspace SP |
 
-**PAT configured:** `slysik-aws` profile has a valid PAT in `~/.databrickscfg`. Auth is clean — no OAuth U2M needed.
-**If PAT expires:** Workspace UI → Settings → Developer → Access tokens → Generate new token → replace `token = dapi...` in `~/.databrickscfg` under `[slysik-aws]`. Remove `auth_type = databricks-cli` if present — it conflicts with PAT.
-**AWS = no SCIM issues:** `current_user()` returns `slysik@gmail.com` (human email, not SP UUID). Pipeline `run_as_user_name` is clean. No Azure-style SCIM flakiness.
+**PAT not yet configured:** New workspace uses OAuth M2M via SP `5d54409d-304c-42aa-8a21-8070a8879443` (dbx-agent).
+**To add PAT later:** Workspace UI → Settings → Developer → Access tokens → Generate → add `token = dapi...` to `[slysik-aws]` in `~/.databrickscfg`, remove `client_id`/`client_secret` from that profile.
+**AWS = no SCIM issues:** `current_user()` via SQL returns SP UUID (not email) until a PAT is added.
 **dbx-tools auto-failover:** If primary fails with auth error, tools retry with `slysik-aws-sp` automatically.
 **MCP profile:** `.mcp.json` uses `slysik-aws-sp`. MCP tools for Genie/Dashboard/VectorSearch CRUD.
 
@@ -109,11 +122,42 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 ## CLI GOTCHAS — CRITICAL
 
 ### AWS workspace-specific
-- **GRANT to SP must use `client_id`, not display name** — `GRANT ... TO \`64e5d26a-41fd-4089-b71b-c6b83154bd91\`` not `\`dbx-ssa-coding-agent\``
+- **GRANT to SP must use `client_id`, not display name** — `GRANT ... TO \`5d54409d-304c-42aa-8a21-8070a8879443\`` not `\`dbx-agent\``
 - **Workspace admin implicit UC access** — `SHOW GRANTS` won't show admin-derived privileges; workspace admins have full UC access without explicit grants
 - **Serverless-only** — no cluster available; notebooks run on serverless compute (omit `existing_cluster_id` in runs/submit API)
 - **Notebook serverless submit** — `dbx_run_notebook` tool DOES NOT support serverless. Use direct API: `api post "/api/2.1/jobs/runs/submit"` with `tasks` array + `"queue": {"enabled": true}`, no cluster spec
-- **Dashboard parent_path** — ALWAYS use `/Users/slysik@gmail.com/dashboards` (DIRECTORY). The git repo path is type REPO and fails. `dbx_deploy_dashboard` tool uses REPO path — always bypass with direct `api post`
+- **Dashboard parent_path** — ALWAYS use `/Users/lysiak043@gmail.com/dashboards` (DIRECTORY) once SP has admin access. Until then, use SP home: `/Users/5d54409d-304c-42aa-8a21-8070a8879443/dashboards`. Always bypass `dbx_deploy_dashboard` tool with direct `api post`.
+- **SP not in admins group** — SP `5d54409d-304c-42aa-8a21-8070a8879443` cannot write to `/Users/lysiak043@gmail.com/`. Add to workspace admins: Workspace UI → Admin Console → Groups → admins → Add member (2026-03-19)
+
+### Backup workspace-specific (learned 2026-03-19)
+- **`databricks auth token -p slysik-aws-backup-sp` is BROKEN on macOS** — returns `Error: cache: d...`. Get OAuth token via direct curl client_credentials grant:
+  ```bash
+  TOKEN=$(curl -s -X POST "https://dbc-a092293f-ea93.cloud.databricks.com/oidc/v1/token" \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "grant_type=client_credentials&client_id=bb2b9d09-a4b3-40e4-b848-6efc2e31480a&client_secret=***REMOVED***&scope=all-apis" \
+    | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+  ```
+- **SQL RANGE() Bronze — always include `customer_id` from dim_accounts join** — PySpark notebook selects `a.customer_id` from the accounts dim. SQL RANGE() translation can silently drop it. Without it, Silver SDP fails immediately: `UNRESOLVED_COLUMN: customer_id`. Double-check all FK columns from dim joins are in the SELECT list.
+- **Backup bundle target — independent tfstate** — adding a `backup` target to `databricks.yml` creates `.databricks/bundle/backup/terraform/terraform.tfstate` separate from `dev`. No tfstate conflict. Use `databricks bundle deploy -t backup` to deploy.
+- **Backup workspace SQL warehouse starts STOPPED** — always start it first: `databricks -p slysik-aws-backup-sp api post "/api/2.0/sql/warehouses/228419b788367ab7/start" --json '{}'`
+- **`workspace import` flag syntax on backup** — use `--file /path/to/local.py TARGET_PATH` (not positional second arg). Wrong: `workspace import TARGET src/file.py`. Right: `workspace import --file src/file.py TARGET`.
+- **`slysik@yahoo.com` is already workspace admin on backup** — implicit UC access. Explicit UC grants still best practice for governance demonstration. Don't skip them.
+- **Dashboard `parent_path` on backup = `/Users/slysik@yahoo.com/dashboards`** — pre-create with `workspace mkdirs` before first deploy. SP home folder also works (`/Users/bb2b9d09-a4b3-40e4-b848-6efc2e31480a`) but less clean for user visibility.
+- **Pipeline permissions API uses `user_name` key, not `principal_name`** — `{"access_control_list": [{"user_name": "slysik@yahoo.com", "permission_level": "CAN_MANAGE"}]}`
+- **Genie Space has NO explicit permissions API** — `PATCH /api/2.0/permissions/data-rooms/{id}` returns `400: 'data-rooms' is not a supported object type`. Genie Spaces are accessible to workspace admins automatically. For non-admins, share via UI or use the `/api/2.0/data-rooms/{id}/collaborators` endpoint if available.
+- **`databricks jobs list` on backup returns tabular text** — not JSON. Parse plaintext or use `api get "/api/2.1/jobs?limit=25"` for JSON.
+
+### New primary workspace gotchas (learned 2026-03-19 finserv_lakehouse build)
+- **Workspace admin ≠ UC CREATE SCHEMA** — adding SP to workspace admins group grants `USE CATALOG` implicitly but NOT `CREATE SCHEMA`. SP needs `GRANT ALL PRIVILEGES ON CATALOG finserv TO <sp_id>` from the catalog owner (`lysiak043@gmail.com`) before bundle can deploy a pipeline.
+- **`GRANT ALL PRIVILEGES ON CATALOG` must come from catalog owner** — SP cannot self-grant even as workspace admin. Human user must run this once in SQL editor or notebook.
+- **`GRANT SELECT ON ALL TABLES IN SCHEMA` syntax is invalid** — `PARSE_SYNTAX_ERROR at 'TABLES'`. Grant per table in a loop.
+- **Grants lost on table drop+recreate** — when SDP MV is dropped and notebook writes Delta table in its place, all prior SELECT grants are gone. Re-grant after every drop+recreate cycle.
+- **`client: "1"` environment spec not supported on this workspace** — `INVALID_PARAMETER_VALUE: Workspace doesn't support Client-1 channel for REPL`. Remove `environments:` block from bundle job YAML entirely; serverless is the default for notebook tasks.
+- **`databricks bundle run --task` flag doesn't exist** — use `--only <task_key>` instead.
+- **MLflow `spark.mlflow.modelRegistryUri` not available on serverless** — `mlflow.set_experiment()` and `spark.conf.set("spark.mlflow.modelRegistryUri", ...)` both throw `[CONFIG_NOT_AVAILABLE]`. Remove all MLflow setup from notebooks on this workspace. Narrate MLflow as the production add-on (`"wrap pipe.fit() in mlflow.start_run() — one context manager"`).
+- **Sklearn churn labels: check temporal alignment** — if Bronze data spans 2023-2025 and current date is 2026, `days_since_last_txn >= 90` labels ALL customers as at-risk (100% class 1). LogisticRegression fails: `ValueError: needs at least 2 classes`. Use complaint/escalation/sentiment signals for labels instead, or adjust the recency threshold to match actual date range.
+- **OAuth token for direct REST calls** — `databricks auth token --output json` doesn't work reliably. Always use curl client_credentials grant: `curl -s -X POST "{host}/oidc/v1/token" -d "grant_type=client_credentials&client_id={id}&client_secret={secret}&scope=all-apis"`.
+- **RAG in pure SQL — no Vector Search needed for small corpus** — `ai_similarity(question, chunk_text)` scores all chunks, `ORDER BY score DESC LIMIT 3` retrieves top-k, `ai_query(model, CONCAT(context, question))` generates the answer. Works for < 100 chunks in a Delta table. Scales to Vector Search for production.
 
 ### General (learned 2026-03-11 + 2026-03-18 test runs)
 
@@ -138,15 +182,99 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 
 ## WORKSPACE — QUICK COMMANDS
 
-**Active workspace:** `dbc-ad74b11b-230d` (AWS) | Auth: PAT ✅ (`slysik-aws` profile configured)
+### Primary Workspace (dbc-61514402-8451) — NEW ✅ (2026-03-19)
+**Active workspace:** `dbc-61514402-8451` (AWS) | Org: `7474656067656578` | Auth: OAuth M2M (`slysik-aws-sp`)
 **Cluster:** none — workspace is serverless-only. Notebooks use serverless compute, pipelines use serverless SDP.
-**Catalog:** `workspace` ✅
-**Schema:** `finserv` — THE demo domain. Never use `finance`, `retail`, or other schemas for the real demo.
-**SQL Warehouse:** `214e9f2a308e800d` (SQL WH — PRO serverless) ✅
-**User email:** `slysik@gmail.com` ✅
-**Git folder:** `/Workspace/Users/slysik@gmail.com/dbx-sa-build-demo-pitch` (ID: `3401527313137932`) — type REPO
-**Dashboard folder:** `/Users/slysik@gmail.com/dashboards` — type DIRECTORY, use as `parent_path` for all dashboard deploys
+**Catalog:** `finserv` ✅ (clean — only `default` + `information_schema` schemas)
+**Schema:** project-specific under `finserv` catalog — e.g., `finserv.demo`
+**SQL Warehouse:** `4bbaafe9538467a0` (Serverless Starter Warehouse — PRO, RUNNING, auto_resume) ✅
+**User email:** `lysiak043@gmail.com`
+**SP:** `dbx-agent` | client_id: `5d54409d-304c-42aa-8a21-8070a8879443` ⚠️ NOT yet in workspace admins
+**Git folder:** `/Workspace/Users/lysiak043@gmail.com/dbx-sa-build-demo-pitch` (ID: TBD — no repo yet, clone from GitHub)
+**Dashboard folder (SP):** `/Users/5d54409d-304c-42aa-8a21-8070a8879443/dashboards` — SP home (usable today)
+**Dashboard folder (user):** `/Users/lysiak043@gmail.com/dashboards` — create via UI once SP has admin access
 **GitHub repo:** `https://github.com/slysik/dbx-sa-build-demo-pitch`
+
+#### ⚠️ SETUP TODO (new workspace — 2026-03-19)
+- [x] Add SP to workspace admins: Admin Console → Groups → admins → Add `5d54409d-304c-42aa-8a21-8070a8879443` ✅
+- [x] Grant SP ALL PRIVILEGES ON CATALOG finserv (run as lysiak043@gmail.com in SQL editor) ✅
+- [x] Grant lysiak043@gmail.com SELECT on all 12 finserv.banking tables ✅
+- [ ] Create dashboard folder in user home: `workspace mkdirs /Users/lysiak043@gmail.com/dashboards`
+- [ ] Clone Git repo: Workspace → Repos → Add → `https://github.com/slysik/dbx-sa-build-demo-pitch` → note folder ID
+- [ ] Generate PAT (optional but cleaner): Settings → Developer → Access tokens → update `~/.databrickscfg [slysik-aws]`
+- [ ] Update `GIT_FOLDER_ID` in `justfile` once repo is cloned
+
+#### Primary Workspace — Live Asset IDs (finserv_lakehouse, 2026-03-19)
+| Asset | ID | URL |
+|-------|----|----|
+| SDP Pipeline | `25fe1040-0aa8-4d2f-8f90-ab8c0754c956` | `.../?o=7474656067656578#pipelines/25fe1040-...` |
+| Job | `995548364992521` | `.../?o=7474656067656578#job/995548364992521` |
+| Dashboard | `01f123be25df19bb8f33e18d0fd6b197` | `.../dashboardsv3/01f123be25df19bb8f33e18d0fd6b197` |
+| Genie Space | `01f123af4575169f84599de01de4855c` | `.../genie/rooms/01f123af4575169f84599de01de4855c` |
+
+#### Primary Workspace — Table Counts (finserv.banking, 2026-03-19)
+| Table | Rows | Notes |
+|-------|------|-------|
+| `bronze_dim_customers` | 200 | Core Banking (Postgres) |
+| `bronze_dim_accounts` | 500 | Core Banking (Postgres) |
+| `bronze_fact_transactions` | 10,000 | Core Banking (Postgres) |
+| `bronze_crm_interactions` | 500 | Salesforce CRM SaaS |
+| `bronze_policy_docs` | 15 | Internal policy vault (3 docs × 5 chunks) |
+| `silver_transactions` | 10,000 | SDP MV |
+| `silver_interactions` | 500 | SDP MV + ai_classify + ai_analyze_sentiment |
+| `gold_rfm_features` | 200 | SDP MV — ML feature store |
+| `gold_churn_risk` | 200 | SDP MV — rule-based scoring |
+| `gold_customer_ai_summary` | 200 | Delta table (notebook) — ai_summarize |
+| `gold_segment_kpis` | 15 | SDP MV — BI aggregates |
+| `gold_churn_predictions` | 200 | Delta table (notebook) — sklearn LogReg |
+
+### Old Primary Workspace (dbc-ad74b11b-230d) — ARCHIVED (was active until 2026-03-19)
+**Host:** `https://dbc-ad74b11b-230d.cloud.databricks.com`
+**User:** `slysik@gmail.com` | **Catalog:** `workspace` | **Schema:** `workspace.finserv`
+**SQL Warehouse:** `214e9f2a308e800d` | **SP:** `dbx-ssa-coding-agent` (client_id: `64e5d26a-41fd-4089-b71b-c6b83154bd91`)
+**Profiles:** archived as `slysik-aws-old` / `slysik-aws-sp-old` in `~/.databrickscfg`
+
+### Backup Workspace (dbc-a092293f-ea93) — DEPLOYED ✅ (2026-03-19)
+**Host:** `https://dbc-a092293f-ea93.cloud.databricks.com`
+**Org ID:** `7474660773634193`
+**User:** `slysik@yahoo.com` (workspace admin, SCIM active ✅)
+**SP:** `databricks-agent` | client_id: `bb2b9d09-a4b3-40e4-b848-6efc2e31480a` (admins group ✅)
+**Catalog:** `workspace` | **Schema:** `workspace.finserv` ✅
+**SQL Warehouse:** `228419b788367ab7` (Serverless Starter Warehouse — starts on demand)
+**Notebook folder:** `/Users/slysik@yahoo.com/finserv_lakehouse/`
+**Dashboard folder:** `/Users/slysik@yahoo.com/dashboards/` — pre-created DIRECTORY ✅
+**Bundle target:** `backup` in `finserv_lakehouse/databricks.yml` — deploy with `databricks bundle deploy -t backup`
+
+#### Backup Workspace — Live Asset IDs
+| Asset | ID | URL |
+|-------|----|----|
+| SDP Pipeline | `203da4c9-d48e-46df-8e9f-fa64b91a546e` | `.../?o=7474660773634193#pipelines/203da4c9-...` |
+| Job | `662188896016780` | `.../?o=7474660773634193#job/662188896016780` |
+| Dashboard | `01f12331054a1f618a8e6a36bebcd2fb` | `.../dashboardsv3/01f12331054a1f618a8e6a36bebcd2fb` |
+| Genie Space | `01f12331f45515778ae0d2ab78a0e7aa` | `.../genie/rooms/01f12331f45515778ae0d2ab78a0e7aa?o=7474660773634193` |
+| Notebook | `4400390734878752` | `.../?o=7474660773634193#notebook/4400390734878752` |
+
+#### Backup Workspace — Table Counts (baseline, 2026-03-19)
+| Table | Rows |
+|-------|------|
+| `bronze_dim_customers` | 200 |
+| `bronze_dim_accounts` | 2,000 |
+| `bronze_fact_transactions` | 100,000 |
+| `silver_transactions` | 100,000 |
+| `gold_txn_by_category` | 144 |
+| `gold_segment_risk` | 24 |
+| `gold_daily_risk` | 4,380 |
+
+#### Backup Workspace — Permissions Granted (slysik@yahoo.com)
+| Asset | Permission | Method |
+|-------|-----------|--------|
+| UC Catalog `workspace` | `USE_CATALOG` | SQL GRANT |
+| UC Schema `workspace.finserv` | `USE_SCHEMA`, `SELECT`, `MODIFY`, `CREATE TABLE` | SQL GRANT |
+| SDP Pipeline | `CAN_MANAGE` | REST PATCH `/permissions/pipelines/{id}` |
+| Job | `CAN_MANAGE` | REST PATCH `/permissions/jobs/{id}` |
+| Dashboard | `CAN_MANAGE` | REST PATCH `/permissions/dashboards/{id}` |
+| SQL Warehouse | `CAN_USE` | REST PATCH `/permissions/warehouses/{id}` |
+| Genie Space | implicit ✅ | workspace admin — `data-rooms` is NOT a valid ACL object type |
 
 ```bash
 just upload-project {domain}_lakehouse   # push notebooks + SQL into Git folder
@@ -165,6 +293,139 @@ just cluster-start                     # Start interview cluster
 just tables media                      # List tables in schema
 just counts media                      # Row counts across schema
 just metrics finserv_lakehouse <pipeline> <run_id> <dashboard> <genie>   # Build metrics report
+```
+
+---
+
+## MULTI-WORKSPACE PATTERNS (2026-03-19)
+
+### Bundle Multi-Target Deployment
+Add a `backup` target to any `databricks.yml` — independent tfstate, zero conflict with `dev`:
+```yaml
+targets:
+  dev:                                           # primary workspace
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-ad74b11b-230d.cloud.databricks.com
+
+  backup:                                        # backup workspace
+    mode: development
+    workspace:
+      host: https://dbc-a092293f-ea93.cloud.databricks.com
+      profile: slysik-aws-backup-sp
+    variables:
+      warehouse_id: 228419b788367ab7             # override workspace-specific vars
+```
+```bash
+databricks bundle validate -t backup   # validate against backup workspace
+databricks bundle deploy   -t backup   # deploy pipeline + job to backup workspace
+```
+
+### Backup SP OAuth Token (curl — not CLI)
+`databricks auth token -p slysik-aws-backup-sp` fails on macOS. Always use curl:
+```bash
+TOKEN=$(curl -s -X POST "https://dbc-a092293f-ea93.cloud.databricks.com/oidc/v1/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id=bb2b9d09-a4b3-40e4-b848-6efc2e31480a&client_secret=***REMOVED***&scope=all-apis" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+# Then use: -H "Authorization: Bearer $TOKEN" in all curl calls
+```
+
+### Backup Workspace — SQL Bronze Generation
+No PySpark cluster → use SQL RANGE() via Statements API. Identical pattern to `spark.range()`.
+**Critical:** Always include `a.customer_id` from the accounts dim join — easy to drop, breaks Silver immediately.
+```sql
+-- Canonical fact join for backup workspace
+SELECT
+  CONCAT('TXN-', LPAD(CAST(f.id AS STRING), 8, '0'))         AS txn_id,
+  CONCAT('ACCT-', LPAD(CAST(f.id % 2000 AS STRING), 6, '0')) AS account_id,
+  a.customer_id,           -- ← MUST INCLUDE — Silver references this column
+  a.account_type, a.branch, a.account_status,
+  c.segment, c.risk_tier, c.region,
+  ...
+FROM RANGE(100000) f
+JOIN workspace.finserv.bronze_dim_accounts  a ON a.account_id  = CONCAT('ACCT-', ...)
+JOIN workspace.finserv.bronze_dim_customers c ON c.customer_id = CONCAT('CUST-', ...)
+```
+
+### Backup Workspace — Dashboard Deploy
+```bash
+# 1. Create (first deploy)
+curl -s -X POST "https://dbc-a092293f-ea93.cloud.databricks.com/api/2.0/lakeview/dashboards" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"display_name":"...", "parent_path":"/Users/slysik@yahoo.com/dashboards",
+       "serialized_dashboard":"...", "warehouse_id":"228419b788367ab7"}'
+
+# 2. Publish
+curl -s -X POST "https://dbc-a092293f-ea93.cloud.databricks.com/api/2.0/lakeview/dashboards/{id}/published" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"embed_credentials": false, "warehouse_id": "228419b788367ab7"}'
+```
+
+### Backup Workspace — Permission Grants
+```bash
+# UC grants (run as SP via SQL Statements API)
+GRANT USE_CATALOG ON CATALOG workspace TO `slysik@yahoo.com`
+GRANT USE_SCHEMA, SELECT, MODIFY, CREATE TABLE ON SCHEMA workspace.finserv TO `slysik@yahoo.com`
+
+# Object permissions (REST API — PATCH, not POST)
+PATCH /api/2.0/permissions/pipelines/{id}  → {"access_control_list": [{"user_name":"slysik@yahoo.com","permission_level":"CAN_MANAGE"}]}
+PATCH /api/2.0/permissions/jobs/{id}       → same pattern
+PATCH /api/2.0/permissions/dashboards/{id} → same pattern
+PATCH /api/2.0/permissions/warehouses/{id} → permission_level: "CAN_USE"
+```
+
+### Backup Workspace — Genie Space Creation
+```python
+import json, uuid, urllib.request, urllib.parse
+
+BKUP_HOST = "https://dbc-a092293f-ea93.cloud.databricks.com"
+BKUP_WH   = "228419b788367ab7"
+
+# Tables MUST be sorted alphabetically
+tables = sorted([
+    "workspace.finserv.gold_daily_risk",
+    "workspace.finserv.gold_segment_risk",
+    "workspace.finserv.gold_txn_by_category",
+    "workspace.finserv.silver_transactions",
+])
+
+serialized_space = {
+    "version": 2,
+    "data_sources": {"tables": [{"identifier": t} for t in tables]},
+    "config": {
+        "sample_questions": [
+            {"id": uuid.uuid4().hex, "question": [q]}      # id = 32hex, question = list
+            for q in ["What is total revenue by category?", ...]
+        ]
+    }
+}
+
+payload = {
+    "warehouse_id":      BKUP_WH,
+    "serialized_space":  json.dumps(serialized_space),     # inner dict as JSON string
+    "title":             "Apex Financial — Risk & Revenue Intelligence",
+    "description":       "...",
+    "parent_path":       "/Users/slysik@yahoo.com/dashboards",
+    "table_identifiers": tables,                           # ALSO top-level, not inside serialized_space
+}
+# POST /api/2.0/genie/spaces → returns {space_id, title, warehouse_id}
+# URL: {BKUP_HOST}/genie/rooms/{space_id}?o=7474660773634193
+```
+**Permissions:** `data-rooms` is NOT a valid ACL object type — `PATCH /permissions/data-rooms/{id}` returns 400.
+Workspace admins (`slysik@yahoo.com`) have implicit access. No explicit grant needed.
+
+### Workspace Import — Correct Flag Syntax
+```bash
+# ✅ CORRECT
+databricks -p slysik-aws-backup-sp workspace import \
+  --format SOURCE --language PYTHON --overwrite \
+  --file /local/path/notebook.py \
+  "/Users/slysik@yahoo.com/finserv_lakehouse/notebook_name"
+
+# ❌ WRONG — positional second arg not supported
+databricks workspace import TARGET_PATH /local/file.py
 ```
 
 ---

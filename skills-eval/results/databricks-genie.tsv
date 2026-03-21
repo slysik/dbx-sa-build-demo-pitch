@@ -1,0 +1,9 @@
+commit	FTS	skill_tokens	status	description
+a4b5c6d	4.20	1200	keep	baseline — upstream SKILL.md
+b5c6d7e	5.60	1400	keep	added serialized_space proto3 JSON format
+c6d7e8f	6.40	1500	keep	added table alphabetical sort requirement
+d7e8f90	7.00	1600	keep	added permissions gotcha (data-rooms NOT valid)
+e8f9001	7.40	1700	keep	added sample_questions 32hex id + list format
+f900112	7.20	2200	discard	added full API examples — too verbose for index
+0011223	7.80	1750	keep	trim + refocus on proto3 rules
+1122334	8.20	1850	keep	added ask_genie conversation pattern

@@ -3,25 +3,30 @@ bundle:
 
 variables:
   catalog:
-    default: workspace
-  schema:
     default: finserv
+  schema:
+    default: banking
   warehouse_id:
-    default: 214e9f2a308e800d
+    default: 4bbaafe9538467a0   # Serverless Starter Warehouse
 
 targets:
   dev:
     mode: development
     default: true
     workspace:
-      host: https://dbc-ad74b11b-230d.cloud.databricks.com
+      host: https://dbc-61514402-8451.cloud.databricks.com
+      profile: slysik-aws-sp
 
 resources:
+
+  # ── Layer 1+2+3: SDP Pipeline ──────────────────────────────────────────────
+  # Silver transforms + Gold feature engineering + GenAI enrichment in one
+  # declarative pipeline. SDP resolves table dependencies automatically.
   pipelines:
-    finserv_medallion:
-      name: "finserv_medallion"
+    banking_medallion:
+      name: "[dev dbx_agent] banking_medallion"
       catalog: ${var.catalog}
-      schema: ${var.schema}
+      schema:  ${var.schema}
       development: true
       serverless: true
       channel: PREVIEW
@@ -31,17 +36,40 @@ resources:
         - file:
             path: src/pipeline/03_gold_aggregations.sql
 
+  # ── Orchestration: the full end-to-end story as a single job DAG ───────────
+  #
+  #   generate_bronze          → raw data from two sources (CBS + CRM)
+  #        ↓
+  #   run_pipeline             → Silver clean + Gold features + AI enrichment
+  #        ↓
+  #   train_churn_model        → ML model trained on Gold features, scored back
+  #
+  # This DAG IS the connection diagram the business leader needs to see.
   jobs:
-    finserv_orchestrator:
-      name: "finserv_orchestrator"
+    banking_orchestrator:
+      name: "[dev dbx_agent] banking_orchestrator"
+      queue:
+        enabled: true
       tasks:
+
+        # Task 1: generate Bronze from both source systems
         - task_key: generate_bronze
           notebook_task:
             notebook_path: src/notebooks/01_generate_bronze.py
+            source: WORKSPACE
 
+        # Task 2: SDP pipeline — Silver + Gold + GenAI enrichment
         - task_key: run_pipeline
           depends_on:
             - task_key: generate_bronze
           pipeline_task:
-            pipeline_id: ${resources.pipelines.finserv_medallion.id}
+            pipeline_id: ${resources.pipelines.banking_medallion.id}
             full_refresh: true
+
+        # Task 3: train churn model on Gold features, write predictions
+        - task_key: train_churn_model
+          depends_on:
+            - task_key: run_pipeline
+          notebook_task:
+            notebook_path: src/notebooks/04_train_churn_model.py
+            source: WORKSPACE

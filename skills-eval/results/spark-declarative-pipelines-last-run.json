@@ -1,0 +1,78 @@
+{
+  "skill": "spark-declarative-pipelines",
+  "timestamp": "2026-03-21T17:16:35.339695",
+  "model": "claude-opus-4-6",
+  "fts": 8.0,
+  "skill_tokens": 8656,
+  "prompts": [
+    {
+      "prompt": "Silver transform with data quality",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 2.0,
+        "completeness": 2.0,
+        "first_try_runnable": 2.0,
+        "total": 9.0,
+        "violations": []
+      },
+      "fts": 9.0
+    },
+    {
+      "prompt": "Schema evolution in streaming tables",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 1.33,
+        "pattern_adherence": 2.0,
+        "completeness": 2.0,
+        "first_try_runnable": 2.0,
+        "total": 8.33,
+        "violations": [
+          "uses SELECT * \u2014 forbidden in Silver/Gold"
+        ]
+      },
+      "fts": 8.33
+    },
+    {
+      "prompt": "ai_summarize in pipeline vs notebook",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 1.0,
+        "completeness": 2.0,
+        "first_try_runnable": 2.0,
+        "total": 8.0,
+        "violations": []
+      },
+      "fts": 8.0
+    },
+    {
+      "prompt": "Streaming table with Auto Loader from cloud storage",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 1.33,
+        "pattern_adherence": 2.0,
+        "completeness": 2.0,
+        "first_try_runnable": 2.0,
+        "total": 8.33,
+        "violations": [
+          "uses SELECT * \u2014 forbidden in Silver/Gold"
+        ]
+      },
+      "fts": 8.33
+    },
+    {
+      "prompt": "CDC vs SCD Type 2 decision",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 1.0,
+        "completeness": 1.0,
+        "first_try_runnable": 1.33,
+        "total": 6.33,
+        "violations": []
+      },
+      "fts": 6.33
+    }
+  ]
+}

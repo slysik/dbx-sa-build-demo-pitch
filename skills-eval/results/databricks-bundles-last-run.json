@@ -1,0 +1,74 @@
+{
+  "skill": "databricks-bundles",
+  "timestamp": "2026-03-21T17:42:41.031097",
+  "model": "claude-opus-4-6",
+  "fts": 6.53,
+  "skill_tokens": 3002,
+  "prompts": [
+    {
+      "prompt": "Multi-target bundle for two workspaces",
+      "scores": {
+        "correct_imports": 0.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 3.0,
+        "completeness": 0.0,
+        "first_try_runnable": 2.0,
+        "total": 7.0,
+        "violations": []
+      },
+      "fts": 7.0
+    },
+    {
+      "prompt": "Permission error during bundle deploy (Workspace Admin \u2260 UC Grants)",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 0.0,
+        "completeness": 2.0,
+        "first_try_runnable": 1.33,
+        "total": 6.33,
+        "violations": []
+      },
+      "fts": 6.33
+    },
+    {
+      "prompt": "Running single task in orchestration job",
+      "scores": {
+        "correct_imports": 0.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 1.0,
+        "completeness": 0.0,
+        "first_try_runnable": 1.33,
+        "total": 4.33,
+        "violations": []
+      },
+      "fts": 4.33
+    },
+    {
+      "prompt": "Troubleshooting serverless notebook task in bundle",
+      "scores": {
+        "correct_imports": 0.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 1.0,
+        "completeness": 2.0,
+        "first_try_runnable": 2.0,
+        "total": 7.0,
+        "violations": []
+      },
+      "fts": 7.0
+    },
+    {
+      "prompt": "Deploy failure with stale Terraform state",
+      "scores": {
+        "correct_imports": 1.0,
+        "no_antipatterns": 2.0,
+        "pattern_adherence": 2.0,
+        "completeness": 1.0,
+        "first_try_runnable": 2.0,
+        "total": 8.0,
+        "violations": []
+      },
+      "fts": 8.0
+    }
+  ]
+}

@@ -426,6 +426,15 @@ done
 46. **Metric view with star-schema joins works on streaming table source.** YAML `joins` reference Bronze dims by fully-qualified name. `source` is the Silver streaming table.
 47. **Metric view is NOT SDP syntax — runs on SQL warehouse.** Don't include in pipeline libraries. Create via `dbx_sql` after pipeline completes.
 
+### ML + GenAI Layer Patterns (learned 2026-03-19 finserv_lakehouse)
+48. **Sklearn over Spark MLlib for < 1K rows.** 200-customer feature store → pandas + sklearn LogisticRegression. Narrate MLlib as the scale path ("same features, same MLflow tracking, just swap the estimator"). Avoids VectorAssembler/Pipeline complexity in a demo.
+49. **Churn label temporal trap.** If Bronze data spans 2023-2025 and current date is 2026, `days_since_last_txn >= 90` labels 100% of customers as at-risk → LogisticRegression fails: `ValueError: needs at least 2 classes`. Always use complaint/escalation/sentiment signals for labels, OR set `START_DATE` close to current date so recency varies.
+50. **MLflow unavailable on serverless (new AWS workspace).** `spark.mlflow.modelRegistryUri` config not available → `mlflow.set_experiment()` throws `[CONFIG_NOT_AVAILABLE]`. Remove all MLflow calls. Narrate: "wrap `pipe.fit()` in `mlflow.start_run()` — one context manager, full experiment tracking." Don't show broken MLflow in a demo.
+51. **RAG in pure SQL — no Vector Search needed for small corpus.** For < 100 doc chunks stored in a Bronze Delta table, use `ai_similarity(question, chunk_text)` to score all chunks, `ORDER BY score DESC LIMIT 3` for retrieval, `ai_query(model, CONCAT(context, question))` for generation. All in one SQL query. In production: replace `ai_similarity` with Vector Search endpoint for sub-second retrieval at scale.
+52. **Policy doc chunks as Bronze source.** Store internal documents as chunked text rows in `bronze_policy_docs` (columns: `doc_id`, `doc_name`, `doc_category`, `chunk_id`, `chunk_text`, `source_system`, `ingest_ts`). This makes them UC-governed, lineage-tracked, and queryable alongside structured data — exactly the "untapped asset" story.
+53. **Separate architecture for non-deterministic AI enrichment.** SDP pipeline owns deterministic transforms (Silver quality gates, Gold RFM features, segment KPIs). Non-deterministic AI (ai_summarize, ai_query) runs in a notebook after the pipeline. Tables written by the notebook are plain Delta; tables written by SDP are MVs. Never mix — notebook can't overwrite SDP-managed MV.
+54. **Genie shows tables + "Visualize" button.** Genie doesn't pre-build charts — it generates SQL and shows tabular results. After query runs, a "Visualize" button appears. Best chart-generating questions: group-by aggregations ("average churn score by segment" → bar chart). Best narrative moment: "Which Premium customers are at highest risk and what have they been calling about?" → table with `interaction_summary` column showing AI briefs inline.
+
 ## Complete Config Block (Copy-Paste Start)
 
 ```python

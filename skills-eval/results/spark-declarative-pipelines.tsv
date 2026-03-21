@@ -1,0 +1,11 @@
+commit	FTS	skill_tokens	status	description
+a1b2c3d	5.00	8200	keep	baseline — upstream SKILL.md
+b2c3d4e	5.80	8450	keep	added ai_summarize non-determinism gotcha
+c3d4e5f	5.40	9100	discard	added too much prose — noise > signal
+d4e5f60	6.20	8500	keep	restructured checklist, added FK column note
+e5f6071	6.80	8650	keep	added pipelines list-pipelines correction
+f607182	7.20	8700	keep	added serverless poll cadence (15-20s)
+0718293	7.20	9200	discard	added streaming patterns — off-topic for interview
+1829304	7.60	8250	keep	removed duplicate content, tightened language
+2930415	7.80	8400	keep	added CDC auto_cdc_flow pattern
+3041526	8.20	8450	keep	refined quick start + multi-source gold pattern

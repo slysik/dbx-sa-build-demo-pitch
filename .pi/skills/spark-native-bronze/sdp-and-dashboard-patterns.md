@@ -5,6 +5,11 @@ Loaded on-demand from the spark-native-bronze skill when building Silver/Gold/Da
 ## SDP Pipeline Gotchas
 
 1. **Bronze tables from `spark.range()` are regular Delta — not streaming tables.** Silver/Gold must use `CREATE OR REFRESH MATERIALIZED VIEW`, NOT `CREATE OR REFRESH STREAMING TABLE`.
+1a. **`ai_summarize(COLLECT_LIST(...))` is non-deterministic — INVALID in Materialized Views.** Error: `[INVALID_NON_DETERMINISTIC_EXPRESSIONS] exists(customer_id)`. Fix: remove the MV, drop it via SQL, and write the enriched table from a notebook after the pipeline completes. Same applies to any `ai_*` function wrapping a non-deterministic aggregate. `ai_classify` and `ai_analyze_sentiment` on a single column ARE valid in MVs (row-level, deterministic input). Only aggregation-then-AI is blocked.
+1b. **`CONSTRAINT ... EXPECT ... ON VIOLATION` is NOT valid on Materialized Views** — only on Streaming Tables. Error: `PARSE_SYNTAX_ERROR at 'CONSTRAINT'`. Use `WHERE` predicates for quality gates in MVs instead.
+1c. **`"owner"` is a reserved TBLPROPERTIES key** — `UNSUPPORTED_FEATURE.SET_TABLE_PROPERTY`. Remove it from all MV TBLPROPERTIES blocks. Safe keys: `"quality"`, `"layer"`, `"source_system"`.
+1d. **Join fanout in Gold MVs** — never JOIN `silver_transactions` (many rows) to `silver_interactions` (many rows) directly in a Gold MV. Always pre-aggregate each source in a CTE first (`WITH txn_agg AS (...) GROUP BY customer_id, WITH int_agg AS (...) GROUP BY customer_id`), then JOIN the aggregates. Fan-out produces inflated counts (complaint_count: 180 instead of 3).
+1e. **SDP-managed MV cannot be overwritten by a notebook `saveAsTable()`** — error: `DELTA_NOT_A_DATABRICKS_DELTA_TABLE`. Must `DROP MATERIALIZED VIEW IF EXISTS` via SQL first, then the notebook can create a regular Delta table in its place. After dropping, remove the MV from the pipeline SQL or it will be recreated on next pipeline run.
 2. **Column availability**: Silver should only SELECT columns that exist in the Bronze table it reads. If Bronze fact was broadcast-joined with dims, those dim columns ARE in Bronze. But if Silver reads only the fact table, dim columns must come from joins in Gold.
 3. **Pipeline CREATED state can last 3-5 min** — serverless compute provisioning. Don't panic or re-trigger.
 4. **`RETRY_ON_FAILURE` auto-retries** — if a pipeline fails, Databricks retries automatically. Stop the pipeline before redeploying updated SQL to avoid running stale code.
@@ -20,6 +25,43 @@ Loaded on-demand from the spark-native-bronze skill when building Silver/Gold/Da
 4. **Query metric views** — `SELECT dim, MEASURE(measure) FROM mv GROUP BY ALL`. `SELECT *` is NOT supported.
 5. **Metric views work in dashboard datasets** — just put the MEASURE() query in `queryLines`. No special handling needed.
 6. **Requires serverless SQL warehouse** — classic SQL warehouses may not support metric views.
+
+## Dashboard Deployment via REST API (Lakeview)
+
+### Critical dashboard gotchas (learned 2026-03-19 finserv_lakehouse build)
+
+**D1. `queryLines` array is concatenated WITHOUT spaces or newlines.**
+Every element in `queryLines` is joined as-is. `["SELECT ... AS customers", "FROM table"]` becomes `"... AS customersFROM table"` — parse error. **Always use a single-string `queryLines`: `["SELECT ... FROM ... WHERE ..."]`. One string per dataset, no line splitting.**
+
+**D2. `aggType: "NONE"` is invalid for counter widgets — causes silent "No data".**
+Counter widgets show "No data" with no error when `aggType` is unrecognized. Either omit `aggType` entirely or use `"SUM"` (sum of a single pre-aggregated value = that value). Correct counter spec:
+```json
+{"version": 2, "widgetType": "counter", "encodings": {"value": {"fieldName": "at_risk_customers", "displayName": "At Risk"}}}
+```
+
+**D3. `PATCH /api/2.0/lakeview/dashboards/{id}` does not always update `serialized_dashboard`.**
+If widgets still show old SQL after PATCH, delete and recreate the dashboard. `DELETE` + `POST` is more reliable than `PATCH` for full dashboard rewrites.
+
+**D4. Widget specs via API may not render in Edit draft mode.**
+Draft edit UI shows configuration panels (not rendered output). Always click "View published" to validate actual rendering. Counter widgets especially need one manual save in Edit mode to wire field mappings correctly.
+
+**D5. Use `urllib.request` + OAuth token from client_credentials for dashboard API calls.**
+`databricks api post --json <large_payload>` fails when payload exceeds CLI arg size limits. Use Python + `urllib.request` with OAuth token obtained via:
+```bash
+TOKEN=$(curl -s -X POST "https://{host}/oidc/v1/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id={id}&client_secret={secret}&scope=all-apis" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+```
+
+**D6. `Published: False` in publish response means `embed_credentials=false` — not a failure.**
+The publish API returns `{"embed_credentials": false, "warehouse_id": "..."}` — `false` is the correct value when publishing without embedded credentials. This is success.
+
+**D7. Grants on dropped+recreated tables are lost.**
+When an SDP-managed MV is dropped and recreated as a Delta table (notebook), any previously granted SELECT permissions are gone. Re-grant after every drop+recreate. Use a post-pipeline grant script or grant at schema level.
+
+**D8. `GRANT SELECT ON ALL TABLES IN SCHEMA` syntax is invalid in Databricks SQL.**
+Error: `PARSE_SYNTAX_ERROR at 'TABLES'`. Must grant per table. Workaround: loop over table names in bash and grant individually.
 
 ## Dashboard Deployment via REST API
 
@@ -471,3 +513,94 @@ payload = {
 # URL: https://{host}/genie/rooms/{space_id}?o={org_id}
 ```
 PATCH to same endpoint to update existing space. GET does NOT return `serialized_space`.
+
+## Test Run Learnings (2026-03-19 backup workspace deployment — dbc-a092293f-ea93)
+
+### SQL RANGE() Bronze — Always Include customer_id from Dim Join
+93. **SQL RANGE() Bronze fact must explicitly select `a.customer_id` from the accounts dim join.** The original PySpark notebook selects `"account_id", "customer_id", "account_type", "branch", "account_status"` from dim_accounts. When translating to SQL RANGE(), `customer_id` is easy to omit since it's not on the fact itself. Without it, Silver SQL fails immediately: `UNRESOLVED_COLUMN: customer_id cannot be resolved`. Always verify the SELECT list includes all FK/attribute columns needed by Silver.
+
+### Backup Workspace Bundle Target Pattern
+94. **Add a `backup` target to `databricks.yml` to deploy the same bundle to a different workspace.** Key fields: `host`, `profile`, and any variable overrides (e.g., `warehouse_id`). The backup target gets its own independent tfstate at `.databricks/bundle/backup/terraform/`. No conflict with the `dev` target:
+```yaml
+targets:
+  backup:
+    mode: development
+    workspace:
+      host: https://<backup-host>.cloud.databricks.com
+      profile: slysik-aws-backup-sp
+    variables:
+      warehouse_id: <backup_warehouse_id>
+```
+Then: `databricks bundle validate -t backup && databricks bundle deploy -t backup`.
+
+### Multi-Workspace SP OAuth Token
+95. **Get OAuth token for backup SP via client_credentials grant directly.** `databricks auth token -p slysik-aws-backup-sp` errors on macOS. Use curl instead:
+```bash
+TOKEN=$(curl -s -X POST "https://<host>/oidc/v1/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&scope=all-apis" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+```
+This token is valid for all REST API calls to that workspace.
+
+### Backup Workspace SQL Warehouse
+96. **Backup workspace SQL warehouse starts in STOPPED state.** Always start it before running any SQL or notebook: `databricks -p slysik-aws-backup-sp api post "/api/2.0/sql/warehouses/{wh_id}/start" --json '{}'`. Then poll until `state: RUNNING` before submitting statements.
+
+### workspace import — Correct Flag Syntax
+97. **`workspace import` on backup requires `--file` flag — NOT a positional second argument.** The CLI silently ignores a bare path as a second positional arg:
+```bash
+# ✅ CORRECT
+databricks -p slysik-aws-backup-sp workspace import \
+  --format SOURCE --language PYTHON --overwrite \
+  --file /local/path/notebook.py \
+  "/Users/user@email.com/folder/notebook_name"
+
+# ❌ WRONG — second positional arg not supported, no error thrown
+databricks workspace import TARGET_PATH /local/file.py
+```
+
+### Backup Dashboard parent_path
+98. **Backup workspace dashboard `parent_path` must be a pre-created DIRECTORY.** Use `/Users/slysik@yahoo.com/dashboards` — create with `workspace mkdirs` before first deploy. SP home folder (`/Users/{client_id}`) also works but is less visible in the UI. Always use `curl` with `Authorization: Bearer $TOKEN`, not `dbx_deploy_dashboard` (wrong path hardcoded):
+```bash
+# Create
+curl -s -X POST "https://<host>/api/2.0/lakeview/dashboards" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"display_name":"...","parent_path":"/Users/slysik@yahoo.com/dashboards",
+       "serialized_dashboard":"...","warehouse_id":"<wh_id>"}'
+# Publish
+curl -s -X POST "https://<host>/api/2.0/lakeview/dashboards/{id}/published" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"embed_credentials": false, "warehouse_id": "<wh_id>"}'
+```
+
+### Pipeline & Job Permissions — Correct Key Name
+99. **Pipeline/job permissions REST API uses `user_name` key, NOT `principal_name`.** Getting this wrong returns a 400 or silently ignores the ACL entry:
+```bash
+# ✅ CORRECT — PATCH (not POST)
+curl -s -X PATCH "https://<host>/api/2.0/permissions/pipelines/{id}" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"access_control_list": [{"user_name": "slysik@yahoo.com", "permission_level": "CAN_MANAGE"}]}'
+# Same pattern for: /permissions/jobs/{id}, /permissions/dashboards/{id}
+# For warehouses: permission_level "CAN_USE"
+```
+
+### Genie Space — No Permissions API
+100. **Genie Spaces do NOT support `PATCH /api/2.0/permissions/data-rooms/{id}`.** This returns `400: 'data-rooms' is not a supported object type`. Workspace admins have implicit access — no explicit grant needed. For non-admins on non-admin workspaces, share via UI or explore `/api/2.0/data-rooms/{id}/collaborators` endpoint.
+
+### databricks jobs list — Returns Tabular Text, Not JSON
+101. **`databricks jobs list` returns plain tabular text on backup workspace (and some CLI versions) — not JSON.** Parse as plaintext or use the API directly for JSON output:
+```bash
+# ✅ JSON output — use REST API
+databricks -p slysik-aws-backup-sp api get "/api/2.1/jobs?limit=25"
+# ❌ Not JSON — tabular text
+databricks -p slysik-aws-backup-sp jobs list
+```
+
+### UC Grants on Backup Workspace
+102. **Grant UC catalog + schema access to users/SPs on backup workspace via SQL Statements API.** Workspace admins have implicit UC access but explicit grants are best practice for governance demos:
+```sql
+GRANT USE_CATALOG ON CATALOG workspace TO `slysik@yahoo.com`;
+GRANT USE_SCHEMA, SELECT, MODIFY, CREATE TABLE ON SCHEMA workspace.finserv TO `slysik@yahoo.com`;
+-- For SP: use client_id UUID, not display name
+GRANT USE_CATALOG ON CATALOG workspace TO `bb2b9d09-a4b3-40e4-b848-6efc2e31480a`;
+```

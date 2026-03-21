@@ -1,0 +1,11 @@
+commit	FTS	skill_tokens	status	description
+a2b3c4d	4.50	2200	keep	baseline — upstream SKILL.md
+b3c4d5e	5.20	2400	keep	added widget version number table
+c4d5e6f	6.00	2550	keep	added filter page type documentation
+d5e6f70	7.00	2650	keep	added embed_credentials: false gotcha
+e6f7081	7.60	2700	keep	added parent_path pre-creation requirement
+f708192	7.40	3300	discard	added 8 more examples — too verbose
+0819203	7.80	2750	keep	added troubleshooting guide reference
+1920314	7.60	3500	discard	tried to embed full widget JSON — broke routing
+2031425	8.40	2600	keep	trim + restructure → clean index file
+3142536	8.60	2700	keep	added widget name vs frame.title gotcha

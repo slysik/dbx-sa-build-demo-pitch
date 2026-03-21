@@ -1,0 +1,316 @@
+{
+  "datasets": [
+    {
+      "name": "ds_kpi",
+      "displayName": "KPI Summary",
+      "queryLines": [
+        "SELECT",
+        "  SUM(total_streams) AS total_streams,",
+        "  ROUND(SUM(total_watch_minutes) / 60, 0) AS total_watch_hours,",
+        "  ROUND(SUM(total_watch_minutes) / SUM(total_streams), 1) AS avg_session_min",
+        "FROM interview.media.gold_daily_streaming"
+      ]
+    },
+    {
+      "name": "ds_daily",
+      "displayName": "Daily Streaming",
+      "queryLines": [
+        "SELECT stream_date, total_streams, total_watch_minutes, unique_viewers",
+        "FROM interview.media.gold_daily_streaming",
+        "ORDER BY stream_date"
+      ]
+    },
+    {
+      "name": "ds_genre",
+      "displayName": "Genre Breakdown",
+      "queryLines": [
+        "SELECT genre,",
+        "  SUM(total_streams) AS total_streams,",
+        "  ROUND(SUM(total_watch_minutes), 0) AS total_watch_minutes",
+        "FROM interview.media.gold_content_popularity",
+        "GROUP BY genre",
+        "ORDER BY total_watch_minutes DESC"
+      ]
+    },
+    {
+      "name": "ds_engagement",
+      "displayName": "Engagement by Plan",
+      "queryLines": [
+        "SELECT plan_type, region, active_subscribers,",
+        "  total_watch_minutes, avg_watch_minutes",
+        "FROM interview.media.gold_subscriber_engagement",
+        "ORDER BY total_watch_minutes DESC"
+      ]
+    },
+    {
+      "name": "ds_top_content",
+      "displayName": "Top Content",
+      "queryLines": [
+        "SELECT title, genre, total_streams,",
+        "  total_watch_minutes, avg_session_minutes",
+        "FROM interview.media.gold_content_popularity",
+        "ORDER BY total_streams DESC",
+        "LIMIT 10"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "media-streaming-overview",
+      "displayName": "Media Streaming Overview",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": ["## 📺 Media Streaming — CDC Lakehouse"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["Bronze CDC → Silver APPLY CHANGES → Gold MVs → Metric Views | 99K events after CDC resolution"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-streams",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "total_streams", "expression": "`total_streams`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_streams", "displayName": "Total Streams"}
+              },
+              "frame": {"showTitle": true, "title": "Total Streams"}
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-watch-hours",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "total_watch_hours", "expression": "`total_watch_hours`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_watch_hours", "displayName": "Watch Hours"}
+              },
+              "frame": {"showTitle": true, "title": "Total Watch Hours"}
+            }
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-avg-session",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "avg_session_min", "expression": "`avg_session_min`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "avg_session_min", "displayName": "Avg Session (min)"}
+              },
+              "frame": {"showTitle": true, "title": "Avg Session Minutes"}
+            }
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "section-trends",
+            "multilineTextboxSpec": {
+              "lines": ["### Streaming Trends"]
+            }
+          },
+          "position": {"x": 0, "y": 5, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "daily-streams-line",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_daily",
+                "fields": [
+                  {"name": "stream_date", "expression": "`stream_date`"},
+                  {"name": "total_streams", "expression": "`total_streams`"},
+                  {"name": "unique_viewers", "expression": "`unique_viewers`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "stream_date",
+                  "scale": {"type": "temporal"},
+                  "displayName": "Date"
+                },
+                "y": {
+                  "scale": {"type": "quantitative"},
+                  "fields": [
+                    {"fieldName": "total_streams", "displayName": "Streams"},
+                    {"fieldName": "unique_viewers", "displayName": "Unique Viewers"}
+                  ]
+                }
+              },
+              "frame": {"showTitle": true, "title": "Daily Streams & Viewers"}
+            }
+          },
+          "position": {"x": 0, "y": 6, "width": 6, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-breakdown",
+            "multilineTextboxSpec": {
+              "lines": ["### Content & Engagement Breakdown"]
+            }
+          },
+          "position": {"x": 0, "y": 11, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "genre-bar",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_genre",
+                "fields": [
+                  {"name": "genre", "expression": "`genre`"},
+                  {"name": "total_watch_minutes", "expression": "`total_watch_minutes`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "genre",
+                  "scale": {"type": "categorical"},
+                  "displayName": "Genre"
+                },
+                "y": {
+                  "scale": {"type": "quantitative"},
+                  "fields": [
+                    {"fieldName": "total_watch_minutes", "displayName": "Watch Minutes"}
+                  ]
+                }
+              },
+              "frame": {"showTitle": true, "title": "Watch Minutes by Genre"}
+            }
+          },
+          "position": {"x": 0, "y": 12, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "engagement-pie",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_engagement",
+                "fields": [
+                  {"name": "plan_type", "expression": "`plan_type`"},
+                  {"name": "total_watch_minutes", "expression": "`total_watch_minutes`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "total_watch_minutes",
+                  "displayName": "Watch Minutes"
+                },
+                "color": {
+                  "fieldName": "plan_type",
+                  "scale": {"type": "categorical"},
+                  "displayName": "Plan Type"
+                }
+              },
+              "frame": {"showTitle": true, "title": "Engagement by Plan Type"}
+            }
+          },
+          "position": {"x": 3, "y": 12, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-details",
+            "multilineTextboxSpec": {
+              "lines": ["### Top Content"]
+            }
+          },
+          "position": {"x": 0, "y": 17, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "top-content-table",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_top_content",
+                "fields": [
+                  {"name": "title", "expression": "`title`"},
+                  {"name": "genre", "expression": "`genre`"},
+                  {"name": "total_streams", "expression": "`total_streams`"},
+                  {"name": "total_watch_minutes", "expression": "`total_watch_minutes`"},
+                  {"name": "avg_session_minutes", "expression": "`avg_session_minutes`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {"fieldName": "title", "displayName": "Title"},
+                  {"fieldName": "genre", "displayName": "Genre"},
+                  {"fieldName": "total_streams", "displayName": "Streams"},
+                  {"fieldName": "total_watch_minutes", "displayName": "Watch Min"},
+                  {"fieldName": "avg_session_minutes", "displayName": "Avg Session"}
+                ]
+              },
+              "frame": {"showTitle": true, "title": "Top 10 Content by Streams"}
+            }
+          },
+          "position": {"x": 0, "y": 18, "width": 6, "height": 6}
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "skill": "databricks-bundles",
+  "timestamp": "2026-03-21T17:46:59.533392",
+  "scores": {
+    "sa": 2.5,
+    "sc": 2.0,
+    "pf": 2.5,
+    "te": 2.0,
+    "bp": 2.5,
+    "cp": null
+  },
+  "fts_matrix": 0.775,
+  "fts_matrix_100": 77.5,
+  "is_demo_ready": true,
+  "notes": "Good but needs tightening"
+}

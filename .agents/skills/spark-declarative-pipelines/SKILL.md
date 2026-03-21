@@ -1,5 +1,5 @@
 ---
-name: spark-declarative-pipelines
+name: databricks-spark-declarative-pipelines
 description: "Creates, configures, and updates Databricks Lakeflow Spark Declarative Pipelines (SDP/LDP) using serverless compute. Handles streaming tables, materialized views, CDC, SCD Type 2, and Auto Loader ingestion patterns. Use when building data pipelines, working with Delta Live Tables, ingesting streaming data, implementing change data capture, or when the user mentions SDP, LDP, DLT, Lakeflow pipelines, streaming tables, or bronze/silver/gold medallion architectures."
 ---
 
@@ -13,6 +13,13 @@ IMPORTANT: If this is a new pipeline (one does not already exist), see Quick Sta
 - **MUST** confirm language as Python or SQL. Stick with that language unless told otherwise.
 - **MUST** if not modifying an existing pipeline, use [Quick Start](#quick-start) below.
 - **MUST** create serverless pipelines  by default. ** Only use classic clusters if user explicitly requires R language, Spark RDD APIs, or JAR libraries.
+
+## ⚠️ Known Gotchas (workspace-validated)
+- **`ai_summarize` is non-deterministic → INVALID in Materialized Views** — SDP rejects it at definition time. Use it in a notebook that writes a plain Delta table AFTER the pipeline runs. Pattern: `ai_summarize(CONCAT_WS('. ', COLLECT_LIST(note_text)), 50)` in a notebook, write to `gold_customer_ai_summary` as Delta, not MV.
+- **`ai_classify` and `ai_analyze_sentiment` ARE valid in MVs** — they are deterministic (same input = same output).
+- **`databricks pipelines list` does not exist** — use `databricks pipelines list-pipelines`.
+- **Serverless poll cadence** — SDP pipelines on serverless complete in ~47–51 sec for 3 MVs. Poll every 15–20 sec.
+- **FK columns from dim joins** — always explicitly select FK columns (e.g., `a.customer_id`) from broadcast-joined dims. SQL RANGE() translations silently drop them → Silver MVs fail with `UNRESOLVED_COLUMN`.
 
 
 ## Required Steps
@@ -138,7 +145,7 @@ databricks bundle deploy --target prod
    **Using Python API?** → Read [5-python-api.md](5-python-api.md)
    **Migrating from DLT?** → Read [6-dlt-migration.md](6-dlt-migration.md)
    **Advanced configuration?** → Read [7-advanced-configuration.md](7-advanced-configuration.md)
-   **Validating?** → Read [validation-checklist.md](validation-checklist.md)
+   **Validating?** → Read [7-advanced-configuration.md](7-advanced-configuration.md) (dry_run, development mode)
 
 2. Follow the instructions in the relevant guide
 
@@ -526,7 +533,7 @@ def enriched_orders():
 | **Streaming reads fail** | For file ingestion in a streaming table, you must use the `STREAM` keyword with `read_files`: `FROM STREAM read_files(...)`. For table streams use `FROM stream(table)`. See [read_files — Usage in streaming tables](https://docs.databricks.com/aws/en/sql/language-manual/functions/read_files#usage-in-streaming-tables). |
 | **Timeout during run** | Increase `timeout`, or use `wait_for_completion=False` and check status with `get_pipeline` |
 | **MV doesn't refresh** | Enable row tracking on source tables |
-| **SCD2: query column not found** | Lakeflow uses `__START_AT` and `__END_AT` (double underscore), not `START_AT`/`END_AT`. Use `WHERE __END_AT IS NULL` for current rows. See [3-scd-patterns.md](3-scd-patterns.md). |
+| **SCD2: query column not found** | Lakeflow uses `__START_AT` and `__END_AT` (double underscore), not `START_AT`/`END_AT`. Use `WHERE __END_AT IS NULL` for current rows. See [3-scd-query-patterns.md](3-scd-query-patterns.md). |
 | **AUTO CDC parse error at APPLY/SEQUENCE** | Put `APPLY AS DELETE WHEN` **before** `SEQUENCE BY`. Only list columns in `COLUMNS * EXCEPT (...)` that exist in the source (omit `_rescued_data` unless bronze uses rescue data). Omit `TRACK HISTORY ON *` if it causes "end of input" errors; default is equivalent. See [2-streaming-patterns.md](2-streaming-patterns.md). |
 | **"Cannot create streaming table from batch query"** | In a streaming table query, use `FROM STREAM read_files(...)` so `read_files` leverages Auto Loader; `FROM read_files(...)` alone is batch. See [1-ingestion-patterns.md](1-ingestion-patterns.md) and [read_files — Usage in streaming tables](https://docs.databricks.com/aws/en/sql/language-manual/functions/read_files#usage-in-streaming-tables). |
 
@@ -572,6 +579,6 @@ For advanced configuration options (development mode, continuous pipelines, cust
 ## Related Skills
 
 - **[databricks-jobs](../databricks-jobs/SKILL.md)** - for orchestrating and scheduling pipeline runs
-- **[databricks-asset-bundles](../databricks-asset-bundles/SKILL.md)** - for multi-environment deployment of pipeline projects
-- **[databricks-synthetic-data-generation](../databricks-synthetic-data-generation/SKILL.md)** - for generating test data to feed into pipelines
+- **[databricks-bundles](../databricks-bundles/SKILL.md)** - for multi-environment deployment of pipeline projects
+- **[databricks-synthetic-data-gen](../databricks-synthetic-data-gen/SKILL.md)** - for generating test data to feed into pipelines
 - **[databricks-unity-catalog](../databricks-unity-catalog/SKILL.md)** - for catalog/schema/volume management and governance

@@ -1,283 +1,129 @@
-# Apex Financial Services — FinServ Lakehouse
+# Apex Banking — Customer 360 Intelligence Platform
 
-> **Databricks SA Demo** · Full medallion lakehouse + AI/BI · Built end-to-end in ~6 minutes on serverless compute
+> "The business is growing, but our ability to make smart, fast decisions isn't keeping pace."
 
-[![Databricks](https://img.shields.io/badge/Databricks-Serverless-FF3621?logo=databricks)](https://databricks.com)
-[![Unity Catalog](https://img.shields.io/badge/Unity%20Catalog-workspace.finserv-0080FF)](https://docs.databricks.com/data-governance/unity-catalog/)
-[![Delta Lake](https://img.shields.io/badge/Delta%20Lake-3.x-003366?logo=delta)](https://delta.io)
-[![Lakeflow](https://img.shields.io/badge/Lakeflow-SDP-00A4EF)](https://docs.databricks.com/workflows/delta-live-tables/)
+This prototype answers that problem across four connected layers. Each layer feeds the next — this is one solution, not four demos stitched together.
+
+---
+
+## The Story
+
+```
+Customer calls in angry about ATM fees (CRM note)
+    → AI classifies it as a complaint
+    → Sentiment score turns negative
+    → Churn model sees: 90 days dormant + 2 complaints + negative sentiment
+    → Risk score: HIGH
+    → Relationship manager gets an alert in the dashboard
+    → Genie answers: "Which Premium customers are at risk this month and why?"
+```
+
+---
+
+## Four Layers, One Thread
+
+### Layer 1 — Governed Data Foundation
+Two source systems, unified:
+- **Core Banking System (Postgres)** → customers, accounts, 10K transactions
+- **Salesforce CRM (SaaS export)** → 500 customer interaction notes
+
+Unity Catalog enforces the single source of truth. Data quality constraints (EXPECT) are the contract. Delta history gives you full audit lineage.
+
+### Layer 2 — Predictive ML
+A churn risk model trained on the data we just ingested:
+- **Features:** how recently did they transact? how often? how much? how many complaints?
+- **Model:** Logistic Regression (Spark MLlib), tracked in MLflow, registered in UC Model Registry
+- **Output:** `gold_churn_predictions` — churn probability 0–1 per customer
+
+Every pipeline refresh can trigger a retrain. Model versions are audited in the registry.
+
+### Layer 3 — GenAI Activation
+The "untapped asset" — years of customer interaction notes nobody could use:
+- `ai_classify` turns raw call notes into structured complaint/inquiry/escalation/praise labels
+- `ai_analyze_sentiment` scores how customers feel across every interaction
+- `ai_summarize` synthesizes a customer's full history into one readable insight for relationship managers
+
+These run **inside the data pipeline** — no separate AI infrastructure.
+
+### Layer 4 — Business Presentation
+- **AI/BI Dashboard:** Where is churn risk concentrated? Which segments drive revenue? Who are the specific at-risk customers and what did AI say about them?
+- **Genie Space:** Business leaders ask questions in plain English — "What's our churn exposure in the Northeast?" — and get answers backed by live Gold data.
 
 ---
 
 ## Architecture
 
-```
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                     APEX FINANCIAL — LAKEHOUSE ARCHITECTURE                  ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║
-║   ┌─────────────────────────────────────────────────────────────────────┐   ║
-║   │                    DATA GENERATION (PySpark Serverless)             │   ║
-║   │   spark.range(N)  ──►  No Faker · No Pandas · No Python loops      │   ║
-║   └──────────────────────────┬──────────────────────────────────────────┘   ║
-║                               │                                              ║
-║   ┌───────────────────────────▼──────────────────────────────────────────┐  ║
-║   │  🥉 BRONZE  (Append-only · Raw fidelity · Delta · ingest_ts)        │  ║
-║   │                                                                      │  ║
-║   │  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐   │  ║
-║   │  │ dim_customers    │  │ dim_accounts     │  │ fact_transactions │   │  ║
-║   │  │    200 rows      │  │   2,000 rows     │  │   100,000 rows   │   │  ║
-║   │  │  broadcast dim   │  │  broadcast dim   │  │  spark.range FK  │   │  ║
-║   │  └──────────────────┘  └──────────────────┘  └────────┬─────────┘   │  ║
-║   └─────────────────────────────────────────────────────────┼────────────┘  ║
-║                               │ Lakeflow Spark Declarative Pipelines         ║
-║   ┌───────────────────────────▼──────────────────────────────────────────┐  ║
-║   │  🥈 SILVER  (Typed · Deduped · Null-handled · Explicit schema)      │  ║
-║   │                                                                      │  ║
-║   │  ┌────────────────────────────────────────────────────────────────┐  │  ║
-║   │  │  silver_transactions  ·  100,000 rows  ·  Materialized View   │  │  ║
-║   │  │  joins: fact ⋈ dim_accounts ⋈ dim_customers                  │  │  ║
-║   │  │  adds:  customer_segment · account_type · merchant_category   │  │  ║
-║   │  └────────────────────────────────────────────────────────────────┘  │  ║
-║   └──────────────────────────────┬───────────────────────────────────────┘  ║
-║                                  │ SDP Materialized Views                    ║
-║   ┌──────────────────────────────▼───────────────────────────────────────┐  ║
-║   │  🥇 GOLD  (Pre-aggregated · BI-ready · Stable contract)             │  ║
-║   │                                                                      │  ║
-║   │  ┌────────────────────┐  ┌────────────────────┐  ┌───────────────┐  │  ║
-║   │  │ txn_by_category    │  │  segment_risk      │  │ daily_risk    │  │  ║
-║   │  │  1,303 rows        │  │    44 rows         │  │  4,380 rows   │  │  ║
-║   │  │  revenue + risk    │  │  avg risk score    │  │  daily trends │  │  ║
-║   │  │  by merchant cat   │  │  by segment        │  │  + anomalies  │  │  ║
-║   │  └────────┬───────────┘  └─────────┬──────────┘  └──────┬────────┘  │  ║
-║   └───────────┼──────────────────────── ┼────────────────────┼───────────┘  ║
-║               │                         │                    │               ║
-║   ┌───────────▼─────────────────────────▼────────────────────▼───────────┐  ║
-║   │                        AI / BI CONSUMPTION                           │  ║
-║   │                                                                      │  ║
-║   │   ┌──────────────────────────────┐   ┌───────────────────────────┐  │  ║
-║   │   │  📊 AI/BI Dashboard          │   │  🤖 Genie Space           │  │  ║
-║   │   │  Finance Risk & Revenue      │   │  Apex Financial           │  │  ║
-║   │   │  Intelligence                │   │  Risk & Revenue           │  │  ║
-║   │   │                              │   │  Intelligence             │  │  ║
-║   │   │  · KPI scorecards            │   │                           │  │  ║
-║   │   │  · Category breakdown        │   │  · Natural language SQL   │  │  ║
-║   │   │  · Segment risk heatmap      │   │  · 8 sample questions     │  │  ║
-║   │   │  · Daily trend lines         │   │  · Live FM inference      │  │  ║
-║   │   │  · Fraud rate gauge          │   │  · 4 UC tables connected  │  │  ║
-║   │   └──────────────────────────────┘   └───────────────────────────┘  │  ║
-║   └──────────────────────────────────────────────────────────────────────┘  ║
-║                                                                              ║
-║   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
-║   🏛  UNITY CATALOG  ·  workspace.finserv  ·  All tables governed + lineage  ║
-║   ⚡  SERVERLESS COMPUTE  ·  Notebooks + SDP pipelines · Zero cluster mgmt   ║
-║   📦  ASSET BUNDLE  ·  databricks.yml  ·  One-command deploy (CI/CD ready)   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-```
-
----
-
-## Mermaid Flow Diagram
-
 ```mermaid
-flowchart TD
-    classDef bronze fill:#cd7f32,color:#fff,stroke:#a0522d,rx:6
-    classDef silver fill:#c0c0c0,color:#222,stroke:#999,rx:6
-    classDef gold   fill:#FFD700,color:#333,stroke:#b8860b,rx:6
-    classDef ai     fill:#4A90D9,color:#fff,stroke:#2c6fad,rx:6
-    classDef infra  fill:#2d2d2d,color:#fff,stroke:#555,rx:6
+graph LR
+    P[(Postgres\nCore Banking)] -->|spark.range| B1[bronze_dim_customers]
+    P -->|spark.range| B2[bronze_dim_accounts]
+    P -->|spark.range| B3[bronze_fact_transactions]
+    SF[(Salesforce\nCRM SaaS)] -->|spark.range| B4[bronze_crm_interactions]
 
-    GEN["⚙️ spark.range(N)\nPySpark · Serverless\n01_generate_bronze.py"]:::infra
+    B3 -->|SDP + EXPECT| S1[silver_transactions]
+    B4 -->|SDP + ai_classify\n+ ai_sentiment| S2[silver_interactions]
 
-    GEN -->|"200 rows\nbroadcast dim"| DC["🥉 bronze_dim_customers\n200 rows"]:::bronze
-    GEN -->|"2,000 rows\nbroadcast dim"| DA["🥉 bronze_dim_accounts\n2,000 rows"]:::bronze
-    GEN -->|"100K rows\nFK modulo"| DT["🥉 bronze_fact_transactions\n100,000 rows"]:::bronze
+    S1 -->|SDP| G1[gold_rfm_features]
+    S2 -->|SDP| G1
+    G1 -->|SDP| G2[gold_churn_risk]
+    S2 -->|SDP + ai_summarize| G3[gold_customer_ai_summary]
+    G2 -->|SDP| G4[gold_segment_kpis]
 
-    DC & DA & DT -->|"Lakeflow SDP\n02_silver_transforms.sql"| SIL["🥈 silver_transactions\n100,000 rows\nMaterialized View"]:::silver
+    G1 -->|MLlib + MLflow| G5[gold_churn_predictions]
 
-    SIL -->|"03_gold_aggregations.sql"| G1["🥇 gold_txn_by_category\n1,303 rows"]:::gold
-    SIL -->|"03_gold_aggregations.sql"| G2["🥇 gold_segment_risk\n44 rows"]:::gold
-    SIL -->|"03_gold_aggregations.sql"| G3["🥇 gold_daily_risk\n4,380 rows"]:::gold
-
-    G1 & G2 & G3 --> DASH["📊 AI/BI Dashboard\nFinance Risk & Revenue\nIntelligence"]:::ai
-    G1 & G2 & G3 & SIL --> GEN2["🤖 Genie Space\nApex Financial\nRisk & Revenue"]:::ai
-
-    UC["🏛️ Unity Catalog\nworkspace.finserv\nGovernance + Lineage"]:::infra
-    UC -.->|governs| DC & DA & DT & SIL & G1 & G2 & G3
-
-    style GEN rx:8,ry:8
+    G2 -->|SQL| D[AI/BI Dashboard]
+    G3 -->|SQL| D
+    G4 -->|SQL| D
+    G5 -->|SQL| D
+    G2 -->|NL| GN[Genie Space]
+    G4 -->|NL| GN
+    G3 -->|NL| GN
 ```
 
 ---
 
-## Data at a Glance
+## Tables
 
-| Layer | Table | Rows | Method |
+| Table | Layer | Rows | Description |
 |---|---|---|---|
-| 🥉 Bronze | `bronze_dim_customers` | 200 | `spark.range()` → broadcast dim |
-| 🥉 Bronze | `bronze_dim_accounts` | 2,000 | `spark.range()` → broadcast dim |
-| 🥉 Bronze | `bronze_fact_transactions` | **100,000** | `spark.range()` → FK modulo |
-| 🥈 Silver | `silver_transactions` | **100,000** | SDP Materialized View · 3-way join |
-| 🥇 Gold | `gold_txn_by_category` | 1,303 | SDP MV · revenue + risk by category |
-| 🥇 Gold | `gold_segment_risk` | 44 | SDP MV · risk profile by segment |
-| 🥇 Gold | `gold_daily_risk` | 4,380 | SDP MV · daily trends + anomalies |
-
-**Total rows:** 207,927 · **Revenue (reconciled):** $166,991,362.86 across all three layers ✅
-
----
-
-## AI Assets
-
-### 📊 AI/BI Dashboard — Finance Risk & Revenue Intelligence
-> **ID:** `01f123059a321a288cbedf386dba1076`  
-> **URL:** https://dbc-ad74b11b-230d.cloud.databricks.com/dashboards/01f123059a321a288cbedf386dba1076?o=1562063418817826
-
-| Widget | Description |
-|---|---|
-| KPI Scorecards | Total revenue · Transaction count · High-risk count · Risk rate % |
-| Revenue by Category | Bar chart — Retail leads at $50M |
-| Segment Risk Heatmap | Risk score × high-risk count by customer segment |
-| Daily Volume Trend | Line chart — transaction count + revenue over time |
-| Fraud Rate Gauge | % high-risk transactions vs threshold |
-
-### 🤖 Genie Space — Apex Financial Risk & Revenue Intelligence
-> **ID:** `01f123083e551b77b5eaa2959201f257`  
-> **URL:** https://dbc-ad74b11b-230d.cloud.databricks.com/genie/rooms/01f123083e551b77b5eaa2959201f257?o=1562063418817826
-
-**Tables connected:** `silver_transactions` · `gold_txn_by_category` · `gold_segment_risk` · `gold_daily_risk`
-
-**Sample questions loaded:**
-1. What are the top 5 transaction categories by total revenue?
-2. Which customer segments have the highest average risk score?
-3. What is the daily transaction volume and revenue trend over the last 30 days?
-4. How many transactions were flagged as high risk, and what percentage is that?
-5. What is the total revenue across all transaction categories?
-6. Which categories have the highest ratio of declined transactions?
-7. Show me revenue and risk metrics broken down by customer segment
-8. Which day had the most high-risk transactions?
-
-**Live test result (2026-03-18):**
-> **Q:** What is the total revenue and how many transactions were high risk?  
-> **A:** Total revenue is **$166,991,362.86** · **3,853 high-risk transactions** flagged.
+| `bronze_dim_customers` | Bronze | 200 | Customer profile — segment, region, risk tier |
+| `bronze_dim_accounts` | Bronze | 500 | Account master — type, branch, status |
+| `bronze_fact_transactions` | Bronze | 10,000 | Transaction ledger from core banking |
+| `bronze_crm_interactions` | Bronze | 500 | Raw CRM interaction notes from Salesforce |
+| `silver_transactions` | Silver | ~10,000 | Cleaned, typed, validated transactions |
+| `silver_interactions` | Silver | ~500 | CRM notes + AI classification + sentiment |
+| `gold_rfm_features` | Gold | 200 | Per-customer RFM + behavioral features |
+| `gold_churn_risk` | Gold | 200 | Churn score + tier (pipeline-based scoring) |
+| `gold_customer_ai_summary` | Gold | ~150 | AI-generated interaction summary per customer |
+| `gold_segment_kpis` | Gold | ~25 | Segment × region aggregates for BI |
+| `gold_churn_predictions` | Gold | 200 | ML model churn probability (MLflow model) |
 
 ---
 
-## Build Metrics (2026-03-18)
-
-| Phase | Time | Notes |
-|---|---|---|
-| Phase 1 — Clean Slate | 8s | dbx_cleanup + DROP SCHEMA + verify |
-| Phase 2 — Bundle Deploy | 22s | validate + deploy + upload to Git |
-| Phase 3 — Bronze Gen | 1m 15s | 100K rows · spark.range() · serverless |
-| Phase 4 — SDP Pipeline | 47s | Silver MV + 3 Gold MVs · serverless |
-| Phase 5 — Validate | 12s | Row counts + revenue reconciliation |
-| Phase 6 — Dashboard | 6s | POST + publish lakeview |
-| Phase 7 — Genie Space | 18s | Create + tables + sample questions |
-| **Total** | **~6 min** | Full stack · zero manual steps |
-
----
-
-## Databricks Features Demonstrated
-
-| Feature | Where Used | Why It Matters |
-|---|---|---|
-| **spark.range()** | Bronze generation | Scalable synthetic data — 100 → 1M by changing one param |
-| **Broadcast join** | Bronze dim lookup | Eliminates shuffle for small dims — AQE aware |
-| **Lakeflow SDP** | Silver + Gold | Zero-code pipeline — SQL-only, serverless, auto-managed |
-| **Materialized Views** | Silver + Gold | Declarative transforms — incremental by default |
-| **Delta Lake** | All layers | ACID, time travel, Z-order, liquid clustering ready |
-| **Unity Catalog** | workspace.finserv | 3-level namespace · lineage · governance · fine-grained ACL |
-| **Serverless Compute** | Notebooks + SDP | No cluster management · instant start · pay-per-query |
-| **Asset Bundles** | databricks.yml | CI/CD-ready IaC — one command deploy |
-| **AI/BI Dashboard** | Lakeview | Business-user BI on top of UC-governed gold tables |
-| **Genie Space** | NL SQL | Business users ask questions in plain English |
-
----
-
-## Project Structure
-
-```
-finserv_lakehouse/
-├── databricks.yml                    # Asset Bundle (pipeline + job)
-├── README.md                         # This file
-│
-├── src/
-│   ├── notebooks/
-│   │   └── 01_generate_bronze.py     # PySpark · spark.range() · Bronze Delta
-│   ├── pipeline/
-│   │   ├── 02_silver_transforms.sql  # SDP · Silver Materialized View
-│   │   ├── 03_gold_aggregations.sql  # SDP · 3 Gold Materialized Views
-│   │   └── 04_validate.sql           # Row counts + revenue reconciliation
-│   ├── dashboard/
-│   │   └── dashboard.json            # AI/BI Dashboard (Lakeview format)
-│   └── genie/
-│       └── genie_space.json          # Genie Space config + rebuild instructions
-│
-├── docs/
-│   ├── architecture.md               # Deep-dive architecture notes
-│   ├── BUILD_METRICS.md              # Latest build metrics report
-│   ├── BUILD_REPORT.md               # Build summary
-│   ├── metrics/
-│   │   └── 2026-03-18.json           # Machine-readable build metrics
-│   └── demo_flows/
-│       ├── MASTER_DEMO_GUIDE.md      # Full demo script
-│       ├── persona_01_data_engineer.md
-│       ├── persona_02_risk_analyst.md
-│       └── persona_03_executive.md
-│
-└── scripts/
-    └── generate_build_metrics.py     # Post-build metrics reporter
-```
-
----
-
-## Quick Deploy
+## Run
 
 ```bash
-# 0. Pre-flight
-just preflight
-
-# 1. Clean slate
-dbx_cleanup catalog=workspace schema=finserv
-databricks -p slysik-aws api post ... # DROP SCHEMA IF EXISTS workspace.finserv CASCADE
-
-# 2. Deploy bundle
+# Deploy pipeline + job
 cd finserv_lakehouse
-databricks -p slysik-aws bundle validate && databricks -p slysik-aws bundle deploy
+databricks bundle validate && databricks bundle deploy
 
-# 3. Generate Bronze (serverless)
-databricks -p slysik-aws api post "/api/2.1/jobs/runs/submit" \
-  --json '{"queue":{"enabled":true},"tasks":[{"task_key":"bronze","notebook_task":{"notebook_path":"/Workspace/Users/slysik@gmail.com/dbx-sa-build-demo-pitch/finserv_lakehouse/notebooks/01_generate_bronze"}}]}'
+# Run the full end-to-end story
+databricks bundle run banking_orchestrator
 
-# 4. Run SDP pipeline
-databricks -p slysik-aws pipelines start-update <pipeline_id> --full-refresh
-
-# 5. Generate metrics report
-just metrics finserv_lakehouse <pipeline_id> <run_id> <dashboard_id> <genie_id>
+# Or step by step
+databricks bundle run banking_orchestrator --task generate_bronze
+databricks bundle run banking_orchestrator --task run_pipeline
+databricks bundle run banking_orchestrator --task train_churn_model
 ```
 
 ---
 
-## Demo Personas
+## Production Path (narrate, don't build live)
 
-| Persona | Entry Point | Key Talking Points |
-|---|---|---|
-| 🔧 **Data Engineer** | Bronze notebook → Pipeline UI | "How we build zero-ETL pipelines that scale from 100K to 100M rows by changing one parameter — and deploy with a single `bundle deploy` command." |
-| 📊 **Risk Analyst** | Dashboard → Genie | "Real-time risk rate across 100K transactions. Ask questions in plain English — Genie generates the SQL and returns structured results instantly." |
-| 💼 **Finance Executive** | Dashboard KPIs | "Total revenue $167M reconciled across bronze/silver/gold. Retail leads at $50M. Risk rate visible in one click — no SQL required." |
-
----
-
-## Workspace Links
-
-| Resource | URL |
+| What we built | What you'd add |
 |---|---|
-| Git Folder | https://dbc-ad74b11b-230d.cloud.databricks.com/browse/folders/3401527313137932?o=1562063418817826 |
-| SDP Pipeline | https://dbc-ad74b11b-230d.cloud.databricks.com/pipelines/05ba7758-cf42-4a2f-9033-7a301b09c3f8?o=1562063418817826 |
-| AI/BI Dashboard | https://dbc-ad74b11b-230d.cloud.databricks.com/dashboards/01f123059a321a288cbedf386dba1076?o=1562063418817826 |
-| Genie Space | https://dbc-ad74b11b-230d.cloud.databricks.com/genie/rooms/01f123083e551b77b5eaa2959201f257?o=1562063418817826 |
-| GitHub | https://github.com/slysik/dbx-sa-build-demo-pitch |
-
----
-
-*Built with Databricks Asset Bundles · Lakeflow SDP · Unity Catalog · AI/BI · Serverless*
+| `spark.range()` synthetic data | Auto Loader reading from S3/ADLS with schema evolution |
+| Rule-based churn scoring in pipeline | ML model served as SQL UDF via Model Serving |
+| Batch ai_summarize in Gold | Streaming summaries via Zerobus / Delta Live Tables |
+| Single environment | dev → staging → prod via bundle targets + GitHub Actions |
+| SP auth | Service principal with fine-grained UC grants per role |

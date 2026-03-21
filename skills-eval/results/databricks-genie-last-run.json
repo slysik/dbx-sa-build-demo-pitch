@@ -1,0 +1,63 @@
+{
+  "skill": "databricks-genie",
+  "timestamp": "2026-03-20T17:24:02.494491",
+  "fts": 8.2,
+  "skill_tokens": 1850,
+  "prompts": [
+    {
+      "prompt": "Create a Genie Space via API",
+      "fts": 8.46,
+      "scores": {
+        "correct_imports": 0.85,
+        "no_antipatterns": 1.69,
+        "pattern_adherence": 2.54,
+        "completeness": 1.69,
+        "first_try_runnable": 1.69
+      }
+    },
+    {
+      "prompt": "serialized_space format",
+      "fts": 7.85,
+      "scores": {
+        "correct_imports": 0.78,
+        "no_antipatterns": 1.57,
+        "pattern_adherence": 2.35,
+        "completeness": 1.57,
+        "first_try_runnable": 1.57
+      }
+    },
+    {
+      "prompt": "Table sort order requirement",
+      "fts": 8.1,
+      "scores": {
+        "correct_imports": 0.81,
+        "no_antipatterns": 1.62,
+        "pattern_adherence": 2.43,
+        "completeness": 1.62,
+        "first_try_runnable": 1.62
+      }
+    },
+    {
+      "prompt": "Ask a question via Genie API",
+      "fts": 8.04,
+      "scores": {
+        "correct_imports": 0.8,
+        "no_antipatterns": 1.61,
+        "pattern_adherence": 2.41,
+        "completeness": 1.61,
+        "first_try_runnable": 1.61
+      }
+    },
+    {
+      "prompt": "Genie permissions model",
+      "fts": 8.56,
+      "scores": {
+        "correct_imports": 0.86,
+        "no_antipatterns": 1.71,
+        "pattern_adherence": 2.57,
+        "completeness": 1.71,
+        "first_try_runnable": 1.71
+      }
+    }
+  ]
+}

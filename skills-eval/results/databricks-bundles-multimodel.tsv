@@ -1,0 +1,3 @@
+commit	decision	description	haiku_before	haiku_after	sonnet_before	sonnet_after	opus_before	opus_after
+cd2ada53	DISCARD	added --only flag + not --task clarification	7.00	7.00	9.00	9.00	7.00	7.00
+732de803	DISCARD	added serverless notebook task pattern + critical rules	8.00	9.00	9.00	9.00	7.00	7.00

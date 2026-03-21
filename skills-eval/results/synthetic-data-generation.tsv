@@ -1,0 +1,9 @@
+commit	FTS	skill_tokens	status	description
+a3b4c5d	5.50	2800	keep	baseline — upstream SKILL.md
+b4c5d6e	6.40	3000	keep	added spark.range() override for interview context
+c5d6e7f	7.00	3100	keep	added ingest_ts/source_system/batch_id requirement
+d6e7f80	7.40	3200	keep	added broadcast join pattern for dim tables
+e7f8091	7.20	4000	discard	added domain examples — too long, wrong skill
+f809102	7.60	3300	keep	added dim ≤6 columns rule
+0910213	7.80	3500	discard	added Faker examples — contradicts spark.range() rule
+1021324	8.20	3200	keep	simplified + column naming gotcha

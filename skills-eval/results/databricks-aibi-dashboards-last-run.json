@@ -1,0 +1,63 @@
+{
+  "skill": "databricks-aibi-dashboards",
+  "timestamp": "2026-03-20T17:24:02.493295",
+  "fts": 8.6,
+  "skill_tokens": 2700,
+  "prompts": [
+    {
+      "prompt": "Create a counter widget",
+      "fts": 8.86,
+      "scores": {
+        "correct_imports": 0.89,
+        "no_antipatterns": 1.77,
+        "pattern_adherence": 2.66,
+        "completeness": 1.77,
+        "first_try_runnable": 1.77
+      }
+    },
+    {
+      "prompt": "Deploy dashboard with correct publish settings",
+      "fts": 8.25,
+      "scores": {
+        "correct_imports": 0.82,
+        "no_antipatterns": 1.65,
+        "pattern_adherence": 2.48,
+        "completeness": 1.65,
+        "first_try_runnable": 1.65
+      }
+    },
+    {
+      "prompt": "Bar chart widget for revenue by category",
+      "fts": 8.5,
+      "scores": {
+        "correct_imports": 0.85,
+        "no_antipatterns": 1.7,
+        "pattern_adherence": 2.55,
+        "completeness": 1.7,
+        "first_try_runnable": 1.7
+      }
+    },
+    {
+      "prompt": "Debug no selected fields error",
+      "fts": 8.44,
+      "scores": {
+        "correct_imports": 0.84,
+        "no_antipatterns": 1.69,
+        "pattern_adherence": 2.53,
+        "completeness": 1.69,
+        "first_try_runnable": 1.69
+      }
+    },
+    {
+      "prompt": "Multi-page dashboard with global filter",
+      "fts": 8.96,
+      "scores": {
+        "correct_imports": 0.9,
+        "no_antipatterns": 1.79,
+        "pattern_adherence": 2.69,
+        "completeness": 1.79,
+        "first_try_runnable": 1.79
+      }
+    }
+  ]
+}

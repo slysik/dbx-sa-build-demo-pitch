@@ -1,29 +1,7 @@
-# Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-dist/
-.eggs/
-
-# Databricks
 .databricks/
 *.whl
-
-# Delta / Spark
-spark-warehouse/
-metastore_db/
-derby.log
-
-# IDE
-.idea/
-.vscode/
-*.swp
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Secrets
 .env
-*.pem
-*.key
+.DS_Store
+spark-warehouse/

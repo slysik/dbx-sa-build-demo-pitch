@@ -1,49 +1,61 @@
 {
-  "space_id": "01f123083e551b77b5eaa2959201f257",
-  "title": "Apex Financial \u2014 Risk & Revenue Intelligence",
-  "description": "Natural language exploration of 100K Apex Financial transactions. Ask about revenue by category, high-risk accounts, daily trends, customer segments, and fraud risk metrics. Powered by Unity Catalog gold and silver tables in workspace.finserv.",
-  "warehouse_id": "214e9f2a308e800d",
-  "table_identifiers": [
-    "workspace.finserv.silver_transactions",
-    "workspace.finserv.gold_txn_by_category",
-    "workspace.finserv.gold_segment_risk",
-    "workspace.finserv.gold_daily_risk"
-  ],
-  "sample_questions": [
-    "What are the top 5 transaction categories by total revenue?",
-    "Which customer segments have the highest average risk score?",
-    "What is the daily transaction volume and revenue trend over the last 30 days?",
-    "How many transactions were flagged as high risk, and what percentage is that?",
-    "What is the total revenue across all transaction categories?",
-    "Which categories have the highest ratio of declined transactions?",
-    "Show me revenue and risk metrics broken down by customer segment",
-    "Which day had the most high-risk transactions?"
-  ],
+  "primary": {
+    "space_id": "01f123083e551b77b5eaa2959201f257",
+    "workspace": "primary (dbc-ad74b11b-230d)",
+    "title": "Apex Financial — Risk & Revenue Intelligence",
+    "description": "Natural language exploration of 100K Apex Financial transactions. Ask about revenue by category, high-risk accounts, daily trends, customer segments, and fraud risk metrics. Powered by Unity Catalog gold and silver tables in workspace.finserv.",
+    "warehouse_id": "214e9f2a308e800d",
+    "url": "https://dbc-ad74b11b-230d.cloud.databricks.com/genie/rooms/01f123083e551b77b5eaa2959201f257",
+    "table_identifiers": [
+      "workspace.finserv.gold_daily_risk",
+      "workspace.finserv.gold_segment_risk",
+      "workspace.finserv.gold_txn_by_category",
+      "workspace.finserv.silver_transactions"
+    ]
+  },
+  "backup": {
+    "space_id": "01f12331f45515778ae0d2ab78a0e7aa",
+    "workspace": "backup (dbc-a092293f-ea93)",
+    "title": "Apex Financial — Risk & Revenue Intelligence",
+    "description": "Natural language exploration of 100K Apex Financial transactions. Ask about revenue by category, high-risk accounts, daily trends, customer segments, and fraud risk metrics. Powered by Unity Catalog gold and silver tables in workspace.finserv.",
+    "warehouse_id": "228419b788367ab7",
+    "url": "https://dbc-a092293f-ea93.cloud.databricks.com/genie/rooms/01f12331f45515778ae0d2ab78a0e7aa?o=7474660773634193",
+    "table_identifiers": [
+      "workspace.finserv.gold_daily_risk",
+      "workspace.finserv.gold_segment_risk",
+      "workspace.finserv.gold_txn_by_category",
+      "workspace.finserv.silver_transactions"
+    ],
+    "sample_questions": [
+      "What are the top 5 transaction categories by total revenue?",
+      "Which customer segments have the highest average risk score?",
+      "What is the daily transaction volume and revenue trend?",
+      "How many transactions were flagged as high risk, and what percentage is that?",
+      "What is the total revenue across all transaction categories?",
+      "Which categories have the highest ratio of declined transactions?",
+      "Show me revenue and risk metrics broken down by customer segment",
+      "Which day had the most high-risk transactions?"
+    ]
+  },
   "rebuild_notes": {
     "serialized_space_format": {
       "version": 2,
       "data_sources": {
-        "tables": [
-          {
-            "identifier": "catalog.schema.table"
-          }
-        ]
+        "tables": [{"identifier": "catalog.schema.table"}]
       },
       "config": {
         "sample_questions": [
-          {
-            "id": "<32hex-uuid>",
-            "question": [
-              "<question string>"
-            ]
-          }
+          {"id": "<32hex-uuid-no-hyphens>", "question": ["<question string>"]}
         ]
       }
     },
     "gotchas": [
-      "Tables must be sorted alphabetically by identifier",
-      "Pass table_identifiers as top-level API field alongside serialized_space",
-      "SampleQuestion.id must be lowercase 32-hex UUID without hyphens"
+      "Tables MUST be sorted alphabetically by identifier — API rejects unsorted",
+      "Pass table_identifiers as top-level API field alongside serialized_space (not inside it)",
+      "SampleQuestion.id must be lowercase 32-hex UUID without hyphens — uuid.uuid4().hex",
+      "SampleQuestion.question is an ARRAY of strings, not a plain string",
+      "Genie Space permissions: data-rooms is NOT a valid ACL object type — workspace admins have access automatically",
+      "databricks auth token -p slysik-aws-backup-sp is BROKEN on macOS — get token via curl client_credentials"
     ]
   }
 }

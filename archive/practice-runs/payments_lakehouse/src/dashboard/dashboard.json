@@ -1,0 +1,333 @@
+{
+  "datasets": [
+    {
+      "name": "ds_kpi",
+      "displayName": "KPI Summary",
+      "queryLines": [
+        "SELECT ",
+        "  COUNT(*) AS total_txns, ",
+        "  ROUND(SUM(amount), 2) AS total_amount, ",
+        "  ROUND(AVG(amount), 2) AS avg_amount ",
+        "FROM interview.payments.bronze_payment_transactions"
+      ]
+    },
+    {
+      "name": "ds_status",
+      "displayName": "Status Distribution",
+      "queryLines": [
+        "SELECT status, COUNT(*) AS txn_count, ",
+        "  ROUND(SUM(amount), 2) AS total_amount ",
+        "FROM interview.payments.bronze_payment_transactions ",
+        "GROUP BY status ",
+        "ORDER BY txn_count DESC"
+      ]
+    },
+    {
+      "name": "ds_currency",
+      "displayName": "Currency Distribution",
+      "queryLines": [
+        "SELECT currency, COUNT(*) AS txn_count, ",
+        "  ROUND(SUM(amount), 2) AS total_amount ",
+        "FROM interview.payments.bronze_payment_transactions ",
+        "GROUP BY currency ",
+        "ORDER BY txn_count DESC"
+      ]
+    },
+    {
+      "name": "ds_monthly",
+      "displayName": "Monthly Trend",
+      "queryLines": [
+        "SELECT DATE_TRUNC('MONTH', transaction_ts) AS txn_month, ",
+        "  COUNT(*) AS txn_count, ",
+        "  ROUND(SUM(amount), 2) AS total_amount ",
+        "FROM interview.payments.bronze_payment_transactions ",
+        "GROUP BY txn_month ",
+        "ORDER BY txn_month"
+      ]
+    },
+    {
+      "name": "ds_skew",
+      "displayName": "Top Payment Types (Skew)",
+      "queryLines": [
+        "SELECT ",
+        "  COALESCE(p.type_name, 'unknown') AS type_name, ",
+        "  COALESCE(p.processor, 'unknown') AS processor, ",
+        "  CONCAT(COALESCE(p.type_name, 'unknown'), ' / ', COALESCE(p.processor, 'unknown')) AS type_processor, ",
+        "  COUNT(*) AS txn_count, ",
+        "  ROUND(COUNT(*) / 1000000.0, 2) AS txn_count_m, ",
+        "  ROUND(SUM(t.amount), 2) AS total_amount ",
+        "FROM interview.payments.bronze_payment_transactions t ",
+        "LEFT JOIN interview.payments.bronze_payment_types p ",
+        "  ON t.payment_type_id = p.payment_type_id ",
+        "GROUP BY p.type_name, p.processor ",
+        "ORDER BY txn_count DESC ",
+        "LIMIT 10"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "Payment Transactions — Bronze Analytics",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": ["## Payment Transactions — Bronze Analytics"]
+            }
+          },
+          "position": {"x": 0, "y": 0, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "subtitle",
+            "multilineTextboxSpec": {
+              "lines": ["100M transactions | 10K payment types | 40% skew on ACH/PayPal | Hash-based deterministic generation"]
+            }
+          },
+          "position": {"x": 0, "y": 1, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-txns",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "total_txns", "expression": "`total_txns`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_txns", "displayName": "Total Transactions"}
+              },
+              "frame": {"showTitle": true, "title": "Total Transactions"}
+            }
+          },
+          "position": {"x": 0, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-total-amount",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "total_amount", "expression": "`total_amount`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "total_amount", "displayName": "Total Amount ($)"}
+              },
+              "frame": {"showTitle": true, "title": "Total Amount ($)"}
+            }
+          },
+          "position": {"x": 2, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "kpi-avg-amount",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_kpi",
+                "fields": [{"name": "avg_amount", "expression": "`avg_amount`"}],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {"fieldName": "avg_amount", "displayName": "Avg Amount ($)"}
+              },
+              "frame": {"showTitle": true, "title": "Avg Transaction ($)"}
+            }
+          },
+          "position": {"x": 4, "y": 2, "width": 2, "height": 3}
+        },
+        {
+          "widget": {
+            "name": "section-distributions",
+            "multilineTextboxSpec": {
+              "lines": ["### Distributions"]
+            }
+          },
+          "position": {"x": 0, "y": 5, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "status-pie",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_status",
+                "fields": [
+                  {"name": "status", "expression": "`status`"},
+                  {"name": "txn_count", "expression": "`txn_count`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "txn_count", "scale": {"type": "quantitative"}, "displayName": "Transactions"},
+                "color": {"fieldName": "status", "scale": {"type": "categorical"}, "displayName": "Status"}
+              },
+              "frame": {"showTitle": true, "title": "Status Distribution"}
+            }
+          },
+          "position": {"x": 0, "y": 6, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "currency-pie",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_currency",
+                "fields": [
+                  {"name": "currency", "expression": "`currency`"},
+                  {"name": "txn_count", "expression": "`txn_count`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {"fieldName": "txn_count", "scale": {"type": "quantitative"}, "displayName": "Transactions"},
+                "color": {"fieldName": "currency", "scale": {"type": "categorical"}, "displayName": "Currency"}
+              },
+              "frame": {"showTitle": true, "title": "Currency Distribution"}
+            }
+          },
+          "position": {"x": 3, "y": 6, "width": 3, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-trends",
+            "multilineTextboxSpec": {
+              "lines": ["### Monthly Trend"]
+            }
+          },
+          "position": {"x": 0, "y": 11, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "monthly-trend",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_monthly",
+                "fields": [
+                  {"name": "txn_month", "expression": "`txn_month`"},
+                  {"name": "txn_count", "expression": "`txn_count`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {"fieldName": "txn_month", "scale": {"type": "temporal"}, "displayName": "Month"},
+                "y": {"fieldName": "txn_count", "scale": {"type": "quantitative"}, "displayName": "Transactions"}
+              },
+              "frame": {"showTitle": true, "title": "Monthly Transaction Volume"}
+            }
+          },
+          "position": {"x": 0, "y": 12, "width": 6, "height": 5}
+        },
+        {
+          "widget": {
+            "name": "section-skew",
+            "multilineTextboxSpec": {
+              "lines": ["### Data Skew — Top 10 Payment Types (40% on ACH/PayPal)"]
+            }
+          },
+          "position": {"x": 0, "y": 17, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "skew-bar",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_skew",
+                "fields": [
+                  {"name": "type_processor", "expression": "`type_processor`"},
+                  {"name": "txn_count_m", "expression": "`txn_count_m`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {"fieldName": "type_processor", "scale": {"type": "categorical"}, "displayName": "Payment Type / Processor"},
+                "y": {"fieldName": "txn_count_m", "scale": {"type": "quantitative"}, "displayName": "Transactions (Millions)"}
+              },
+              "frame": {"showTitle": true, "title": "Top 10 Payment Types by Volume (Millions)"}
+            }
+          },
+          "position": {"x": 0, "y": 18, "width": 6, "height": 6}
+        },
+        {
+          "widget": {
+            "name": "section-detail",
+            "multilineTextboxSpec": {
+              "lines": ["### Detail — Top Payment Types"]
+            }
+          },
+          "position": {"x": 0, "y": 24, "width": 6, "height": 1}
+        },
+        {
+          "widget": {
+            "name": "skew-table",
+            "queries": [{
+              "name": "main_query",
+              "query": {
+                "datasetName": "ds_skew",
+                "fields": [
+                  {"name": "type_name", "expression": "`type_name`"},
+                  {"name": "processor", "expression": "`processor`"},
+                  {"name": "txn_count_m", "expression": "`txn_count_m`"},
+                  {"name": "total_amount", "expression": "`total_amount`"}
+                ],
+                "disaggregated": true
+              }
+            }],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {"fieldName": "type_name", "displayName": "Payment Type"},
+                  {"fieldName": "processor", "displayName": "Processor"},
+                  {"fieldName": "txn_count_m", "displayName": "Txns (M)"},
+                  {"fieldName": "total_amount", "displayName": "Total Amount ($)"}
+                ]
+              },
+              "frame": {"showTitle": true, "title": "Top 10 Payment Types"}
+            }
+          },
+          "position": {"x": 0, "y": 25, "width": 6, "height": 5}
+        }
+      ]
+    }
+  ]
+}

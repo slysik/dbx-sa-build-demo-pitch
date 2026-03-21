@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-03-21T17:32:59.832364",
+  "total_diffs": 9,
+  "diffs": {
+    "databricks-model-serving": {
+      "score": 50,
+      "new_patterns": [],
+      "new_gotchas": [],
+      "deprecated": []
+    },
+    "TEMPLATE": {
+      "score": 50,
+      "new_patterns": [],
+      "new_gotchas": [],
+      "deprecated": []
+    },
+    "databricks-synthetic-data-gen": {
+      "score": 50,
+      "new_patterns": [
+        "def generate_amount(tiers: pd",
+        "def fake_name(ids: pd",
+        "CREATE SCHEMA/VOLUME IF NOT EXISTS`)",
+        "CREATE SCHEMA IF NOT EXISTS {CATALOG}",
+        "CREATE VOLUME IF NOT EXISTS {CATALOG}"
+      ],
+      "new_gotchas": [
+        "### \u26a0\ufe0f MUST DO: Confirm Catalog Before Proceeding"
+      ],
+      "deprecated": []
+    },
+    "databricks-zerobus-ingest": {
+      "score": 50,
+      "new_patterns": [],
+      "new_gotchas": [],
+      "deprecated": []
+    },
+    "databricks-unstructured-pdf-generation": {
+      "score": 50,
+      "new_patterns": [
+        "CREATE VOLUME permission |"
+      ],
+      "new_gotchas": [],
+      "deprecated": []
+    },
+    "databricks-lakebase-provisioned": {
+      "score": 50,
+      "new_patterns": [
+        "def is_lakebase_configured() -> bool:",
+        "SELECT version()\")",
+        "def _token_refresh_loop(instance_name: str):",
+        "def provide_token(dialect, conn_rec, cargs, cparams):",
+        "def _generate_token(instance_name: str) -> str:"
+      ],
+      "new_gotchas": [],
+      "deprecated": []
+    },
+    "databricks-spark-declarative-pipelines": {
+      "score": 50,
+      "new_patterns": [
+        "def orders_bronze():",
+        "def bronze_events():",
+        "def orders_clean():",
+        "def silver_clean():",
+        "def transaction_summary():"
+      ],
+      "new_gotchas": [
+        "**CRITICAL RULE**: If the user explicitly mentions \"Python\" in their request (e.g., \"Python Spark Declarative Pipeline\", \"Python SDP\", \"use Python\"), **ALWAYS use Python without asking**. The same applies to SQL - if they say \"SQL pipeline\", use SQL."
+      ],
+      "deprecated": []
+    },
+    "databricks-bundles": {
+      "score": 20,
+      "new_patterns": [
+        "\n\n### Monitoring & Logs\n\n**View application logs (for Apps resources):**\n",
+        "bash\ndatabricks bundle run resource_name          # Run a pipeline or job\ndatabricks bundle run pipeline_name -t prod  # Run in specific environment\n\n# Apps require bundle run to start after deployment\ndatabricks bundle run app_resource_key -t dev    # Start/deploy the app\n"
+      ],
+      "new_gotchas": [],
+      "deprecated": [
+        " runs a single task. The flag ",
+        "bash\ndatabricks bundle run resource_name          # Run a pipeline or job\ndatabricks bundle run pipeline_name -t prod  # Run in specific environment\n\n# Run a single task within a job\ndatabricks bundle run job_name --only task_key       # \u2190 --only, NOT --task (--task doesn't exist)\ndatabricks bundle run banking_orchestrator --only generate_bronze   # example\n\n# Apps require bundle run to start after deployment\ndatabricks bundle run app_resource_key -t dev    # Start/deploy the app\n",
+        "** \u2014 "
+      ]
+    },
+    "databricks-aibi-dashboards": {
+      "score": 10,
+      "new_patterns": [
+        ") a dashboard |\n\n## Reference Files\n\n| What are you building? | Reference |\n|------------------------|-----------|\n| Any widget (text, counter, table, chart) | [1-widget-specifications.md](1-widget-specifications.md) |\n| Dashboard with filters (global or page-level) | [2-filters.md](2-filters.md) |\n| Need a complete working template to adapt | [3-examples.md](3-examples.md) |\n| Debugging a broken dashboard | [4-troubleshooting.md](4-troubleshooting.md) |\n\n---\n\n## Implementation Guidelines\n\n### 1) DATASET ARCHITECTURE (STRICT)\n\n- **One dataset per domain** (e.g., orders, customers, products)\n- **Exactly ONE valid SQL query per dataset** (no multiple queries separated by "
+      ],
+      "new_gotchas": [],
+      "deprecated": [
+        " must include ",
+        " must be a pre-existing DIRECTORY** \u2014 ",
+        " call or "
+      ]
+    }
+  }
+}

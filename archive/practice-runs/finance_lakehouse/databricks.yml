@@ -1,0 +1,56 @@
+bundle:
+  name: finance_lakehouse
+
+variables:
+  catalog:
+    default: workspace
+  schema:
+    default: finance
+  warehouse_id:
+    default: 214e9f2a308e800d
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-ad74b11b-230d.cloud.databricks.com
+
+resources:
+
+  pipelines:
+    finance_medallion:
+      name: "finance_medallion"
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      channel: PREVIEW
+      libraries:
+        - file:
+            path: src/pipeline/02_silver_transforms.sql
+        - file:
+            path: src/pipeline/03_gold_aggregations.sql
+
+  jobs:
+    finance_orchestrator:
+      name: "finance_orchestrator"
+      environments:
+        - environment_key: serverless
+          spec:
+            client: "1"
+      tasks:
+        - task_key: generate_bronze
+          environment_key: serverless
+          notebook_task:
+            notebook_path: src/notebooks/01_generate_bronze.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              n_events: "10000"
+
+        - task_key: run_medallion_pipeline
+          depends_on:
+            - task_key: generate_bronze
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.finance_medallion.id}
+            full_refresh: true
