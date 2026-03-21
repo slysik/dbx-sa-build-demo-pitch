@@ -87,7 +87,8 @@ def extract_skill_keywords(skill_path: Path) -> Dict[str, Set[str]]:
 def load_official_skills(repo_path: Path) -> Dict[str, Dict]:
     """Load all skills from official ai-dev-kit repo."""
     skills = {}
-    skills_dir = repo_path / "skills"
+    # Official repo uses 'databricks-skills' directory
+    skills_dir = repo_path / "databricks-skills"
     
     if not skills_dir.exists():
         print(f"⚠️  Skills directory not found: {skills_dir}")
