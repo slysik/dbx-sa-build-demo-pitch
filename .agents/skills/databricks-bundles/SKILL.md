@@ -89,25 +89,50 @@ resources:
 
 ### Jobs Resources
 
+#### Serverless Notebook Tasks (Default - 2026 Best Practice)
+
 ```yaml
 resources:
   jobs:
     job_name:
       name: "[${bundle.target}] Job Name"
+      queue:
+        enabled: true  # ← Serverless compute (no cluster needed)
       tasks:
         - task_key: "main_task"
           notebook_task:
             notebook_path: ../src/notebooks/main.py  # Relative to resources/
-          new_cluster:
-            spark_version: "13.3.x-scala2.12"
-            node_type_id: "i3.xlarge"
-            num_workers: 2
+            source: WORKSPACE                        # ← Required for serverless
       schedule:
         quartz_cron_expression: "0 0 9 * * ?"
         timezone_id: "America/Los_Angeles"
       permissions:
         - level: CAN_VIEW
           group_name: "users"
+```
+
+⚠️ **Serverless Notebook Tasks — Critical Rules:**
+- `queue: enabled: true` at job root enables serverless (no cluster specified)
+- `source: WORKSPACE` is **required** in notebook_task (tells job where notebook lives)
+- **DO NOT use** `existing_cluster_id` with serverless (will fail)
+- **DO NOT use** `new_cluster` with serverless (will fail)
+- Serverless is faster startup, ideal for orchestration jobs
+- All notebook tasks inherit the `queue: enabled` setting from root
+
+#### Classic Cluster-Based Tasks (Legacy)
+
+For legacy cluster-based jobs (not recommended):
+```yaml
+tasks:
+  - task_key: "main_task"
+    notebook_task:
+      notebook_path: ../src/notebooks/main.py
+    existing_cluster_id: cluster-abc123  # ← Legacy: reference existing cluster
+    # OR
+    new_cluster:
+      spark_version: "13.3.x-scala2.12"
+      node_type_id: "i3.xlarge"
+      num_workers: 2
 ```
 
 **Permission levels**: `CAN_VIEW`, `CAN_MANAGE_RUN`, `CAN_MANAGE`
