@@ -143,8 +143,9 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
   ```bash
   TOKEN=$(curl -s -X POST "https://dbc-a092293f-ea93.cloud.databricks.com/oidc/v1/token" \
     -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "grant_type=client_credentials&client_id=bb2b9d09-a4b3-40e4-b848-6efc2e31480a&client_secret=***REMOVED***&scope=all-apis" \
+    -d "grant_type=client_credentials&client_id=bb2b9d09-a4b3-40e4-b848-6efc2e31480a&client_secret=$BACKUP_SP_SECRET&scope=all-apis" \
     | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+  # BACKUP_SP_SECRET stored in ~/.zshrc — NEVER hardcode
   ```
 - **SQL RANGE() Bronze — always include `customer_id` from dim_accounts join** — PySpark notebook selects `a.customer_id` from the accounts dim. SQL RANGE() translation can silently drop it. Without it, Silver SDP fails immediately: `UNRESOLVED_COLUMN: customer_id`. Double-check all FK columns from dim joins are in the SELECT list.
 - **Backup bundle target — independent tfstate** — adding a `backup` target to `databricks.yml` creates `.databricks/bundle/backup/terraform/terraform.tfstate` separate from `dev`. No tfstate conflict. Use `databricks bundle deploy -t backup` to deploy.
@@ -401,8 +402,9 @@ databricks bundle deploy   -t backup   # deploy pipeline + job to backup workspa
 ```bash
 TOKEN=$(curl -s -X POST "https://dbc-a092293f-ea93.cloud.databricks.com/oidc/v1/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=client_credentials&client_id=bb2b9d09-a4b3-40e4-b848-6efc2e31480a&client_secret=***REMOVED***&scope=all-apis" \
+  -d "grant_type=client_credentials&client_id=bb2b9d09-a4b3-40e4-b848-6efc2e31480a&client_secret=$BACKUP_SP_SECRET&scope=all-apis" \
   | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+# BACKUP_SP_SECRET stored in ~/.zshrc — NEVER hardcode
 # Then use: -H "Authorization: Bearer $TOKEN" in all curl calls
 ```
 
