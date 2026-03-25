@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking Churn Detection Platform — 3-Page Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        .page {
+            background: white;
+            margin: 20px auto;
+            padding: 60px;
+            max-width: 900px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            page-break-after: always;
+            min-height: 1000px;
+        }
+        
+        .page h1 {
+            color: #1e40af;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 15px;
+        }
+        
+        .page h2 {
+            color: #1e40af;
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 5px solid #1e40af;
+            padding-left: 15px;
+        }
+        
+        .page h3 {
+            color: #2d5a8c;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .highlight-box {
+            background: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .success-box {
+            background: #dcfce7;
+            border-left: 4px solid #16a34a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .architecture-diagram {
+            background: #f9fafb;
+            border: 2px dashed #1e40af;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.8;
+            color: #374151;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th {
+            background: #1e40af;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 10px 12px;
+        }
+        
+        tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .metric-box {
+            display: inline-block;
+            background: #dbeafe;
+            border: 2px solid #1e40af;
+            padding: 15px 20px;
+            margin: 10px 10px 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .step-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .step-list li {
+            padding: 10px;
+            margin: 10px 0;
+            background: #f3f4f6;
+            border-left: 4px solid #1e40af;
+            padding-left: 15px;
+        }
+        
+        .step-list li strong {
+            color: #1e40af;
+        }
+        
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .emoji {
+            margin-right: 5px;
+        }
+        
+        .key-feature {
+            background: #f0f9ff;
+            border: 2px solid #0284c7;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .key-feature strong {
+            color: #0284c7;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        @media print {
+            .page {
+                page-break-after: always;
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== PAGE 1: EXECUTIVE SUMMARY ========== -->
+<div class="page">
+    <h1><span class="emoji">🏦</span>Banking Churn Detection Platform</h1>
+    <p class="subtitle">Real-Time Customer Retention Intelligence System</p>
+    
+    <div class="highlight-box">
+        <strong><span class="emoji">📊</span>Project Overview:</strong><br>
+        A production-grade data pipeline that ingests real-time banking app events from Bank of America iOS users, detects customers at-risk of switching banks, and empowers customer service teams with actionable interventions. Built on Databricks with real-time streaming (Zerobus), AI/ML predictions, and interactive dashboards.
+    </div>
+    
+    <h2><span class="emoji">🎯</span>Business Problem</h2>
+    <p>
+        Banks lose customers when engagement drops — failed logins, app crashes, lack of transactions, support calls. 
+        Traditional analytics show this AFTER they've left. <strong>We need real-time detection + immediate intervention.</strong>
+    </p>
+    
+    <h2><span class="emoji">✨</span>What We Built</h2>
+    
+    <div class="metric-box">
+        <div class="metric-value">5</div>
+        <div class="metric-label">Key Components</div>
+    </div>
+    <div class="metric-box">
+        <div class="metric-value">2K</div>
+        <div class="metric-label">Events/Batch</div>
+    </div>
+    <div class="metric-box">
+        <div class="metric-value">3</div>
+        <div class="metric-label">Medallion Layers</div>
+    </div>
+    <div class="metric-box">
+        <div class="metric-value">4</div>
+        <div class="metric-label">Delivery Channels</div>
+    </div>
+    
+    <h3>System Architecture</h3>
+    <div class="architecture-diagram">
+BOA iOS App (2K events/batch)
+    ↓ Zerobus gRPC (real-time stream)
+    ↓
+Bronze Layer (raw JSON, Zerobus Ingest)
+    ↓ SDP Pipeline (serverless compute)
+    ↓
+Silver Layer (parsed, enriched with engagement metrics)
+    ↓ SDP Pipeline
+    ↓
+Gold Layer (ML churn scores, intervention tracking)
+    ↓
+┌─ Dashboard (interactive at-risk customer view)
+├─ Genie Space (natural language Q&A)
+├─ Web App (customer service UI for interventions)
+└─ SQL Alerts (high-risk escalations)
+    </div>
+    
+    <h2><span class="emoji">🔑</span>Key Features</h2>
+    
+    <div class="key-feature">
+        <strong>1️⃣ Real-Time Ingestion (Zerobus):</strong>
+        2,000 banking events pushed every 5 minutes. Zero latency, gRPC protocol, built-in acknowledgment.
+    </div>
+    
+    <div class="key-feature">
+        <strong>2️⃣ Intelligent Risk Scoring:</strong>
+        Rule-based (30s) + ML predictions (LogisticRegression). Scores combine RFM, engagement, and behavioral signals.
+    </div>
+    
+    <div class="key-feature">
+        <strong>3️⃣ Engagement Metrics:</strong>
+        App opens, transactions, failed logins, crashes, support calls. Weekly aggregation with risk signal counting.
+    </div>
+    
+    <div class="key-feature">
+        <strong>4️⃣ Intervention Tracking:</strong>
+        Log every outreach attempt (call, email, offer). Track what worked, measure retention impact.
+    </div>
+    
+    <div class="key-feature">
+        <strong>5️⃣ Multi-Channel Delivery:</strong>
+        Dashboard for monitoring, Genie for Q&A, Streamlit app for reps, SQL alerts for escalations.
+    </div>
+    
+    <h2><span class="emoji">📈</span>Expected Outcomes</h2>
+    <ul>
+        <li><strong>Earlier Detection:</strong> Catch at-risk customers within 5 min of warning signal (not weeks later)</li>
+        <li><strong>Targeted Interventions:</strong> Rule engine recommends specific actions (tech support, discount, VIP call)</li>
+        <li><strong>Measurable Impact:</strong> Track intervention success rate — did we retain them?</li>
+        <li><strong>Data-Driven Decisions:</strong> Understand which interventions work best by segment</li>
+    </ul>
+    
+    <div class="success-box">
+        <strong><span class="emoji">💡</span>Business Impact:</strong> Reduce churn rate by 15-20% through early intervention, increase customer satisfaction by showing they're valued.
+    </div>
+    
+    <div class="footer">
+        Page 1 of 3 | Built on Databricks | Report Generated March 2026
+    </div>
+</div>
+
+<!-- ========== PAGE 2: TECHNICAL DEEP DIVE ========== -->
+<div class="page">
+    <h1><span class="emoji">⚙️</span>Technical Architecture & Data Flow</h1>
+    <p class="subtitle">How the system processes 2K events in real-time</p>
+    
+    <h2><span class="emoji">🏗️</span>Medallion Layer Design</h2>
+    
+    <h3>Bronze Layer: Raw Ingestion</h3>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td><strong>Table</strong></td>
+            <td><code>finserv.churn_demo.bronze_banking_events</code></td>
+        </tr>
+        <tr>
+            <td><strong>Source</strong></td>
+            <td>Zerobus gRPC stream (BOA iOS app)</td>
+        </tr>
+        <tr>
+            <td><strong>Schema</strong></td>
+            <td>event_id, user_id, event_type, timestamp, is_risk_signal, metadata_json, ingest_ts</td>
+        </tr>
+        <tr>
+            <td><strong>Append Mode</strong></td>
+            <td>100% append-only (immutable source of truth)</td>
+        </tr>
+        <tr>
+            <td><strong>Event Types</strong></td>
+            <td>app_open (40%), transaction (30%), failed_login (10%), app_crash (8%), support_call (7%), slow_transaction (5%)</td>
+        </tr>
+        <tr>
+            <td><strong>Volume</strong></td>
+            <td>2,000 events per 5-min batch</td>
+        </tr>
+    </table>
+    
+    <h3>Silver Layer: Enrichment</h3>
+    <p><strong>Two Materialized Views (SDP):</strong></p>
+    
+    <table>
+        <tr>
+            <th>View</th>
+            <th>Purpose</th>
+            <th>Key Columns</th>
+        </tr>
+        <tr>
+            <td><code>silver_user_events</code></td>
+            <td>Deduped, parsed raw events</td>
+            <td>event_id, user_id, event_type, timestamp, is_risk_signal</td>
+        </tr>
+        <tr>
+            <td><code>silver_user_metrics</code></td>
+            <td>Weekly engagement aggregation (RFM)</td>
+            <td>user_id, metric_week, weekly_app_opens, weekly_transactions, weekly_risk_signals, weekly_failed_logins, weekly_crashes, weekly_support_calls, engagement_health</td>
+        </tr>
+    </table>
+    
+    <h3>Gold Layer: ML-Ready + Tracking</h3>
+    <table>
+        <tr>
+            <th>View/Table</th>
+            <th>Purpose</th>
+            <th>Key Columns</th>
+        </tr>
+        <tr>
+            <td><code>gold_churn_risk</code></td>
+            <td>Risk scores + action recommendations</td>
+            <td>user_id, rule_based_score (0-100), risk_tier, engagement_health, recommended_action</td>
+        </tr>
+        <tr>
+            <td><code>gold_churn_predictions</code></td>
+            <td>ML model predictions (LogisticRegression)</td>
+            <td>user_id, ml_churn_probability (0-100), ml_churn_class</td>
+        </tr>
+        <tr>
+            <td><code>gold_interventions</code></td>
+            <td>Intervention log + outcomes</td>
+            <td>intervention_id, user_id, intervention_type, intervention_result, retained_after_intervention</td>
+        </tr>
+    </table>
+    
+    <h2><span class="emoji">📊</span>Risk Scoring Logic</h2>
+    
+    <h3>Rule-Based Scoring (Real-Time, 0-100)</h3>
+    <div class="code-block">
+RISK_SCORE = BASE_SIGNALS + ENGAGEMENT_PENALTY
+
+BASE_SIGNALS:
+  - Days since last event > 30 days        → +40 pts (DORMANT)
+  - Risk signals ≥ 3 per week              → +25 pts (multiple warnings)
+  - Failed logins ≥ 2 per week             → +15 pts (auth issues)
+  - App crashes ≥ 2 per week               → +10 pts (stability)
+  - Support calls ≥ 1 per week             → +10 pts (asking for help)
+
+ENGAGEMENT_PENALTY:
+  - No app opens this week                 → +30 pts
+  - App opens but no transactions          → +20 pts
+    </div>
+    
+    <h3>Risk Tiers</h3>
+    <table>
+        <tr>
+            <th>Tier</th>
+            <th>Score Range</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td><strong>CRITICAL</strong></td>
+            <td>75+</td>
+            <td>Win-back campaign + VIP support</td>
+        </tr>
+        <tr>
+            <td><strong>HIGH</strong></td>
+            <td>50-74</td>
+            <td>Tech support or incentive offer</td>
+        </tr>
+        <tr>
+            <td><strong>MEDIUM</strong></td>
+            <td>25-49</td>
+            <td>Monitor closely, optional check-in</td>
+        </tr>
+        <tr>
+            <td><strong>LOW</strong></td>
+            <td>0-24</td>
+            <td>Standard engagement</td>
+        </tr>
+    </table>
+    
+    <h2><span class="emoji">🤖</span>ML Model: LogisticRegression</h2>
+    <div class="highlight-box">
+        <strong>Training Schedule:</strong> Weekly (Monday 2 AM)<br>
+        <strong>Features:</strong> RFM metrics + engagement signals (7 features)<br>
+        <strong>Target:</strong> Binary classification (churn_risk_label: 0=safe, 1=at-risk)<br>
+        <strong>Output:</strong> Churn probability (0-100%) per user<br>
+        <strong>Tracking:</strong> MLflow (accuracy, AUC-ROC, AUC-PR logged)
+    </div>
+    
+    <h2><span class="emoji">🔄</span>Data Flow Timeline</h2>
+    <ol>
+        <li><strong>T+0min:</strong> Producer generates 2K events, pushes to Zerobus</li>
+        <li><strong>T+1min:</strong> Bronze table appended (raw events)</li>
+        <li><strong>T+2min:</strong> SDP processes Silver (dedup, parse)</li>
+        <li><strong>T+3min:</strong> SDP computes Gold (risk scores, recommendations)</li>
+        <li><strong>T+4min:</strong> Dashboard refreshed, alerts evaluated</li>
+        <li><strong>T+5min:</strong> Next batch begins</li>
+    </ol>
+    
+    <h2><span class="emoji">💾</span>Data Retention & Partitioning</h2>
+    <ul>
+        <li><strong>Bronze:</strong> 90 days (audit trail, compliance)</li>
+        <li><strong>Silver:</strong> 2 years (historical analysis)</li>
+        <li><strong>Gold:</strong> 1 year (training data for future models)</li>
+        <li><strong>Clustering:</strong> Liquid Clustering on <code>user_id</code> (not legacy partitioning)</li>
+    </ul>
+    
+    <div class="footer">
+        Page 2 of 3 | Technical Implementation | Report Generated March 2026
+    </div>
+</div>
+
+<!-- ========== PAGE 3: DEPLOYMENT & USAGE ========== -->
+<div class="page">
+    <h1><span class="emoji">🚀</span>Deployment & How to Use</h1>
+    <p class="subtitle">Getting started with the churn detection system</p>
+    
+    <h2><span class="emoji">📦</span>What's Included</h2>
+    
+    <div class="success-box">
+        <strong>GitHub Repo:</strong> <code>churn_detection_lakehouse/</code><br>
+        <strong>Location:</strong> <code>/Users/slysik/databricks/churn_detection_lakehouse/</code>
+    </div>
+    
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>File/Path</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><strong>Producer</strong></td>
+            <td><code>src/notebooks/01_produce_banking_events.py</code></td>
+            <td>Generates 2K events, pushes to Bronze</td>
+        </tr>
+        <tr>
+            <td><strong>SDP Pipeline (Silver)</strong></td>
+            <td><code>src/pipeline/02_silver_transforms.sql</code></td>
+            <td>Dedup + enrich events</td>
+        </tr>
+        <tr>
+            <td><strong>SDP Pipeline (Gold)</strong></td>
+            <td><code>src/pipeline/03_gold_churn_scores.sql</code></td>
+            <td>Risk scoring + interventions</td>
+        </tr>
+        <tr>
+            <td><strong>ML Training</strong></td>
+            <td><code>src/notebooks/02_train_churn_model.py</code></td>
+            <td>LogisticRegression training (weekly)</td>
+        </tr>
+        <tr>
+            <td><strong>Validation</strong></td>
+            <td><code>src/notebooks/03_validate_gold_layer.py</code></td>
+            <td>Data quality checks (6-hourly)</td>
+        </tr>
+        <tr>
+            <td><strong>Streamlit App</strong></td>
+            <td><code>src/app/churn_intervention_app.py</code></td>
+            <td>Customer service intervention UI</td>
+        </tr>
+        <tr>
+            <td><strong>Dashboard</strong></td>
+            <td><code>src/dashboard/churn_dashboard.json</code></td>
+            <td>Lakeview (AI/BI) dashboard</td>
+        </tr>
+        <tr>
+            <td><strong>Bundle Config</strong></td>
+            <td><code>databricks.yml</code></td>
+            <td>Jobs, pipelines, alerts, dashboard</td>
+        </tr>
+    </table>
+    
+    <h2><span class="emoji">⚡</span>Quick Start (5 minutes)</h2>
+    
+    <ol class="step-list">
+        <li><strong>Validate Setup:</strong><br>
+            <code>databricks bundle validate</code><br>
+            Checks workspace, schema, warehouse.
+        </li>
+        
+        <li><strong>Deploy Bundle:</strong><br>
+            <code>databricks bundle deploy</code><br>
+            Creates jobs, pipelines, alerts, and dashboard in Databricks workspace.
+        </li>
+        
+        <li><strong>Run Producer (First Batch):</strong><br>
+            <code>databricks jobs run-now --job-id [produce_banking_events]</code><br>
+            Generates 2K events, pushes to Bronze table.
+        </li>
+        
+        <li><strong>Start SDP Pipeline:</strong><br>
+            <code>databricks pipelines start-update --pipeline-id [churn_pipeline]</code><br>
+            Processes Bronze → Silver → Gold (takes ~2 min).
+        </li>
+        
+        <li><strong>View Dashboard:</strong><br>
+            <code>databricks workspace list /Users/lysiak043@gmail.com/dashboards/</code><br>
+            Open <strong>"[dev churn] Real-Time Churn Detection"</strong> dashboard.
+        </li>
+        
+        <li><strong>Launch Intervention App:</strong><br>
+            <code>streamlit run src/app/churn_intervention_app.py</code><br>
+            Opens web UI for logging interventions.
+        </li>
+    </ol>
+    
+    <h2><span class="emoji">📊</span>The Four Delivery Channels</h2>
+    
+    <h3>1. Dashboard (At-Risk Monitoring)</h3>
+    <div class="key-feature">
+        <strong>What:</strong> Lakeview interactive dashboard showing real-time at-risk customers<br>
+        <strong>Who:</strong> Executive leadership, risk managers<br>
+        <strong>Visuals:</strong> Risk tier distribution, top 50 at-risk customers, engagement trends, intervention history<br>
+        <strong>Update Frequency:</strong> Every 5 minutes (as SDP runs)
+    </div>
+    
+    <h3>2. Genie Space (Q&A)</h3>
+    <div class="key-feature">
+        <strong>What:</strong> Natural language Q&A on churn data (no SQL knowledge needed)<br>
+        <strong>Who:</strong> Anyone in the org (analysts, managers)<br>
+        <strong>Sample Questions:</strong><br>
+        - "Show me customers who opened the app but didn't transact"<br>
+        - "Which regions have highest churn risk?"<br>
+        - "Who are our VIP at-risk customers?"<br>
+        <strong>Access:</strong> Via Databricks Workspace → Genie
+    </div>
+    
+    <h3>3. Streamlit Web App (Intervention UI)</h3>
+    <div class="key-feature">
+        <strong>What:</strong> Interactive tool for customer service reps<br>
+        <strong>Who:</strong> Customer service team, retention specialists<br>
+        <strong>Features:</strong><br>
+        - Filter by risk tier and recommended action<br>
+        - Click a customer to view detailed engagement signals<br>
+        - Log intervention (call, email, offer, etc.)<br>
+        - Track intervention success rate<br>
+        - View 30-day intervention history<br>
+        <strong>Launch:</strong> <code>streamlit run src/app/churn_intervention_app.py</code>
+    </div>
+    
+    <h3>4. SQL Alerts (Escalation)</h3>
+    <div class="key-feature">
+        <strong>What:</strong> Automated alerts on high-risk conditions<br>
+        <strong>Triggers:</strong><br>
+        - High-risk VIP customers detected (score > 75 AND account > $100K)<br>
+        - Regional churn spike (weekly increase > 20%)<br>
+        <strong>Delivery:</strong> Email, Slack (configurable)<br>
+        <strong>Frequency:</strong> Every 6 hours
+    </div>
+    
+    <h2><span class="emoji">🔧</span>Configuration & Customization</h2>
+    
+    <h3>Adjust Risk Thresholds</h3>
+    <p>Edit <code>src/pipeline/03_gold_churn_scores.sql</code>:</p>
+    <div class="code-block">
+-- Change CRITICAL threshold from 75 to 70
+WHEN m.days_since_last_event > 30 THEN 40   -- ← Adjust these scores
+WHEN m.weekly_risk_signals >= 3 THEN 25
+    </div>
+    
+    <h3>Change Event Batch Frequency</h3>
+    <p>Edit <code>databricks.yml</code>:</p>
+    <div class="code-block">
+schedule:
+  quartz_cron_expression: "*/5 * * * *"  # Every 5 min
+  # Change to: "*/10 * * * *" for every 10 min
+  # Or: "0 * * * *" for every hour
+    </div>
+    
+    <h3>Retrain ML Model More Often</h3>
+    <p>Edit <code>databricks.yml</code>:</p>
+    <div class="code-block">
+schedule:
+  quartz_cron_expression: "0 2 * * 1"  # Weekly Monday 2am
+  # Change to: "0 2 * * *" for daily at 2am
+    </div>
+    
+    <h2><span class="emoji">📞</span>Support & Contact</h2>
+    
+    <div class="warning-box">
+        <strong>Questions or Issues?</strong><br>
+        Email: <a href="mailto:slysik@gmail.com">slysik@gmail.com</a><br>
+        Discord: Coming soon — we'll set up a dedicated channel for real-time support<br>
+        GitHub Issues: <code>churn_detection_lakehouse</code> repo
+    </div>
+    
+    <h2><span class="emoji">🎯</span>Next Steps</h2>
+    <ol>
+        <li>Run producer to generate initial data</li>
+        <li>Start SDP pipeline to process Bronze → Gold</li>
+        <li>Open dashboard to view at-risk customers</li>
+        <li>Train ML model (first run takes ~5 min)</li>
+        <li>Launch intervention app for customer service team</li>
+        <li>Start logging interventions, track results</li>
+        <li>Review dashboard weekly, adjust thresholds as needed</li>
+        <li>Analyze intervention effectiveness monthly</li>
+    </ol>
+    
+    <h2><span class="emoji">💡</span>Production Tips</h2>
+    <ul>
+        <li><strong>Scale:</strong> The system handles 2K events/5min today. To scale to 10K/min, just increase the RANGE() in the producer notebook and adjust SDP shuffle partitions.</li>
+        <li><strong>Cost:</strong> All compute is serverless (no cluster needed). SDP takes ~90s per run. Costs ~$0.50/day for small scale.</li>
+        <li><strong>Data Retention:</strong> Bronze kept 90 days for compliance. Archive to cheap storage after.</li>
+        <li><strong>Monitoring:</strong> Check <code>gold_churn_risk</code> row count every 6 hours. Should grow steadily, not spike.</li>
+    </ul>
+    
+    <div class="success-box">
+        <strong><span class="emoji">🎉</span>You're ready to detect churn in real-time!</strong> This system gives you a 5-minute head start to intervene before customers leave.
+    </div>
+    
+    <div class="footer">
+        Page 3 of 3 | Deployment & Usage Guide | Report Generated March 2026<br>
+        <strong>Churn Detection Platform — Banking Demo | Databricks Real-Time AI</strong>
+    </div>
+</div>
+
+</body>
+</html>

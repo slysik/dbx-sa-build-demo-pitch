@@ -1,0 +1,32 @@
+bundle:
+  name: churn_detection_lakehouse
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    default: finserv
+  schema:
+    default: churn_demo
+  warehouse_id:
+    default: 4bbaafe9538467a0
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-61514402-8451.cloud.databricks.com
+      profile: slysik-aws-sp
+
+resources:
+  # ── Dashboard: At-Risk Customers + Trends ────────────────────────────────
+  dashboards:
+    churn_dashboard:
+      display_name: "[dev churn] Real-Time Churn Detection"
+      file_path: src/dashboard/churn_dashboard.json
+      warehouse_id: ${var.warehouse_id}
+      permissions:
+        - level: CAN_RUN
+          group_name: "users"

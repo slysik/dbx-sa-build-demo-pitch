@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Databricks
+.databricks/
+*.pid
+*.log
+
+# Environment
+.env
+.env.local
+
+# Credentials (NEVER commit these!)
+~/.databrickscfg
+secrets.json
+credentials.json
+SENDER_PASSWORD=*

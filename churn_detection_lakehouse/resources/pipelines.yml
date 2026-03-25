@@ -1,0 +1,15 @@
+resources:
+  # ── SDP Pipeline: Bronze → Silver → Gold (Churn Detection) ─────────────────
+  pipelines:
+    churn_pipeline:
+      name: "[dev churn] Real-Time Churn Detection Pipeline"
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      channel: PREVIEW
+      development: true
+      libraries:
+        - file:
+            path: src/pipeline/02_silver_transforms.sql
+        - file:
+            path: src/pipeline/03_gold_churn_scores.sql

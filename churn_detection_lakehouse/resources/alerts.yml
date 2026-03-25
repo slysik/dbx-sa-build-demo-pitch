@@ -1,0 +1,31 @@
+resources:
+  # ── SQL Alerts: Escalation Triggers ──────────────────────────────────────
+  alerts:
+    high_risk_vips:
+      name: "[dev churn] Alert: High-Risk VIPs Detected"
+      query: |
+        SELECT 
+          COUNT(*) as at_risk_count,
+          MAX(rule_based_score) as highest_score
+        FROM ${var.catalog}.${var.schema}.gold_churn_risk
+        WHERE risk_tier IN ('HIGH', 'CRITICAL')
+      alert_conditions:
+        - operator: ">"
+          threshold: 0
+      display_options:
+        include_result_set: true
+
+    churn_spike:
+      name: "[dev churn] Alert: Churn Spike Detected"
+      query: |
+        SELECT 
+          COUNT(*) as new_at_risk_count,
+          ROUND(AVG(rule_based_score), 2) as avg_score
+        FROM ${var.catalog}.${var.schema}.gold_churn_risk
+        WHERE risk_tier IN ('HIGH', 'CRITICAL')
+          AND score_timestamp >= CURRENT_TIMESTAMP() - INTERVAL 1 HOUR
+      alert_conditions:
+        - operator: ">"
+          threshold: 2
+      display_options:
+        include_result_set: true

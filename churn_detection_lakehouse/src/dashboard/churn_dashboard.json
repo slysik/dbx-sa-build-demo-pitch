@@ -1,0 +1,181 @@
+{
+  "version": 2,
+  "dashboard": {
+    "title": "[dev churn] Real-Time Churn Detection",
+    "displayMode": "normal"
+  },
+  "pages": [
+    {
+      "displayName": "At-Risk Customers",
+      "layout": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 4,
+          "height": 4,
+          "card": {
+            "name": "critical_customers",
+            "title": "🚨 CRITICAL Tier",
+            "query": "SELECT COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_churn_risk WHERE risk_tier = 'CRITICAL'",
+            "visualization": {
+              "type": "big_number",
+              "options": {
+                "sparklineOptions": {
+                  "show": false
+                }
+              }
+            }
+          }
+        },
+        {
+          "x": 4,
+          "y": 0,
+          "width": 4,
+          "height": 4,
+          "card": {
+            "name": "high_customers",
+            "title": "🔴 HIGH Tier",
+            "query": "SELECT COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_churn_risk WHERE risk_tier = 'HIGH'",
+            "visualization": {
+              "type": "big_number"
+            }
+          }
+        },
+        {
+          "x": 8,
+          "y": 0,
+          "width": 4,
+          "height": 4,
+          "card": {
+            "name": "medium_customers",
+            "title": "🟡 MEDIUM Tier",
+            "query": "SELECT COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_churn_risk WHERE risk_tier = 'MEDIUM'",
+            "visualization": {
+              "type": "big_number"
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "width": 12,
+          "height": 8,
+          "card": {
+            "name": "top_at_risk",
+            "title": "Top 25 At-Risk Customers",
+            "query": "SELECT user_id, risk_tier, rule_based_score, recommended_action, weekly_risk_signals, engagement_health FROM ${var.catalog}.${var.schema}.gold_churn_risk ORDER BY rule_based_score DESC LIMIT 25",
+            "visualization": {
+              "type": "table"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "displayName": "Risk Distribution",
+      "layout": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 6,
+          "height": 6,
+          "card": {
+            "name": "risk_distribution",
+            "title": "Risk Tier Distribution",
+            "query": "SELECT risk_tier, COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_churn_risk GROUP BY risk_tier ORDER BY count DESC",
+            "visualization": {
+              "type": "pie",
+              "options": {
+                "groupBy": ["risk_tier"],
+                "values": ["count"]
+              }
+            }
+          }
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "width": 6,
+          "height": 6,
+          "card": {
+            "name": "engagement_health",
+            "title": "Engagement Health Distribution",
+            "query": "SELECT engagement_health, COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_churn_risk GROUP BY engagement_health",
+            "visualization": {
+              "type": "bar",
+              "options": {
+                "groupBy": ["engagement_health"],
+                "values": ["count"]
+              }
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "width": 12,
+          "height": 6,
+          "card": {
+            "name": "score_distribution",
+            "title": "Risk Score Distribution",
+            "query": "SELECT ROUND(rule_based_score / 10) * 10 as score_bucket, COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_churn_risk GROUP BY ROUND(rule_based_score / 10) * 10 ORDER BY score_bucket DESC",
+            "visualization": {
+              "type": "bar",
+              "options": {
+                "groupBy": ["score_bucket"],
+                "values": ["count"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "displayName": "Interventions",
+      "layout": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 6,
+          "height": 4,
+          "card": {
+            "name": "intervention_count",
+            "title": "Total Interventions Logged",
+            "query": "SELECT COUNT(*) as count FROM ${var.catalog}.${var.schema}.gold_interventions WHERE intervention_ts >= CURRENT_TIMESTAMP() - INTERVAL 30 DAYS",
+            "visualization": {
+              "type": "big_number"
+            }
+          }
+        },
+        {
+          "x": 6,
+          "y": 0,
+          "width": 6,
+          "height": 4,
+          "card": {
+            "name": "intervention_success",
+            "title": "Intervention Success Rate",
+            "query": "SELECT ROUND(100 * SUM(CASE WHEN retained_after_intervention THEN 1 ELSE 0 END) / COUNT(*), 1) as success_pct FROM ${var.catalog}.${var.schema}.gold_interventions WHERE intervention_ts >= CURRENT_TIMESTAMP() - INTERVAL 30 DAYS AND retained_after_intervention IS NOT NULL",
+            "visualization": {
+              "type": "big_number"
+            }
+          }
+        },
+        {
+          "x": 0,
+          "y": 4,
+          "width": 12,
+          "height": 8,
+          "card": {
+            "name": "recent_interventions",
+            "title": "Recent Interventions (Last 30 Days)",
+            "query": "SELECT intervention_id, user_id, intervention_type, intervention_result, intervention_ts, retained_after_intervention FROM ${var.catalog}.${var.schema}.gold_interventions WHERE intervention_ts >= CURRENT_TIMESTAMP() - INTERVAL 30 DAYS ORDER BY intervention_ts DESC LIMIT 50",
+            "visualization": {
+              "type": "table"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

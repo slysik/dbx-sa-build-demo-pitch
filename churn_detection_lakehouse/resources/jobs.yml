@@ -1,0 +1,43 @@
+resources:
+  # ── Real-Time Producer: BOA iOS App Events → Zerobus ──────────────────────
+  jobs:
+    produce_banking_events:
+      name: "[dev churn] Produce Banking Events → Zerobus"
+      queue:
+        enabled: true  # Serverless
+      tasks:
+        - task_key: producer
+          notebook_task:
+            notebook_path: ${workspace.root_path}/src/notebooks/01_produce_banking_events
+            source: WORKSPACE
+          schedule:
+            quartz_cron_expression: "*/5 * * * *"  # Every 5 min
+            timezone_id: "America/New_York"
+
+    # ── ML Training: LogisticRegression Churn Model ──────────────────────────
+    train_churn_model:
+      name: "[dev churn] Train Churn Prediction Model"
+      queue:
+        enabled: true  # Serverless
+      tasks:
+        - task_key: train
+          notebook_task:
+            notebook_path: ${workspace.root_path}/src/notebooks/02_train_churn_model
+            source: WORKSPACE
+          schedule:
+            quartz_cron_expression: "0 2 * * 1"  # Weekly Monday 2am
+            timezone_id: "America/New_York"
+
+    # ── Validation: Final Layer Quality Checks ───────────────────────────────
+    validate_gold_layer:
+      name: "[dev churn] Validate Gold Layer"
+      queue:
+        enabled: true  # Serverless
+      tasks:
+        - task_key: validate
+          notebook_task:
+            notebook_path: ${workspace.root_path}/src/notebooks/03_validate_gold_layer
+            source: WORKSPACE
+          schedule:
+            quartz_cron_expression: "0 */6 * * *"  # Every 6 hours
+            timezone_id: "America/New_York"
