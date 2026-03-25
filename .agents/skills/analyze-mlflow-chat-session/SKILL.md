@@ -1,5 +1,5 @@
 ---
-name: analyze-mlflow-chat-session
+name: analyzing-mlflow-session
 description: Analyzes an MLflow session — a sequence of traces from a multi-turn chat conversation or interaction. Use when the user asks to debug a chat conversation, review session or chat history, find where a multi-turn chat went wrong, or analyze patterns across turns. Triggers on "analyze this session", "what happened in this conversation", "debug session", "review chat history", "where did this chat go wrong", "session traces", "analyze chat", "debug this chat".
 ---
 

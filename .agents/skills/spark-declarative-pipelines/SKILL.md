@@ -1,5 +1,5 @@
 ---
-name: spark-declarative-pipelines
+name: databricks-spark-declarative-pipelines
 description: "Creates, configures, and updates Databricks Lakeflow Spark Declarative Pipelines (SDP/LDP) using serverless compute. Handles streaming tables, materialized views, CDC, SCD Type 2, and Auto Loader ingestion patterns. Use when building data pipelines, working with Delta Live Tables, ingesting streaming data, implementing change data capture, or when the user mentions SDP, LDP, DLT, Lakeflow pipelines, streaming tables, or bronze/silver/gold medallion architectures."
 ---
 
@@ -13,13 +13,6 @@ IMPORTANT: If this is a new pipeline (one does not already exist), see Quick Sta
 - **MUST** confirm language as Python or SQL. Stick with that language unless told otherwise.
 - **MUST** if not modifying an existing pipeline, use [Quick Start](#quick-start) below.
 - **MUST** create serverless pipelines  by default. ** Only use classic clusters if user explicitly requires R language, Spark RDD APIs, or JAR libraries.
-
-## ⚠️ Known Gotchas (workspace-validated)
-- **`ai_summarize` is non-deterministic → INVALID in Materialized Views** — SDP rejects it at definition time. Use it in a notebook that writes a plain Delta table AFTER the pipeline runs. Pattern: `ai_summarize(CONCAT_WS('. ', COLLECT_LIST(note_text)), 50)` in a notebook, write to `gold_customer_ai_summary` as Delta, not MV.
-- **`ai_classify` and `ai_analyze_sentiment` ARE valid in MVs** — they are deterministic (same input = same output).
-- **`databricks pipelines list` does not exist** — use `databricks pipelines list-pipelines`.
-- **Serverless poll cadence** — SDP pipelines on serverless complete in ~47–51 sec for 3 MVs. Poll every 15–20 sec.
-- **FK columns from dim joins** — always explicitly select FK columns (e.g., `a.customer_id`) from broadcast-joined dims. SQL RANGE() translations silently drop them → Silver MVs fail with `UNRESOLVED_COLUMN`.
 
 
 ## Required Steps

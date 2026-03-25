@@ -1,5 +1,5 @@
 ---
-name: analyze-mlflow-trace
+name: analyzing-mlflow-trace
 description: Analyzes a single MLflow trace to answer a user query about it. Use when the user provides a trace ID and asks to debug, investigate, find issues, root-cause errors, understand behavior, or analyze quality. Triggers on "analyze this trace", "what went wrong with this trace", "debug trace", "investigate trace", "why did this trace fail", "root cause this trace".
 ---
 

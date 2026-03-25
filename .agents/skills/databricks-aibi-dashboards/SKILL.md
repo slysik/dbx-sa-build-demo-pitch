@@ -53,13 +53,6 @@ Create Databricks AI/BI dashboards (formerly Lakeview dashboards). **Follow thes
 
 ---
 
-## ⚠️ Deployment Gotchas (workspace-validated)
-- **`embed_credentials` MUST be `false`** — always. `true` embeds PAT tokens into the published URL, a security violation. Every `publish_dashboard` call or `POST .../published` must include `"embed_credentials": false`.
-- **`parent_path` must be a pre-existing DIRECTORY** — `POST /api/2.0/lakeview/dashboards` fails if the folder doesn't exist. Pre-create with `workspace mkdirs /Users/<user>/dashboards` before first deploy.
-- **`dbx_deploy_dashboard` tool uses REPO path** — broken for SP deployments. Always bypass with direct `api post /api/2.0/lakeview/dashboards` and set `parent_path` explicitly.
-- **Widget `name` ≠ `frame.title`** — `widget.name` is alphanumeric+hyphens+underscores only (no spaces). `frame.title` is the human-readable label (any chars). Common bug: copying title into name.
-- **`widgetType: "filter"` is invalid** — use `filter-multi-select`, `filter-single-select`, or `filter-date-range-picker`. See [4-troubleshooting.md](4-troubleshooting.md).
-
 ## Implementation Guidelines
 
 ### 1) DATASET ARCHITECTURE (STRICT)

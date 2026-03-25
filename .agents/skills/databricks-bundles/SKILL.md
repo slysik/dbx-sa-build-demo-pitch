@@ -89,50 +89,25 @@ resources:
 
 ### Jobs Resources
 
-#### Serverless Notebook Tasks (Default - 2026 Best Practice)
-
 ```yaml
 resources:
   jobs:
     job_name:
       name: "[${bundle.target}] Job Name"
-      queue:
-        enabled: true  # ← Serverless compute (no cluster needed)
       tasks:
         - task_key: "main_task"
           notebook_task:
             notebook_path: ../src/notebooks/main.py  # Relative to resources/
-            source: WORKSPACE                        # ← Required for serverless
+          new_cluster:
+            spark_version: "13.3.x-scala2.12"
+            node_type_id: "i3.xlarge"
+            num_workers: 2
       schedule:
         quartz_cron_expression: "0 0 9 * * ?"
         timezone_id: "America/Los_Angeles"
       permissions:
         - level: CAN_VIEW
           group_name: "users"
-```
-
-⚠️ **Serverless Notebook Tasks — Critical Rules:**
-- `queue: enabled: true` at job root enables serverless (no cluster specified)
-- `source: WORKSPACE` is **required** in notebook_task (tells job where notebook lives)
-- **DO NOT use** `existing_cluster_id` with serverless (will fail)
-- **DO NOT use** `new_cluster` with serverless (will fail)
-- Serverless is faster startup, ideal for orchestration jobs
-- All notebook tasks inherit the `queue: enabled` setting from root
-
-#### Classic Cluster-Based Tasks (Legacy)
-
-For legacy cluster-based jobs (not recommended):
-```yaml
-tasks:
-  - task_key: "main_task"
-    notebook_task:
-      notebook_path: ../src/notebooks/main.py
-    existing_cluster_id: cluster-abc123  # ← Legacy: reference existing cluster
-    # OR
-    new_cluster:
-      spark_version: "13.3.x-scala2.12"
-      node_type_id: "i3.xlarge"
-      num_workers: 2
 ```
 
 **Permission levels**: `CAN_VIEW`, `CAN_MANAGE_RUN`, `CAN_MANAGE`
@@ -269,15 +244,9 @@ databricks bundle deploy --force             # Force overwrite remote changes
 databricks bundle run resource_name          # Run a pipeline or job
 databricks bundle run pipeline_name -t prod  # Run in specific environment
 
-# Run a single task within a job
-databricks bundle run job_name --only task_key       # ← --only, NOT --task (--task doesn't exist)
-databricks bundle run banking_orchestrator --only generate_bronze   # example
-
 # Apps require bundle run to start after deployment
 databricks bundle run app_resource_key -t dev    # Start/deploy the app
 ```
-
-⚠️ **`--only <task_key>` not `--task`** — `databricks bundle run <job> --only <task_key>` runs a single task. The flag `--task` does not exist and will error.
 
 ### Monitoring & Logs
 

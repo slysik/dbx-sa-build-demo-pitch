@@ -1,5 +1,5 @@
 ---
-name: synthetic-data-generation
+name: databricks-synthetic-data-gen
 description: "Generate realistic synthetic data using Spark + Faker (strongly recommended). Supports serverless execution, multiple output formats (Parquet/JSON/CSV/Delta), and scales from thousands to millions of rows. For small datasets (<10K rows), can optionally generate locally and upload to volumes. Use when user mentions 'synthetic data', 'test data', 'generate data', 'demo dataset', 'Faker', or 'sample data'."
 ---
 
@@ -34,16 +34,6 @@ uv run python generate_data.py
 pip install "databricks-connect>=16.4,<17.4" faker numpy pandas holidays
 python generate_data.py
 ```
-
-## ⚠️ Interview/Demo Context Overrides
-When building interview demos or medallion lakehouse prototypes, use `spark.range()` + Spark-native column expressions INSTEAD of Faker + Pandas UDFs:
-- `spark.range(N)` → rows, scale by changing one parameter
-- `F.when() / F.rand(seed=N)` → distributions (no Faker)
-- `F.broadcast(dim_df)` → join dims without shuffle
-- Dims ≤ 6 columns, direct Delta write, NO intermediate Parquet/Volume hop
-- Bronze metadata required on every table: `.withColumn("ingest_ts", F.current_timestamp()).withColumn("source_system", F.lit("...")).withColumn("batch_id", F.lit(BATCH_ID))`
-
-Faker + Pandas UDFs are for realistic names/addresses in client-facing data generation. Use `spark.range()` when scale and simplicity matter more than realistic string values.
 
 ## Critical Rules
 
