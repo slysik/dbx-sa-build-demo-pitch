@@ -306,6 +306,26 @@ metrics project pipeline_id run_id dashboard_id genie_id phase_times='{"cleanup"
     --claude-model "claude-opus-4-5" \
     2>&1
 
+# Check upstream skills repos for updates (no changes applied)
+skills-check:
+  python3 scripts/sync-skills.py --check
+
+# Check with markdown report saved to docs/
+skills-report:
+  python3 scripts/sync-skills.py --check --markdown --report docs/SKILLS_UPDATE_REPORT.md
+
+# Sync skills from upstream repos (interactive — prompts per skill)
+skills-sync:
+  python3 scripts/sync-skills.py
+
+# Force-sync all skills from upstream (no prompts)
+skills-update:
+  python3 scripts/sync-skills.py --apply
+
+# Sync specific skills only
+skills-sync-one +skills:
+  python3 scripts/sync-skills.py {{skills}}
+
 claude:
   claude --model opus
 

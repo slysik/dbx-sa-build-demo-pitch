@@ -1,5 +1,5 @@
 ---
-name: databricks-unstructured-pdf-generation
+name: unstructured-pdf-generation
 description: "Generate synthetic PDF documents for RAG and unstructured data use cases. Use when creating test PDFs, demo documents, or evaluation datasets for retrieval systems."
 ---
 

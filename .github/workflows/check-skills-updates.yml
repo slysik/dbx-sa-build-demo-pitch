@@ -1,0 +1,104 @@
+name: Check Skills Updates
+
+on:
+  schedule:
+    # Daily at 8am ET (12:00 UTC)
+    - cron: '0 12 * * *'
+  workflow_dispatch:  # Manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check upstream for skill updates
+        id: check
+        run: |
+          # Run the check with both markdown and JSON output
+          python3 scripts/sync-skills.py --check --markdown > /tmp/report.md 2>&1 || true
+          python3 scripts/sync-skills.py --check --json > /tmp/report.json 2>&1 || true
+
+          # Extract counts from JSON
+          UPDATED=$(python3 -c "import json; d=json.load(open('/tmp/report.json')); print(d.get('updated_count',0))" 2>/dev/null || echo 0)
+          NEW=$(python3 -c "import json; d=json.load(open('/tmp/report.json')); print(d.get('new_count',0))" 2>/dev/null || echo 0)
+          TOTAL=$(python3 -c "import json; d=json.load(open('/tmp/report.json')); print(d.get('total_checked',0))" 2>/dev/null || echo 0)
+
+          echo "updated=$UPDATED" >> "$GITHUB_OUTPUT"
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
+
+          echo "### Skills check summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checked: $TOTAL | Updated: $UPDATED | New: $NEW" >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create or update GitHub issue
+        if: steps.check.outputs.updated != '0' || steps.check.outputs.new != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/report.md', 'utf8');
+            const json_report = JSON.parse(fs.readFileSync('/tmp/report.json', 'utf8'));
+
+            const updated = json_report.updated_count || 0;
+            const new_count = json_report.new_count || 0;
+            const date = json_report.date || new Date().toISOString().split('T')[0];
+
+            const title = `🔄 Skills updates: ${updated} updated, ${new_count} new (${date})`;
+            const labels = ['skills-update', 'automated'];
+
+            // Build skill names for quick scanning
+            const skill_names = json_report.skills
+              .map(s => `\`${s.name}\` (${s.status})`)
+              .join(', ');
+
+            const body = `${report}\n\n---\n*Skills: ${skill_names}*\n*Run: ${context.runId}*`;
+
+            // Close existing open skills-update issues
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'skills-update',
+              state: 'open',
+            });
+
+            for (const issue of existing.data) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'not_planned',
+              });
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels,
+            });
+
+      - name: Archive JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills-report-${{ github.run_number }}
+          path: /tmp/report.json
+          retention-days: 30
+
+      - name: No updates
+        if: steps.check.outputs.updated == '0' && steps.check.outputs.new == '0'
+        run: echo "✅ All ${{ steps.check.outputs.total }} skills are up to date."

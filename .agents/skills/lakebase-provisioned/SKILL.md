@@ -1,5 +1,5 @@
 ---
-name: databricks-lakebase-provisioned
+name: lakebase-provisioned
 description: "Patterns and best practices for Lakebase Provisioned (Databricks managed PostgreSQL) for OLTP workloads. Use when creating Lakebase instances, connecting applications or Databricks Apps to PostgreSQL, implementing reverse ETL via synced tables, storing agent or chat memory, or configuring OAuth authentication for Lakebase."
 ---
 

@@ -16,6 +16,15 @@
 - **DO** update `CLAUDE.md` routing table or coding rules if a project-level default changes
 - **DO** update `elle-core.md` rules only if the user explicitly asks
 
+### ⚠️ Skill Conflicts Resolved (2026-03-24)
+
+**3 major skill conflicts identified and resolved.** See `SKILLS_CONFLICT_RESOLUTION.md` for full analysis.
+
+**TL;DR:**
+- **Data generation:** Use `spark-native-bronze` for interviews (default), `databricks-synthetic-data-gen` for production realistic data
+- **Bundles:** Use `databricks-bundles` ONLY (2026+); `asset-bundles` is DEPRECATED
+- **Interview mode is the default** for ambiguous prompts — optimize for speed over realism
+
 ---
 
 ## OPERATING PRINCIPLE
@@ -177,6 +186,71 @@ Prompt arrives → Scaffold project → State assumptions → Generate data → 
 - **NEVER hardcode secrets** — no fallback values in `os.environ.get("KEY", "hardcoded")`. Store all keys in `~/.zshrc`. Use `git-filter-repo` to purge if leaked. GitHub detects `dose*` (Databricks OAuth) and `sk-ant-api03-*` (Anthropic) within 3 min of push.
 - **Git remote** — always verify `git remote -v` before pushing. Canonical remote: `https://github.com/slysik/dbx-sa-build-demo-pitch.git`
 - **SQL Statements API wait_timeout** — max 50s (not 60s). Use `"wait_timeout": "50s"` in all SQL API calls.
+- **macOS bash 3.2 — no associative arrays** — `/bin/bash` is 3.2.57 on macOS (Apple won't ship GPLv3). `declare -A` fails silently or throws `unbound variable`. Always use Python or zsh for scripts needing maps/dicts. No `/opt/homebrew/bin/bash` installed either.
+
+---
+
+## SKILLS SYNC — UPSTREAM TRACKING (2026-03-25)
+
+### Upstream Sources
+Skills in `.agents/skills/` are sourced from **3 upstream repos** and synced manually:
+
+| Repo | Branch | Skills Path | Skills Count |
+|------|--------|-------------|-------------|
+| `databricks-solutions/ai-dev-kit` | `main` | `databricks-skills/` | 25 Databricks skills |
+| `mlflow/skills` | `main` | `.` (root) | 8 MLflow skills |
+| `databricks-solutions/apx` | `main` | `skills/apx/` | 1 APX skill |
+
+### Name Mapping (upstream → local)
+Several skills are renamed locally (prefix stripped). Full mapping in `scripts/sync-skills.py::SKILL_MAP`.
+
+| Upstream Name | Local Name | Why Renamed |
+|--------------|------------|-------------|
+| `databricks-model-serving` | `model-serving` | Prefix stripped |
+| `databricks-lakebase-provisioned` | `lakebase-provisioned` | Prefix stripped |
+| `databricks-spark-declarative-pipelines` | `spark-declarative-pipelines` | Prefix stripped |
+| `databricks-synthetic-data-gen` | `synthetic-data-generation` | Renamed + suffix change |
+| `databricks-unstructured-pdf-generation` | `unstructured-pdf-generation` | Prefix stripped |
+| `databricks-zerobus-ingest` | `zerobus-ingest` | Prefix stripped |
+
+### Local-Only Skills (no upstream)
+| Skill | Notes |
+|-------|-------|
+| `asset-bundles` | ❌ DEPRECATED — use `databricks-bundles` |
+| `databricks-parsing` | Legacy — upstream equivalent is in `databricks-ai-functions` |
+
+### Automated Daily Check
+**GitHub Actions:** `.github/workflows/check-skills-updates.yml`
+- Runs daily at 8am ET (`cron: 0 12 * * *`) + manual dispatch
+- Clones all 3 upstream repos, compares every skill by SHA256
+- Extracts **feature-level diffs** (new/removed/modified sections in SKILL.md)
+- Includes upstream commit messages per skill (last 30 days)
+- Creates a GitHub Issue with full Markdown report when updates found
+- Closes stale `skills-update` issues automatically
+- Archives JSON report as build artifact (30-day retention)
+
+### Local Commands
+```bash
+just skills-check              # Quick terminal check — no changes
+just skills-report             # Markdown report → docs/SKILLS_UPDATE_REPORT.md
+just skills-sync               # Interactive — prompts per skill
+just skills-update             # Force-apply all updates
+just skills-sync-one <names>   # Sync specific skills only
+```
+
+### After Syncing Skills
+1. Review `git diff .agents/skills/` for unexpected changes
+2. Check if upstream **removed sections you added** (e.g., `⚠️ Known Gotchas` added to `spark-declarative-pipelines`)
+3. Re-apply local patches if needed (gotchas, interview-specific overrides)
+4. Run `just skills-check` to confirm clean
+5. Commit: `git add .agents/skills/ && git commit -m "skills: sync from upstream (YYYY-MM-DD)"`
+
+### ⚠️ Sync Gotchas (learned 2026-03-25)
+- **Upstream removes README.md** — many skills had `README.md` removed upstream (Mar 24 cleanup). Safe to apply.
+- **Upstream may remove your local patches** — e.g., `⚠️ Known Gotchas (workspace-validated)` was added to `spark-declarative-pipelines/SKILL.md` locally but doesn't exist upstream. A sync will overwrite it. Keep interview-specific gotchas in `CLAUDE.md` (primary) and skill files (secondary).
+- **`install_skills.sh` targets `.claude/skills/`** — the upstream installer writes to `.claude/skills/` (Claude Code convention). Our project uses `.agents/skills/`. The Python sync script handles this correctly.
+- **Upstream is active** — ~10+ commits/week to `databricks-skills/`. Check before interview day.
+- **`databricks-bundles` upstream reverted our serverless additions** — upstream `SKILL.md` is now +4/-35 vs local (removed serverless notebook task section and `--only` flag gotcha that we added). Keep local version or re-apply after sync.
 
 ---
 
@@ -434,23 +508,55 @@ databricks workspace import TARGET_PATH /local/file.py
 
 Skills load on-demand with full patterns, gotchas, and code templates. **Always read the relevant SKILL.md before building that component.**
 
+### ⚠️ CONFLICT RESOLUTION (2026-03-24) — CANONICAL ROUTING
+
+**3 major skill conflicts have been resolved.** See `SKILLS_CONFLICT_RESOLUTION.md` for full details.
+
+| Conflict | Resolution | Always Use | Never Use |
+|----------|-----------|-----------|-----------|
+| Data generation for interviews | `spark.range()` is canonical for speed | `.pi/skills/spark-native-bronze/SKILL.md` | `databricks-synthetic-data-gen` (production only) |
+| Data generation for production | Faker + Pandas UDFs for realistic data | `.agents/skills/synthetic-data-generation/SKILL.md` | N/A |
+| Bundle configuration naming | "Declarative Automation Bundles" (2026+) | `.agents/skills/databricks-bundles/SKILL.md` | ❌ `.agents/skills/asset-bundles/SKILL.md` (DEPRECATED) |
+
+**Decision tree for routing:**
+- **Interview mode** (default for ambiguous prompts) → Use `spark-native-bronze` + `repo-best-practices`
+- **Production mode** (user asks for "realistic data" or "Faker") → Use `databricks-synthetic-data-gen`
+- **Bundle/DAB task** (any) → Use `databricks-bundles` ONLY (not `asset-bundles`)
+
+---
+
+### Interview Mode (Speed Focus) — Invoke These
+
 | Interview Task | Skill to Read |
 |---|---|
 | **Project scaffold (ALWAYS FIRST)** | `.pi/skills/repo-best-practices/SKILL.md` |
 | **Synthetic data + Bronze + SDP + Dashboard + Bundle** | `.pi/skills/spark-native-bronze/SKILL.md` + `sdp-and-dashboard-patterns.md` |
 | **SDP / Lakeflow pipelines** | `.agents/skills/spark-declarative-pipelines/SKILL.md` |
 | **AI/BI Dashboard** | `.agents/skills/databricks-aibi-dashboards/SKILL.md` |
-| **DBSQL / SQL features** | `.agents/skills/databricks-dbsql/SKILL.md` |
-| **Unity Catalog / Volumes** | `.agents/skills/databricks-unity-catalog/SKILL.md` |
-| **Structured Streaming** | `.agents/skills/databricks-spark-structured-streaming/SKILL.md` |
-| **Jobs / Workflows** | `.agents/skills/databricks-jobs/SKILL.md` |
-| **Asset Bundles (CI/CD)** | `.agents/skills/databricks-bundles/SKILL.md` (preferred, Jan 2026) or `.agents/skills/asset-bundles/SKILL.md` |
-| **AI Functions (ai_classify, ai_extract, ai_forecast, ai_query, ai_gen, ai_mask etc.)** | `.agents/skills/databricks-ai-functions/SKILL.md` |
-| **Genie Spaces** | `.agents/skills/databricks-genie/SKILL.md` + `sdp-and-dashboard-patterns.md` #42-59 |
-| **Model Serving** | `.agents/skills/model-serving/SKILL.md` |
-| **Vector Search** | `.agents/skills/databricks-vector-search/SKILL.md` |
-| **SA knowledge base** | `.pi/skills/databricks-sa/SKILL.md` |
-| **Databricks docs lookup** | `.agents/skills/databricks-docs/SKILL.md` |
+| **Bundles / Declarative Automation** | `.agents/skills/databricks-bundles/SKILL.md` ✅ (2026+) |
+| **Genie Spaces (SQL exploration)** | `.agents/skills/databricks-genie/SKILL.md` + `sdp-and-dashboard-patterns.md` #42-59 |
+
+### Production Mode (Realism Focus) — Invoke These
+
+| Production Task | Skill to Read |
+|---|---|
+| **Realistic synthetic data (Faker + names/addresses)** | `.agents/skills/synthetic-data-generation/SKILL.md` |
+| **DBSQL / SQL features (stored procedures, geospatial, ai_query)** | `.agents/skills/databricks-dbsql/SKILL.md` |
+| **Structured Streaming (Kafka, CDC, stateful ops)** | `.agents/skills/databricks-spark-structured-streaming/SKILL.md` |
+| **Vector Search / RAG** | `.agents/skills/databricks-vector-search/SKILL.md` |
+| **Model Serving / LLM endpoints** | `.agents/skills/model-serving/SKILL.md` |
+| **MLflow Tracing / Observability** | `.agents/skills/instrumenting-with-mlflow-tracing/SKILL.md` |
+| **Agent Bricks (Knowledge Assistants, Supervisor Agents)** | `.agents/skills/databricks-agent-bricks/SKILL.md` |
+
+### Shared Skills (Interview + Production)
+
+| Task | Skill to Read |
+|---|---|
+| **Unity Catalog / Volumes / System Tables** | `.agents/skills/databricks-unity-catalog/SKILL.md` |
+| **Jobs / Workflows / Scheduling** | `.agents/skills/databricks-jobs/SKILL.md` |
+| **AI Functions (ai_classify, ai_extract, ai_summarize, ai_gen, etc.)** | `.agents/skills/databricks-ai-functions/SKILL.md` |
+| **SA knowledge base (DW architecture, FinServ, design patterns)** | `.pi/skills/databricks-sa/SKILL.md` |
+| **Databricks docs / API reference lookup** | `.agents/skills/databricks-docs/SKILL.md` |
 
 ---
 
@@ -575,6 +681,17 @@ DESCRIBE HISTORY dbx_weg.silver.{table} LIMIT 5;
 │   │   └── architecture.md      # Mermaid + design decisions
 │   └── tests/
 │       └── README.md
+│
+├── scripts/
+│   ├── sync-skills.py           # Skills sync engine (Python 3.9+)
+│   └── sync-skills.sh           # Shell wrapper → delegates to .py
+│
+├── .github/
+│   └── workflows/
+│       └── check-skills-updates.yml  # Daily skills update check (→ GitHub Issue)
+│
+├── .agents/skills/              # Upstream skills (synced from ai-dev-kit + mlflow/skills + apx)
+├── .pi/skills/                  # Local interview skills (repo-best-practices, spark-native-bronze, databricks-sa)
 │
 ├── notebooks/                   # Legacy / scratch notebooks
 ├── src/                         # Legacy pipeline code
